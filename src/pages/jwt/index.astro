@@ -1,0 +1,257 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import HowToSection from '../../components/seo/HowToSection.astro';
+import FaqSection from '../../components/seo/FaqSection.astro';
+import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
+import { tools } from '../../lib/tool-registry';
+
+const tool = tools.find(t => t.id === 'jwt-decoder')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="space-y-6">
+    
+    <!-- Input Section -->
+    <div class="flex flex-col h-[200px]">
+      <div class="flex justify-between items-center mb-2 px-1">
+        <label for="jwtInput" class="text-sm font-semibold text-text-primary">Encoded JWT</label>
+        <button id="clearBtn" class="text-xs text-text-muted hover:text-error transition-colors font-medium">Clear</button>
+      </div>
+      <!-- Token Coloring Overlay -->
+      <div class="relative flex-1 bg-surface/50 border border-border-subtle rounded-xl overflow-hidden font-mono text-sm leading-relaxed transition-colors focus-within:border-accent">
+        <div id="jwtColorized" class="absolute inset-0 p-4 whitespace-pre-wrap break-all pointer-events-none overflow-hidden select-none"></div>
+        <textarea 
+          id="jwtInput" 
+          class="absolute inset-0 w-full h-full bg-transparent border-none p-4 text-transparent resize-none focus:ring-0 m-0 z-10 caret-text-primary break-all"
+          placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI..."
+          spellcheck="false"
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Error Banner -->
+    <div id="errorBanner" class="hidden bg-error/10 border border-error/30 text-error px-4 py-3 rounded-lg text-sm flex items-start gap-3 animate-fade-in-down">
+      <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      <div>
+        <strong class="block font-semibold mb-1">Invalid Token</strong>
+        <span id="errorMessage"></span>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div id="resultsPanel" class="hidden flex flex-col lg:flex-row gap-6">
+      
+      <!-- Decoded Data -->
+      <div class="flex-1 space-y-6">
+        
+        <!-- Header -->
+        <div class="bg-surface border border-error/50 rounded-xl overflow-hidden shadow-sm">
+          <div class="bg-error/10 px-4 py-2 border-b border-error/20 flex justify-between items-center">
+            <span class="text-xs font-bold uppercase tracking-wider text-error">Header <span class="font-normal opacity-75 ml-1">Algorithm & Token Type</span></span>
+          </div>
+          <div class="p-4">
+            <pre id="headerOutput" class="text-sm font-mono text-text-primary m-0 whitespace-pre-wrap"></pre>
+          </div>
+        </div>
+
+        <!-- Payload -->
+        <div class="bg-surface border border-accent/50 rounded-xl overflow-hidden shadow-sm">
+          <div class="bg-accent/10 px-4 py-2 border-b border-accent/20 flex justify-between items-center">
+            <span class="text-xs font-bold uppercase tracking-wider text-accent">Payload <span class="font-normal opacity-75 ml-1">Data</span></span>
+            <span id="expiryBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider"></span>
+          </div>
+          <div class="p-4">
+            <pre id="payloadOutput" class="text-sm font-mono text-text-primary m-0 whitespace-pre-wrap"></pre>
+          </div>
+        </div>
+
+        <!-- Signature -->
+        <div class="bg-surface border border-info/50 rounded-xl overflow-hidden shadow-sm">
+          <div class="bg-info/10 px-4 py-2 border-b border-info/20 flex justify-between items-center">
+            <span class="text-xs font-bold uppercase tracking-wider text-info">Signature <span class="font-normal opacity-75 ml-1">Verify</span></span>
+          </div>
+          <div class="p-4">
+            <p class="text-xs text-text-muted mb-2">Note: This tool is a decoder only. It does not verify signatures against a secret key.</p>
+            <div id="signatureOutput" class="font-mono text-sm text-text-secondary break-all"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <Fragment slot="content">
+    <HowToSection 
+      title="How to Decode a JWT"
+      steps={[
+        {
+          name: "Paste Your Token",
+          text: "Copy your JSON Web Token (usually starting with eyJ) and paste it into the input box.",
+          description: "Copy your JSON Web Token (usually starting with <code>eyJ</code>) and paste it into the input box."
+        },
+        {
+          name: "View the Color-Coded Segments",
+          text: "The tool automatically splits the token into its three distinct parts: Header (Red), Payload (Purple), and Signature (Blue).",
+          description: "The tool automatically splits the token into its three distinct parts: Header (Red), Payload (Purple), and Signature (Blue)."
+        },
+        {
+          name: "Inspect Claims",
+          text: "Scroll down to see the decoded JSON representation of the Header and Payload. You can easily read claims like the user ID or roles.",
+          description: "Scroll down to see the decoded JSON representation of the Header and Payload. You can easily read claims like the user ID or roles."
+        },
+        {
+          name: "Check Expiration",
+          text: "If the token has an exp (expiration) claim, the tool will automatically calculate if the token is still valid or if it has expired.",
+          description: "If the token has an <code>exp</code> (expiration) claim, the tool will automatically calculate if the token is still valid or if it has expired."
+        }
+      ]}
+    />
+    <TechnicalExplainer 
+      title="Anatomy of a JSON Web Token"
+      sections={[
+        {
+          title: "1. Header (JOSE Header)",
+          content: "The header typically consists of two parts: the type of the token, which is JWT, and the signing algorithm being used, such as HMAC SHA256 (HS256) or RSA (RS256). It is Base64Url encoded to form the first part of the JWT."
+        },
+        {
+          title: "2. Payload (Claims)",
+          content: "The second part of the token is the payload, which contains the claims. Claims are statements about an entity (typically, the user) and additional data. There are standard Registered Claims like <code>iss</code> (issuer), <code>exp</code> (expiration time), <code>sub</code> (subject), and <code>aud</code> (audience)."
+        },
+        {
+          title: "3. Signature",
+          content: "To create the signature part you have to take the encoded header, the encoded payload, a secret, the algorithm specified in the header, and sign that. The signature is used to verify the message wasn't changed along the way."
+        }
+      ]}
+    />
+    <FaqSection 
+      faqs={[
+        {
+          question: "Is it safe to paste my JWT here?",
+          text: "Yes. This tool is 100% client-side. The JWT decoding happens entirely within your browser using JavaScript. Your token is never sent over the internet or saved to any server.",
+          answer: "Yes. This tool is 100% client-side. The JWT decoding happens entirely within your browser using JavaScript. Your token is never sent over the internet or saved to any server."
+        },
+        {
+          question: "Does this tool verify the signature?",
+          text: "No. This tool is purely a 'Decoder'. It decodes the Base64Url encoded JSON to make it readable. Verifying a signature requires the backend server's private 'secret key', which you should never paste into a public website.",
+          answer: "No. This tool is purely a 'Decoder'. It decodes the Base64Url encoded JSON to make it readable. Verifying a signature requires the backend server's private 'secret key', which you should never paste into a public website."
+        },
+        {
+          question: "Why can anyone decode my JWT without a password?",
+          text: "By design, the Header and Payload of a JWT are only Base64 encoded, not encrypted. Anyone who intercepts a JWT can read its contents. Therefore, you must never put sensitive data (like passwords or credit card numbers) inside a JWT payload.",
+          answer: "By design, the Header and Payload of a JWT are only Base64 encoded, not <em>encrypted</em>. Anyone who intercepts a JWT can read its contents. Therefore, you must <strong>never</strong> put sensitive data (like passwords or credit card numbers) inside a JWT payload."
+        }
+      ]}
+    />
+  </Fragment>
+
+  <script>
+    import { decodeJwt } from '../../tools/jwt-decoder';
+
+    const jwtInput = document.getElementById('jwtInput') as HTMLTextAreaElement;
+    const jwtColorized = document.getElementById('jwtColorized')!;
+    const clearBtn = document.getElementById('clearBtn')!;
+    
+    const errorBanner = document.getElementById('errorBanner')!;
+    const errorMessage = document.getElementById('errorMessage')!;
+    const resultsPanel = document.getElementById('resultsPanel')!;
+    
+    const headerOutput = document.getElementById('headerOutput')!;
+    const payloadOutput = document.getElementById('payloadOutput')!;
+    const signatureOutput = document.getElementById('signatureOutput')!;
+    const expiryBadge = document.getElementById('expiryBadge')!;
+
+    // Sync scroll for the colorizer
+    jwtInput.addEventListener('scroll', () => {
+      jwtColorized.scrollTop = jwtInput.scrollTop;
+    });
+
+    function escapeHtml(str: string): string {
+      return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function processToken() {
+      const val = jwtInput.value.trim();
+      
+      if (!val) {
+        jwtColorized.innerHTML = '';
+        errorBanner.classList.add('hidden');
+        resultsPanel.classList.add('hidden');
+        return;
+      }
+
+      // Colorize the input
+      const parts = val.split('.');
+      if (parts.length === 3) {
+        jwtColorized.innerHTML = `
+          <span class="text-error font-semibold">${escapeHtml(parts[0])}</span><span class="text-text-primary">.</span><span class="text-accent font-semibold">${escapeHtml(parts[1])}</span><span class="text-text-primary">.</span><span class="text-info font-semibold">${escapeHtml(parts[2])}</span>
+        `;
+      } else {
+        jwtColorized.innerHTML = `<span class="text-text-primary">${escapeHtml(val)}</span>`;
+      }
+
+      const res = decodeJwt(val);
+
+      if (!res.isValid) {
+        errorBanner.classList.remove('hidden');
+        errorMessage.textContent = res.error || 'Invalid token';
+        resultsPanel.classList.add('hidden');
+        return;
+      }
+
+      errorBanner.classList.add('hidden');
+      resultsPanel.classList.remove('hidden');
+
+      // Populate data
+      headerOutput.textContent = JSON.stringify(res.header, null, 2);
+      
+      // Inject comments for standard claims if possible
+      let payloadJson = JSON.stringify(res.payload, null, 2);
+      
+      payloadOutput.textContent = payloadJson;
+      signatureOutput.textContent = res.signature;
+
+      // Handle Expiry
+      if (res.payload.exp) {
+        if (res.isExpired) {
+          expiryBadge.textContent = 'Expired';
+          expiryBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-error/20 text-error';
+          
+          // Annotate payload
+          payloadOutput.innerHTML = payloadOutput.textContent!.replace(
+            `"exp": ${res.payload.exp}`, 
+            `"exp": ${res.payload.exp} <span class="text-error text-xs italic">// Expired ${res.expiresIn} ago</span>`
+          );
+        } else {
+          expiryBadge.textContent = 'Valid';
+          expiryBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-success/20 text-success';
+          
+          payloadOutput.innerHTML = payloadOutput.textContent!.replace(
+            `"exp": ${res.payload.exp}`, 
+            `"exp": ${res.payload.exp} <span class="text-success text-xs italic">// Expires in ${res.expiresIn}</span>`
+          );
+        }
+      } else {
+        expiryBadge.textContent = '';
+        expiryBadge.className = 'hidden';
+      }
+      
+      // Add comments for other common claims
+      if (res.payload.iat) {
+        const d = new Date(res.payload.iat * 1000).toLocaleString();
+        payloadOutput.innerHTML = payloadOutput.innerHTML.replace(
+          `"iat": ${res.payload.iat}`, 
+          `"iat": ${res.payload.iat} <span class="text-text-muted text-xs italic">// Issued at: ${d}</span>`
+        );
+      }
+    }
+
+    jwtInput.addEventListener('input', processToken);
+
+    clearBtn.addEventListener('click', () => {
+      jwtInput.value = '';
+      processToken();
+      jwtInput.focus();
+    });
+
+  </script>
+</ToolLayout>

@@ -3,6 +3,7 @@ import HubLayout from '../layouts/HubLayout.astro';
 import { tools } from '../lib/tool-registry';
 
 const featuredTools = tools.filter(t => t.featured);
+const stableTools = tools.filter(t => t.status === 'stable');
 
 const categories = tools.reduce((acc, tool) => {
   if (!acc[tool.category]) {
@@ -12,7 +13,7 @@ const categories = tools.reduce((acc, tool) => {
   return acc;
 }, {} as Record<string, typeof tools>);
 
-const categoryOrder = ['converters', 'formatters', 'dev-tools', 'generators', 'encoders', 'text-tools'];
+const categoryOrder = ['converters', 'formatters', 'dev-tools', 'generators', 'encoders', 'text-tools', 'cleaners'];
 const sortedCategories = Object.keys(categories).sort((a, b) => {
   return categoryOrder.indexOf(a) - categoryOrder.indexOf(b);
 });
@@ -20,39 +21,73 @@ const sortedCategories = Object.keys(categories).sort((a, b) => {
 
 <HubLayout title="MyToolboxHub — Developer Utility Suite" description="Your premium, blazing-fast developer utility suite. Client-side, secure, and built for performance.">
   <!-- Hero Section -->
-  <section class="relative py-24 sm:py-32 overflow-hidden border-b border-border-subtle">
-    <div class="absolute inset-0 bg-void">
-      <!-- Glow effect -->
-      <div class="absolute -top-48 left-1/2 -translate-x-1/2 w-full max-w-3xl h-96 bg-accent/20 blur-[120px] rounded-full pointer-events-none"></div>
-    </div>
+  <section class="relative min-h-[85vh] flex items-center justify-center overflow-hidden border-b border-border-subtle" id="heroSection">
     
-    <div class="relative max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-      <h1 class="text-4xl sm:text-6xl font-bold tracking-tight text-text-primary mb-6">
-        Your Developer Toolbox, <span class="text-accent">Online.</span>
+    <!-- Animated Canvas Background -->
+    <canvas id="heroCanvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+
+    <!-- Accent Glow Orbs -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden">
+      <div class="absolute -top-32 left-1/4 w-[600px] h-[600px] bg-accent/8 rounded-full blur-[150px] animate-pulse-slow"></div>
+      <div class="absolute -bottom-48 right-1/4 w-[500px] h-[500px] bg-accent/6 rounded-full blur-[130px] animate-pulse-slow" style="animation-delay: 2s;"></div>
+    </div>
+
+    <!-- Grid overlay -->
+    <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px); background-size: 60px 60px;"></div>
+
+    <!-- Content -->
+    <div class="relative z-10 max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      
+      <!-- Eyebrow -->
+      <div class="inline-flex items-center gap-2 bg-surface/40 backdrop-blur-sm border border-border-subtle rounded-full px-4 py-1.5 mb-8 animate-fade-in-down" style="animation-delay: 0.1s;">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-accent"></span>
+        </span>
+        <span class="text-xs font-medium text-text-secondary tracking-wide">{stableTools.length} tools live — 100% client-side</span>
+      </div>
+
+      <!-- Headline -->
+      <h1 class="hero-title text-5xl sm:text-7xl lg:text-8xl font-bold tracking-tighter text-text-primary mb-6 leading-[0.9]">
+        <span class="block animate-fade-in-up" style="animation-delay: 0.2s;">Your Developer</span>
+        <span class="block animate-fade-in-up" style="animation-delay: 0.35s;">Toolbox, <span class="text-accent relative inline-block">Online<span class="absolute -bottom-2 left-0 w-full h-[3px] bg-accent/60 rounded-full"></span></span></span>
       </h1>
-      <p class="text-xl text-text-secondary max-w-2xl mx-auto mb-10">
-        Blazing fast, privacy-first, client-side tools designed for modern developers. Zero friction.
+
+      <!-- Subtitle -->
+      <p class="text-lg sm:text-xl text-text-secondary max-w-2xl mx-auto mb-12 animate-fade-in-up leading-relaxed" style="animation-delay: 0.5s;">
+        Blazing fast, privacy-first utilities designed for modern developers.<br class="hidden sm:inline" /> Zero friction. Zero dependencies. Zero data leaves your browser.
       </p>
       
-      <!-- Search Bar -->
-      <div class="max-w-xl mx-auto relative group">
-        <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-          <svg class="w-5 h-5 text-text-muted group-focus-within:text-accent transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <!-- CTA Row -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up" style="animation-delay: 0.65s;">
+        <button 
+          id="heroSearchBtn" 
+          class="group flex items-center gap-3 px-6 py-3.5 bg-accent text-void font-bold rounded-xl hover:bg-accent-hover transition-all shadow-lg shadow-accent/20 hover:shadow-accent/40 hover:-translate-y-0.5 focus-glow"
+        >
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-        </div>
-        <input 
-          type="text" 
-          placeholder="Search for tools (e.g., JSON to CSV, Base64)..." 
-          class="w-full bg-surface/50 border border-border-strong rounded-full py-4 pl-12 pr-4 text-text-primary placeholder:text-text-muted focus-glow backdrop-blur-sm transition-all"
-        >
-        <div class="absolute inset-y-0 right-4 flex items-center">
-          <kbd class="hidden sm:inline-flex items-center gap-1 font-sans text-xs bg-base border border-border-default px-2 py-1 rounded text-text-secondary">
-            ⌘K
-          </kbd>
+          Search Tools
+          <kbd class="hidden sm:inline-flex items-center text-[10px] bg-void/20 px-1.5 py-0.5 rounded font-mono font-normal">⌘K</kbd>
+        </button>
+        <a href="#directory" class="flex items-center gap-2 px-6 py-3.5 text-text-secondary font-medium rounded-xl border border-border-subtle hover:border-border-default hover:text-text-primary hover:bg-surface/50 transition-all">
+          Browse All Tools
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </a>
+      </div>
+
+      <!-- Scroll indicator -->
+      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce hidden md:block" style="animation-delay: 1.5s;">
+        <div class="w-6 h-10 rounded-full border-2 border-border-default flex items-start justify-center p-1.5">
+          <div class="w-1.5 h-3 rounded-full bg-text-muted animate-scroll-dot"></div>
         </div>
       </div>
     </div>
+
+    <!-- Mouse-tracking glow -->
+    <div id="mouseGlow" class="absolute w-[500px] h-[500px] rounded-full pointer-events-none opacity-0 transition-opacity duration-500" style="background: radial-gradient(circle, rgba(var(--color-accent-rgb, 99, 102, 241), 0.08), transparent 70%); transform: translate(-50%, -50%);"></div>
   </section>
 
   <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full space-y-24">
@@ -73,7 +108,6 @@ const sortedCategories = Object.keys(categories).sort((a, b) => {
             <div class="absolute top-0 left-0 w-full h-1 bg-accent transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
             <div class="flex items-start justify-between mb-4">
               <div class="bg-surface border border-border-subtle p-3 rounded-xl group-hover:bg-accent/10 transition-colors">
-                <!-- Icon Placeholder -->
                 <svg class="w-6 h-6 text-text-primary group-hover:text-accent transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
@@ -90,7 +124,7 @@ const sortedCategories = Object.keys(categories).sort((a, b) => {
     </section>
 
     <!-- All Tools by Category -->
-    <section>
+    <section id="directory">
       <h2 class="text-2xl font-bold text-text-primary mb-12">All Tools Directory</h2>
       <div class="space-y-16">
         {sortedCategories.map(category => (
@@ -117,4 +151,228 @@ const sortedCategories = Object.keys(categories).sort((a, b) => {
       </div>
     </section>
   </div>
+
+  <!-- Hero Canvas Animation -->
+  <script>
+    // Wire up hero search button to the global search modal
+    const heroSearchBtn = document.getElementById('heroSearchBtn');
+    if (heroSearchBtn) {
+      heroSearchBtn.addEventListener('click', () => {
+        // Trigger Cmd+K programmatically to open search modal
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, ctrlKey: true, bubbles: true }));
+      });
+    }
+
+    // Mouse tracking glow
+    const heroSection = document.getElementById('heroSection');
+    const mouseGlow = document.getElementById('mouseGlow');
+    if (heroSection && mouseGlow) {
+      heroSection.addEventListener('mousemove', (e) => {
+        const rect = heroSection.getBoundingClientRect();
+        mouseGlow.style.left = (e.clientX - rect.left) + 'px';
+        mouseGlow.style.top = (e.clientY - rect.top) + 'px';
+        mouseGlow.style.opacity = '1';
+      });
+      heroSection.addEventListener('mouseleave', () => {
+        mouseGlow.style.opacity = '0';
+      });
+    }
+
+    // Particle Grid Canvas (inspired by fabric.vc mesh)
+    const canvas = document.getElementById('heroCanvas') as HTMLCanvasElement;
+    if (canvas) {
+      const ctx = canvas.getContext('2d')!;
+      let animId: number;
+      let mouse = { x: -9999, y: -9999 };
+      
+      interface Point {
+        x: number;
+        y: number;
+        baseX: number;
+        baseY: number;
+        vx: number;
+        vy: number;
+      }
+      
+      let points: Point[] = [];
+      let cols = 0;
+      let rows = 0;
+      const spacing = 50;
+      const interactionRadius = 120;
+      const returnForce = 0.04;
+      const friction = 0.85;
+
+      function resize() {
+        canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+        canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        initGrid();
+      }
+
+      function initGrid() {
+        const w = canvas.offsetWidth;
+        const h = canvas.offsetHeight;
+        cols = Math.ceil(w / spacing) + 1;
+        rows = Math.ceil(h / spacing) + 1;
+        points = [];
+
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            points.push({
+              x: c * spacing,
+              y: r * spacing,
+              baseX: c * spacing,
+              baseY: r * spacing,
+              vx: 0,
+              vy: 0,
+            });
+          }
+        }
+      }
+
+      function getIdx(r: number, c: number) {
+        if (r < 0 || r >= rows || c < 0 || c >= cols) return -1;
+        return r * cols + c;
+      }
+
+      function draw() {
+        const w = canvas.offsetWidth;
+        const h = canvas.offsetHeight;
+        ctx.clearRect(0, 0, w, h);
+
+        // Update points
+        for (const p of points) {
+          // Mouse repulsion
+          const dx = p.x - mouse.x;
+          const dy = p.y - mouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          if (dist < interactionRadius && dist > 0) {
+            const force = (1 - dist / interactionRadius) * 3;
+            p.vx += (dx / dist) * force;
+            p.vy += (dy / dist) * force;
+          }
+
+          // Return to base
+          p.vx += (p.baseX - p.x) * returnForce;
+          p.vy += (p.baseY - p.y) * returnForce;
+
+          p.vx *= friction;
+          p.vy *= friction;
+
+          p.x += p.vx;
+          p.y += p.vy;
+        }
+
+        // Draw connections
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const idx = getIdx(r, c);
+            if (idx === -1) continue;
+            const p = points[idx];
+
+            // Calculate displacement for opacity
+            const dispX = p.x - p.baseX;
+            const dispY = p.y - p.baseY;
+            const displacement = Math.sqrt(dispX * dispX + dispY * dispY);
+            const baseAlpha = 0.06;
+            const activeAlpha = Math.min(0.35, baseAlpha + displacement * 0.012);
+
+            // Right neighbor
+            const rIdx = getIdx(r, c + 1);
+            if (rIdx !== -1) {
+              const rp = points[rIdx];
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(rp.x, rp.y);
+              ctx.strokeStyle = `rgba(255, 255, 255, ${activeAlpha})`;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+
+            // Bottom neighbor
+            const bIdx = getIdx(r + 1, c);
+            if (bIdx !== -1) {
+              const bp = points[bIdx];
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(bp.x, bp.y);
+              ctx.strokeStyle = `rgba(255, 255, 255, ${activeAlpha})`;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+
+            // Draw node dot
+            const dotAlpha = Math.min(0.5, 0.1 + displacement * 0.02);
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 1.2 + displacement * 0.04, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 255, 255, ${dotAlpha})`;
+            ctx.fill();
+          }
+        }
+
+        animId = requestAnimationFrame(draw);
+      }
+
+      // Mouse events
+      const heroSect = document.getElementById('heroSection')!;
+      heroSect.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+      });
+      heroSect.addEventListener('mouseleave', () => {
+        mouse.x = -9999;
+        mouse.y = -9999;
+      });
+
+      // Init
+      window.addEventListener('resize', resize);
+      resize();
+      draw();
+
+      // Cleanup on navigation
+      document.addEventListener('astro:before-preparation', () => {
+        cancelAnimationFrame(animId);
+      });
+    }
+  </script>
+
+  <style>
+    @keyframes fade-in-up {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fade-in-down {
+      from { opacity: 0; transform: translateY(-12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes scroll-dot {
+      0%, 100% { opacity: 0; transform: translateY(0); }
+      50% { opacity: 1; transform: translateY(6px); }
+    }
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 0.6; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+
+    .animate-fade-in-up {
+      opacity: 0;
+      animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .animate-fade-in-down {
+      opacity: 0;
+      animation: fade-in-down 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .animate-scroll-dot {
+      animation: scroll-dot 2s ease-in-out infinite;
+    }
+    .animate-pulse-slow {
+      animation: pulse-slow 6s ease-in-out infinite;
+    }
+
+    .hero-title {
+      letter-spacing: -0.04em;
+    }
+  </style>
 </HubLayout>

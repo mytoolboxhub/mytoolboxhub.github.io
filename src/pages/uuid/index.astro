@@ -1,0 +1,206 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import HowToSection from '../../components/seo/HowToSection.astro';
+import FaqSection from '../../components/seo/FaqSection.astro';
+import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
+import { tools } from '../../lib/tool-registry';
+
+const tool = tools.find(t => t.id === 'uuid-generator')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="space-y-6">
+    <!-- Controls -->
+    <div class="glass p-6 flex flex-col sm:flex-row gap-6 items-start sm:items-end justify-between">
+      <div class="flex flex-wrap items-center gap-6">
+        
+        <div class="flex flex-col gap-2">
+          <label for="uuidCount" class="text-sm font-medium text-text-secondary">Number of UUIDs</label>
+          <div class="flex items-center gap-2">
+            <input 
+              type="range" 
+              id="uuidCountSlider" 
+              min="1" 
+              max="100" 
+              value="10" 
+              class="w-32 h-2 bg-surface rounded-lg appearance-none cursor-pointer accent-accent"
+            />
+            <input 
+              type="number" 
+              id="uuidCount" 
+              min="1" 
+              max="1000" 
+              value="10" 
+              class="w-20 bg-surface border border-border-default rounded-md px-2 py-1 text-sm text-text-primary focus-glow text-center"
+            />
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <span class="text-sm font-medium text-text-secondary">Options</span>
+          <div class="flex gap-4">
+            <div class="flex items-center gap-2">
+              <input type="checkbox" id="uppercaseCb" class="w-4 h-4 rounded border-border-default bg-surface text-accent focus-glow" />
+              <label for="uppercaseCb" class="text-sm text-text-primary">Uppercase</label>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="checkbox" id="noHyphensCb" class="w-4 h-4 rounded border-border-default bg-surface text-accent focus-glow" />
+              <label for="noHyphensCb" class="text-sm text-text-primary">No Hyphens</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button id="generateBtn" class="px-6 py-2.5 bg-accent text-void font-bold text-sm rounded-lg hover:bg-accent-hover transition-colors focus-glow flex items-center gap-2 shadow-lg shadow-accent/20">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+        Generate
+      </button>
+    </div>
+
+    <!-- Output Panel -->
+    <div class="flex flex-col">
+      <div class="flex justify-between items-center mb-2 px-1">
+        <label for="output" class="text-sm font-semibold text-text-primary">Generated UUIDs (Version 4)</label>
+        <div class="flex gap-3 items-center">
+          <button id="copyBtn" class="text-xs text-accent hover:text-accent-hover transition-colors flex items-center gap-1 font-medium">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+            Copy All
+          </button>
+          <button id="downloadBtn" class="text-xs text-accent hover:text-accent-hover transition-colors flex items-center gap-1 font-medium">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+            Download
+          </button>
+        </div>
+      </div>
+      <textarea 
+        id="output" 
+        class="min-h-[400px] w-full bg-void border border-border-subtle rounded-xl p-4 font-mono text-sm text-text-secondary resize-y focus-glow leading-relaxed tracking-wider"
+        placeholder="UUIDs will appear here..."
+        readonly
+      ></textarea>
+    </div>
+  </div>
+
+  <Fragment slot="content">
+    <HowToSection 
+      title="How to Generate UUIDs/GUIDs"
+      steps={[
+        {
+          name: "Choose the Quantity",
+          text: "Use the slider or input box to select how many UUIDs you want to generate (up to 1,000 at a time).",
+          description: "Use the slider or input box to select how many UUIDs you want to generate (up to 1,000 at a time)."
+        },
+        {
+          name: "Customize Formatting",
+          text: "Toggle 'Uppercase' if you need the letters capitalized. Toggle 'No Hyphens' if you need a contiguous 32-character hex string without dashes.",
+          description: "Toggle <strong>Uppercase</strong> if you need the letters capitalized. Toggle <strong>No Hyphens</strong> if you need a contiguous 32-character hex string without dashes."
+        },
+        {
+          name: "Generate",
+          text: "Click the Generate button. The UUIDs are created instantly using your browser's secure cryptography API.",
+          description: "Click the <strong>Generate</strong> button. The UUIDs are created instantly using your browser's secure cryptography API."
+        },
+        {
+          name: "Copy or Download",
+          text: "Use the Copy All button to copy the entire list to your clipboard, or Download to save them as a text file.",
+          description: "Use the <strong>Copy All</strong> button to copy the entire list to your clipboard, or <strong>Download</strong> to save them as a text file."
+        }
+      ]}
+    />
+    <TechnicalExplainer 
+      title="Understanding UUIDs (Universally Unique Identifiers)"
+      sections={[
+        {
+          title: "What is a UUID?",
+          content: "A UUID (Universally Unique Identifier), also known as a GUID (Globally Unique Identifier) in the Microsoft ecosystem, is a 128-bit label used for information in computer systems. When generated according to standard methods, UUIDs are for practical purposes unique, without depending on a central registration authority."
+        },
+        {
+          title: "What is a Version 4 UUID?",
+          content: "Version 4 UUIDs are generated using entirely random or pseudo-random numbers. Out of the 128 bits, 6 bits are reserved to indicate the version and variant, leaving 122 bits of randomness. This results in 2<sup>122</sup> (or 5.3 × 10<sup>36</sup>) possible UUIDs. The chances of a collision (generating the exact same UUID twice) are astronomically small."
+        },
+        {
+          title: "Anatomy of a UUID",
+          content: "A standard UUID string contains 32 hexadecimal digits displayed in five groups separated by hyphens, in the form <code>8-4-4-4-12</code> for a total of 36 characters (32 alphanumeric characters and 4 hyphens). Example: <code>123e4567-e89b-12d3-a456-426614174000</code>."
+        }
+      ]}
+    />
+    <FaqSection 
+      faqs={[
+        {
+          question: "Are these UUIDs really unique?",
+          text: "Yes. While theoretically possible to generate a duplicate, the probability is so close to zero that it is safely ignored. To put it in perspective, you would need to generate 1 billion UUIDs every second for 85 years to have a 50% chance of a single collision.",
+          answer: "Yes. While theoretically possible to generate a duplicate, the probability is so close to zero that it is safely ignored. To put it in perspective, you would need to generate 1 billion UUIDs every second for 85 years to have a 50% chance of a single collision."
+        },
+        {
+          question: "How are they generated?",
+          text: "This tool uses the Crypto.randomUUID() method available in modern browsers, which relies on a cryptographically secure pseudorandom number generator (CSPRNG) built into your operating system.",
+          answer: "This tool uses the <code>Crypto.randomUUID()</code> method available in modern browsers, which relies on a cryptographically secure pseudorandom number generator (CSPRNG) built into your operating system."
+        },
+        {
+          question: "Is it safe to use these for database primary keys?",
+          text: "Yes. v4 UUIDs are widely used as database primary keys, especially in distributed systems where auto-incrementing integers are impractical. However, be aware that their randomness can cause fragmentation in some index structures (like B-trees) compared to sequential IDs.",
+          answer: "Yes. v4 UUIDs are widely used as database primary keys, especially in distributed systems where auto-incrementing integers are impractical. However, be aware that their randomness can cause fragmentation in some index structures (like B-trees) compared to sequential IDs."
+        }
+      ]}
+    />
+  </Fragment>
+
+  <script>
+    import { copyToClipboard } from '../../lib/clipboard';
+    import { downloadFile } from '../../lib/download';
+    import { generateUUIDs } from '../../tools/uuid-generator';
+
+    const countInput = document.getElementById('uuidCount') as HTMLInputElement;
+    const countSlider = document.getElementById('uuidCountSlider') as HTMLInputElement;
+    const uppercaseCb = document.getElementById('uppercaseCb') as HTMLInputElement;
+    const noHyphensCb = document.getElementById('noHyphensCb') as HTMLInputElement;
+    const generateBtn = document.getElementById('generateBtn')!;
+    const output = document.getElementById('output') as HTMLTextAreaElement;
+    const copyBtn = document.getElementById('copyBtn')!;
+    const downloadBtn = document.getElementById('downloadBtn')!;
+
+    // Sync slider and input
+    countSlider.addEventListener('input', () => {
+      countInput.value = countSlider.value;
+    });
+    countInput.addEventListener('input', () => {
+      let val = parseInt(countInput.value);
+      if (isNaN(val) || val < 1) val = 1;
+      if (val > 1000) val = 1000;
+      if (val <= parseInt(countSlider.max)) {
+        countSlider.value = val.toString();
+      }
+    });
+    countInput.addEventListener('change', () => {
+      let val = parseInt(countInput.value);
+      if (isNaN(val) || val < 1) countInput.value = '1';
+      if (val > 1000) countInput.value = '1000';
+    });
+
+    function processGeneration() {
+      const count = parseInt(countInput.value) || 10;
+      const uuids = generateUUIDs(count, uppercaseCb.checked, noHyphensCb.checked);
+      output.value = uuids.join('\n');
+    }
+
+    generateBtn.addEventListener('click', processGeneration);
+
+    // Initial generation
+    processGeneration();
+
+    copyBtn.addEventListener('click', () => {
+      if (output.value) {
+        copyToClipboard(output.value, copyBtn, `
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+          Copied!
+        `);
+      }
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      if (output.value) {
+        downloadFile(output.value, 'uuids.txt', 'text/plain;charset=utf-8;');
+      }
+    });
+  </script>
+</ToolLayout>

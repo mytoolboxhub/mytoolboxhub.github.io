@@ -1,0 +1,274 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import HowToSection from '../../components/seo/HowToSection.astro';
+import FaqSection from '../../components/seo/FaqSection.astro';
+import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
+import { tools } from '../../lib/tool-registry';
+
+const tool = tools.find(t => t.id === 'timestamp-converter')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="space-y-8 max-w-4xl mx-auto">
+    
+    <!-- Current Time Hero -->
+    <div class="glass p-8 rounded-2xl text-center relative overflow-hidden group">
+      <div class="absolute inset-0 bg-gradient-to-r from-accent/0 via-accent/5 to-accent/0 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+      <h2 class="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-2">Current Unix Timestamp</h2>
+      <div class="text-4xl sm:text-6xl font-bold text-accent font-mono mb-4 tracking-tight" id="currentTimestamp">
+        Loading...
+      </div>
+      <div class="flex justify-center gap-4 text-sm font-medium text-text-muted">
+        <button id="pauseBtn" class="hover:text-text-primary transition-colors flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <span id="pauseBtnText">Pause</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Converter Form -->
+    <div class="glass p-8 rounded-2xl">
+      <div class="flex flex-col md:flex-row gap-4 items-end mb-8">
+        <div class="flex-1 w-full">
+          <label for="inputTime" class="block text-sm font-medium text-text-secondary mb-2">
+            Enter Epoch Timestamp or Date String
+          </label>
+          <input 
+            type="text" 
+            id="inputTime" 
+            class="w-full bg-surface/50 border border-border-subtle rounded-xl px-4 py-3 font-mono text-text-primary focus-glow transition-colors text-lg"
+            placeholder="e.g. 1718365200 or 2024-06-14T12:00:00Z"
+          />
+        </div>
+        <button id="convertBtn" class="w-full md:w-auto px-6 py-3 bg-accent text-void font-bold rounded-xl hover:bg-accent-hover transition-colors focus-glow shadow-lg shadow-accent/20">
+          Convert
+        </button>
+      </div>
+
+      <!-- Error Banner -->
+      <div id="errorBanner" class="hidden mb-6 bg-error/10 border border-error/30 text-error px-4 py-3 rounded-lg text-sm flex items-start gap-3 animate-fade-in-down">
+        <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        <div>
+          <strong class="block font-semibold mb-1">Invalid Format</strong>
+          <span id="errorMessage">Could not parse the provided date or timestamp.</span>
+        </div>
+      </div>
+
+      <!-- Results Grid -->
+      <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <div class="bg-surface/50 border border-border-subtle rounded-xl p-4 flex flex-col relative group">
+          <span class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">Local Time</span>
+          <span id="resLocal" class="font-mono text-text-primary">---</span>
+          <button class="copy-res absolute top-4 right-4 opacity-0 group-hover:opacity-100 text-accent transition-opacity" data-target="resLocal">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+          </button>
+        </div>
+
+        <div class="bg-surface/50 border border-border-subtle rounded-xl p-4 flex flex-col relative group">
+          <span class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">UTC / GMT</span>
+          <span id="resUtc" class="font-mono text-text-primary">---</span>
+          <button class="copy-res absolute top-4 right-4 opacity-0 group-hover:opacity-100 text-accent transition-opacity" data-target="resUtc">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+          </button>
+        </div>
+
+        <div class="bg-surface/50 border border-border-subtle rounded-xl p-4 flex flex-col relative group">
+          <span class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">ISO 8601</span>
+          <span id="resIso" class="font-mono text-text-primary">---</span>
+          <button class="copy-res absolute top-4 right-4 opacity-0 group-hover:opacity-100 text-accent transition-opacity" data-target="resIso">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+          </button>
+        </div>
+
+        <div class="bg-surface/50 border border-border-subtle rounded-xl p-4 flex flex-col relative group">
+          <span class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">Relative</span>
+          <span id="resRelative" class="font-mono text-text-primary">---</span>
+        </div>
+
+        <div class="bg-surface/50 border border-border-subtle rounded-xl p-4 flex flex-col relative group">
+          <span class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">Epoch (Seconds)</span>
+          <span id="resSec" class="font-mono text-text-primary text-accent">---</span>
+          <button class="copy-res absolute top-4 right-4 opacity-0 group-hover:opacity-100 text-accent transition-opacity" data-target="resSec">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+          </button>
+        </div>
+
+        <div class="bg-surface/50 border border-border-subtle rounded-xl p-4 flex flex-col relative group">
+          <span class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-1">Epoch (Milliseconds)</span>
+          <span id="resMs" class="font-mono text-text-primary text-accent">---</span>
+          <button class="copy-res absolute top-4 right-4 opacity-0 group-hover:opacity-100 text-accent transition-opacity" data-target="resMs">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <Fragment slot="content">
+    <HowToSection 
+      title="How to Convert Epoch/Unix Timestamps"
+      steps={[
+        {
+          name: "Enter a Timestamp or Date",
+          text: "Type or paste a Unix timestamp (e.g., 1718365200) or a human-readable date string (e.g., 2024-06-14T12:00:00Z) into the input box.",
+          description: "Type or paste a Unix timestamp (e.g., <code>1718365200</code>) or a human-readable date string (e.g., <code>2024-06-14T12:00:00Z</code>) into the input box."
+        },
+        {
+          name: "Automatic Detection",
+          text: "Click Convert. The tool automatically detects whether you've provided seconds, milliseconds, or a formatted date string and parses it accordingly.",
+          description: "Click Convert. The tool automatically detects whether you've provided seconds, milliseconds, or a formatted date string and parses it accordingly."
+        },
+        {
+          name: "View Conversions",
+          text: "Instantly see the result converted into Local Time, UTC/GMT, ISO 8601, and relative time (e.g., '2 days ago').",
+          description: "Instantly see the result converted into Local Time, UTC/GMT, ISO 8601, and relative time (e.g., <em>'2 days ago'</em>)."
+        },
+        {
+          name: "Copy Formats",
+          text: "Hover over any result box and click the copy icon to copy that specific format directly to your clipboard.",
+          description: "Hover over any result box and click the copy icon to copy that specific format directly to your clipboard."
+        }
+      ]}
+    />
+    <TechnicalExplainer 
+      title="What is a Unix Epoch Timestamp?"
+      sections={[
+        {
+          title: "The Definition",
+          content: "A Unix timestamp (or Epoch time) is a system for describing a point in time. It is defined as the number of seconds that have elapsed since <strong>00:00:00 Coordinated Universal Time (UTC), Thursday, 1 January 1970</strong>, minus leap seconds."
+        },
+        {
+          title: "Seconds vs. Milliseconds",
+          content: "Most Unix systems and backend languages (like PHP or Go) represent timestamps in <strong>seconds</strong> (e.g., <code>1718365200</code>). However, JavaScript, Java, and many frontend frameworks represent timestamps in <strong>milliseconds</strong> (e.g., <code>1718365200000</code>). This tool automatically heuristics which format you pasted."
+        },
+        {
+          title: "The Year 2038 Problem (Y2K38)",
+          content: "On 32-bit systems, the maximum value for a signed integer is 2,147,483,647. This means that at 03:14:07 UTC on 19 January 2038, 32-bit systems will 'overflow' and roll over to a negative number, interpreting the date as 1901. Modern 64-bit systems have solved this, pushing the overflow out by billions of years."
+        }
+      ]}
+    />
+    <FaqSection 
+      faqs={[
+        {
+          question: "Does this tool support leap seconds?",
+          text: "No. The standard Unix epoch time explicitly does not count leap seconds. Every day is treated as containing exactly 86,400 seconds.",
+          answer: "No. The standard Unix epoch time explicitly does not count leap seconds. Every day is treated as containing exactly 86,400 seconds."
+        },
+        {
+          question: "How does it know my Local Time?",
+          text: "The tool uses your browser's internal clock and timezone settings to calculate the 'Local Time' output.",
+          answer: "The tool uses your browser's internal clock and timezone settings to calculate the 'Local Time' output."
+        },
+        {
+          question: "Why did my date parse incorrectly?",
+          text: "If you typed a date string like '04/05/2024', JavaScript's parser handles ambiguous dates differently depending on the browser (is it April 5th or May 4th?). For best results, use standard ISO 8601 format like '2024-04-05'.",
+          answer: "If you typed a date string like <code>04/05/2024</code>, JavaScript's parser handles ambiguous dates differently depending on the browser (is it April 5th or May 4th?). For best results, use standard ISO 8601 format like <code>2024-04-05</code>."
+        }
+      ]}
+    />
+  </Fragment>
+
+  <script>
+    import { copyToClipboard } from '../../lib/clipboard';
+    import { parseTimestamp, formatTimestamp } from '../../tools/timestamp';
+
+    const currentTimestampEl = document.getElementById('currentTimestamp')!;
+    const pauseBtn = document.getElementById('pauseBtn')!;
+    const pauseBtnText = document.getElementById('pauseBtnText')!;
+    
+    const inputTime = document.getElementById('inputTime') as HTMLInputElement;
+    const convertBtn = document.getElementById('convertBtn')!;
+    const errorBanner = document.getElementById('errorBanner')!;
+    
+    const resLocal = document.getElementById('resLocal')!;
+    const resUtc = document.getElementById('resUtc')!;
+    const resIso = document.getElementById('resIso')!;
+    const resRelative = document.getElementById('resRelative')!;
+    const resSec = document.getElementById('resSec')!;
+    const resMs = document.getElementById('resMs')!;
+
+    // Clock
+    let clockInterval: ReturnType<typeof setInterval>;
+    let isClockPaused = false;
+
+    function updateClock() {
+      if (!isClockPaused) {
+        currentTimestampEl.textContent = Math.floor(Date.now() / 1000).toString();
+      }
+    }
+
+    pauseBtn.addEventListener('click', () => {
+      isClockPaused = !isClockPaused;
+      if (isClockPaused) {
+        pauseBtnText.textContent = 'Resume';
+        pauseBtn.innerHTML = `
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <span id="pauseBtnText">Resume</span>
+        `;
+      } else {
+        updateClock();
+        pauseBtn.innerHTML = `
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <span id="pauseBtnText">Pause</span>
+        `;
+      }
+    });
+
+    clockInterval = setInterval(updateClock, 1000);
+    updateClock();
+
+    // Converter
+    function doConvert() {
+      errorBanner.classList.add('hidden');
+      const val = inputTime.value;
+      if (!val) return;
+
+      const date = parseTimestamp(val);
+      if (!date) {
+        errorBanner.classList.remove('hidden');
+        resLocal.textContent = '---';
+        resUtc.textContent = '---';
+        resIso.textContent = '---';
+        resRelative.textContent = '---';
+        resSec.textContent = '---';
+        resMs.textContent = '---';
+        return;
+      }
+
+      const res = formatTimestamp(date);
+      resLocal.textContent = res.local;
+      resUtc.textContent = res.utc;
+      resIso.textContent = res.iso;
+      resRelative.textContent = res.relative;
+      resSec.textContent = res.unixSeconds.toString();
+      resMs.textContent = res.unixMillis.toString();
+    }
+
+    convertBtn.addEventListener('click', doConvert);
+    inputTime.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') doConvert();
+    });
+
+    // Copy buttons
+    document.querySelectorAll('.copy-res').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const targetId = (e.currentTarget as HTMLElement).getAttribute('data-target');
+        if (targetId) {
+          const text = document.getElementById(targetId)?.textContent;
+          if (text && text !== '---') {
+            copyToClipboard(text, e.currentTarget as HTMLElement, `
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+            `);
+          }
+        }
+      });
+    });
+
+    // Populate initial value with current time
+    inputTime.value = Math.floor(Date.now() / 1000).toString();
+    doConvert();
+
+  </script>
+</ToolLayout>

@@ -1,0 +1,222 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import HowToSection from '../../components/seo/HowToSection.astro';
+import FaqSection from '../../components/seo/FaqSection.astro';
+import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
+import { tools } from '../../lib/tool-registry';
+
+const tool = tools.find(t => t.id === 'cron-explainer')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="space-y-6">
+    
+    <!-- Input Section -->
+    <div class="glass p-6 rounded-2xl flex flex-col gap-6">
+      
+      <div class="flex justify-between items-center px-1">
+        <label for="cronInput" class="text-sm font-semibold text-text-primary">Cron Expression</label>
+        <button id="clearBtn" class="text-xs text-text-muted hover:text-error transition-colors font-medium">Clear</button>
+      </div>
+      
+      <div class="relative">
+        <input 
+          type="text" 
+          id="cronInput" 
+          class="w-full bg-surface/50 border border-border-subtle rounded-xl p-4 text-2xl md:text-4xl text-center font-mono text-accent focus-glow transition-colors tracking-widest placeholder:text-border-default uppercase"
+          placeholder="* * * * *"
+          value="* * * * *"
+          spellcheck="false"
+        />
+        
+        <div id="errorBanner" class="absolute -bottom-8 left-0 w-full text-center text-error text-xs font-bold hidden animate-fade-in-down">
+          Invalid Cron Expression
+        </div>
+      </div>
+
+      <!-- Quick Selects -->
+      <div class="flex flex-wrap justify-center gap-2 mt-4">
+        <button class="preset-btn px-3 py-1 bg-surface border border-border-default rounded text-xs text-text-secondary hover:text-accent hover:border-accent transition-colors" data-cron="* * * * *">Every Minute</button>
+        <button class="preset-btn px-3 py-1 bg-surface border border-border-default rounded text-xs text-text-secondary hover:text-accent hover:border-accent transition-colors" data-cron="0 * * * *">Every Hour</button>
+        <button class="preset-btn px-3 py-1 bg-surface border border-border-default rounded text-xs text-text-secondary hover:text-accent hover:border-accent transition-colors" data-cron="0 0 * * *">Every Day (Midnight)</button>
+        <button class="preset-btn px-3 py-1 bg-surface border border-border-default rounded text-xs text-text-secondary hover:text-accent hover:border-accent transition-colors" data-cron="0 0 * * 1">Every Monday</button>
+        <button class="preset-btn px-3 py-1 bg-surface border border-border-default rounded text-xs text-text-secondary hover:text-accent hover:border-accent transition-colors" data-cron="0 0 1 * *">1st of Month</button>
+      </div>
+
+    </div>
+
+    <!-- Output Section -->
+    <div id="resultsPanel" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- Explanation Panel -->
+      <div class="bg-surface border border-border-subtle rounded-2xl p-6 flex flex-col justify-center">
+        <span class="text-xs font-bold uppercase tracking-wider text-text-muted mb-2 text-center">Plain English Translation</span>
+        <div id="explanationText" class="text-xl md:text-2xl font-bold text-text-primary text-center leading-relaxed">
+          At every minute.
+        </div>
+      </div>
+
+      <!-- Next Runs Panel -->
+      <div class="bg-surface border border-border-subtle rounded-2xl overflow-hidden">
+        <div class="bg-void px-6 py-4 border-b border-border-subtle">
+          <span class="text-xs font-bold uppercase tracking-wider text-text-muted">Next Scheduled Runs</span>
+        </div>
+        <ul id="nextRunsList" class="divide-y divide-border-subtle">
+          <!-- Injected by JS -->
+        </ul>
+      </div>
+      
+    </div>
+  </div>
+
+  <Fragment slot="content">
+    <HowToSection 
+      title="How to Understand Cron Expressions"
+      steps={[
+        {
+          name: "Enter an Expression",
+          text: "Type a standard 5-field cron expression into the large input box, or click one of the quick preset buttons below it.",
+          description: "Type a standard 5-field cron expression into the large input box, or click one of the quick preset buttons below it."
+        },
+        {
+          name: "Read the Translation",
+          text: "The tool will instantly translate the cryptic asterisks and numbers into a plain English sentence.",
+          description: "The tool will instantly translate the cryptic asterisks and numbers into a plain English sentence."
+        },
+        {
+          name: "Verify with Next Runs",
+          text: "Check the 'Next Scheduled Runs' panel to see exactly when the job will trigger in real-world time based on your local timezone.",
+          description: "Check the 'Next Scheduled Runs' panel to see exactly when the job will trigger in real-world time based on your local timezone."
+        }
+      ]}
+    />
+    <TechnicalExplainer 
+      title="The 5 Fields of Cron"
+      sections={[
+        {
+          title: "Format: MIN HOUR DOM MON DOW",
+          content: "A standard cron expression consists of five fields separated by spaces: Minute (0-59), Hour (0-23), Day of Month (1-31), Month (1-12), and Day of Week (0-6, where 0 is Sunday)."
+        },
+        {
+          title: "Special Characters",
+          content: "<ul><li><code>*</code> (Asterisk) means 'every'.</li><li><code>,</code> (Comma) separates items in a list (e.g., <code>1,3,5</code>).</li><li><code>-</code> (Hyphen) defines a range (e.g., <code>1-5</code>).</li><li><code>/</code> (Slash) defines a step value (e.g., <code>*/5</code> means every 5).</li></ul>"
+        },
+        {
+          title: "Execution Environment",
+          content: "Remember that this tool displays the 'Next Scheduled Runs' using your browser's local timezone. When you deploy a cron job to a Linux server, the execution time will depend on the server's timezone (which is usually UTC)."
+        }
+      ]}
+    />
+    <FaqSection 
+      faqs={[
+        {
+          question: "Can I use 6 fields for seconds?",
+          text: "Standard Linux cron daemon only supports 5 fields (down to the minute). While some specific schedulers (like AWS EventBridge or Spring Boot) support a 6th field for seconds, this tool currently focuses on the universal 5-field standard.",
+          answer: "Standard Linux cron daemon only supports 5 fields (down to the minute). While some specific schedulers (like AWS EventBridge or Spring Boot) support a 6th field for seconds, this tool currently focuses on the universal 5-field standard."
+        },
+        {
+          question: "Does it support text aliases like 'MON' or 'JAN'?",
+          text: "Yes! You can use three-letter abbreviations for months (JAN, FEB, etc.) and days of the week (SUN, MON, etc.) instead of numbers.",
+          answer: "Yes! You can use three-letter abbreviations for months (JAN, FEB, etc.) and days of the week (SUN, MON, etc.) instead of numbers."
+        },
+        {
+          question: "Why is the next run blank?",
+          text: "If you enter a mathematically impossible date (like February 30th), the scheduler will never trigger, and the next runs list will remain empty.",
+          answer: "If you enter a mathematically impossible date (like February 30th), the scheduler will never trigger, and the next runs list will remain empty."
+        }
+      ]}
+    />
+  </Fragment>
+
+  <script>
+    import { explainCron } from '../../tools/cron-explainer';
+
+    const cronInput = document.getElementById('cronInput') as HTMLInputElement;
+    const errorBanner = document.getElementById('errorBanner')!;
+    const explanationText = document.getElementById('explanationText')!;
+    const nextRunsList = document.getElementById('nextRunsList')!;
+    const resultsPanel = document.getElementById('resultsPanel')!;
+    const clearBtn = document.getElementById('clearBtn')!;
+    
+    const presetBtns = document.querySelectorAll('.preset-btn');
+
+    function processCron() {
+      const val = cronInput.value.trim().toUpperCase();
+      
+      if (!val) {
+        errorBanner.classList.add('hidden');
+        resultsPanel.classList.add('opacity-50');
+        explanationText.textContent = 'Waiting for input...';
+        nextRunsList.innerHTML = '';
+        return;
+      }
+
+      const res = explainCron(val);
+
+      if (res.error) {
+        errorBanner.textContent = res.error;
+        errorBanner.classList.remove('hidden');
+        resultsPanel.classList.add('opacity-50');
+        explanationText.textContent = 'Invalid expression';
+        nextRunsList.innerHTML = '';
+        cronInput.classList.add('border-error', 'text-error');
+        cronInput.classList.remove('border-border-subtle', 'text-accent');
+        return;
+      }
+
+      // Valid
+      errorBanner.classList.add('hidden');
+      resultsPanel.classList.remove('opacity-50');
+      cronInput.classList.remove('border-error', 'text-error');
+      cronInput.classList.add('border-border-subtle', 'text-accent');
+
+      explanationText.innerHTML = res.description;
+
+      if (res.nextRuns.length === 0) {
+        nextRunsList.innerHTML = `
+          <li class="px-6 py-4 flex items-center justify-between text-sm text-error">
+            Never runs (Impossible date)
+          </li>
+        `;
+      } else {
+        let runsHtml = '';
+        res.nextRuns.forEach((date, i) => {
+          const formatted = new Intl.DateTimeFormat('en-US', {
+            weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
+            hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short'
+          }).format(date);
+          
+          runsHtml += `
+            <li class="px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between text-sm hover:bg-surface-hover transition-colors gap-2">
+              <span class="text-text-primary font-mono">${formatted}</span>
+              <span class="text-xs font-bold uppercase tracking-wider text-accent bg-accent/10 px-2 py-0.5 rounded-full">Run #${i + 1}</span>
+            </li>
+          `;
+        });
+        nextRunsList.innerHTML = runsHtml;
+      }
+    }
+
+    cronInput.addEventListener('input', processCron);
+
+    presetBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const expr = (btn as HTMLElement).dataset.cron;
+        if (expr) {
+          cronInput.value = expr;
+          processCron();
+        }
+      });
+    });
+
+    clearBtn.addEventListener('click', () => {
+      cronInput.value = '';
+      processCron();
+      cronInput.focus();
+    });
+
+    // Init
+    processCron();
+
+  </script>
+</ToolLayout>

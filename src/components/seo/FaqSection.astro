@@ -1,101 +1,42 @@
 ---
+interface Props {
+  title?: string;
+  faqs: {
+    question: string;
+    answer: string; // HTML content
+    text: string; // Plain text for JSON-LD
+  }[];
+}
+const { title = "Frequently Asked Questions", faqs } = Astro.props;
 ---
 <section class="mb-12">
-  <h2 class="text-2xl font-bold mb-6 text-text-primary">Frequently Asked Questions</h2>
+  <h2 class="text-2xl font-bold mb-6 text-text-primary">{title}</h2>
   
   <div class="space-y-4">
-    <details class="group bg-surface border border-border-subtle rounded-lg open:bg-base transition-colors" open>
-      <summary class="flex items-center justify-between cursor-pointer p-4 font-medium text-text-primary">
-        Is my data safe? Does the converter send data to a server?
-        <span class="transition group-open:rotate-180">
-          <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
-        </span>
-      </summary>
-      <div class="p-4 pt-0 text-text-secondary leading-relaxed">
-        No. This converter runs entirely in your browser using client-side JavaScript. Your data never leaves your device — nothing is uploaded, stored, or transmitted.
-      </div>
-    </details>
-
-    <details class="group bg-surface border border-border-subtle rounded-lg open:bg-base transition-colors">
-      <summary class="flex items-center justify-between cursor-pointer p-4 font-medium text-text-primary">
-        What is the maximum file size I can convert?
-        <span class="transition group-open:rotate-180">
-          <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
-        </span>
-      </summary>
-      <div class="p-4 pt-0 text-text-secondary leading-relaxed">
-        There is no hard limit, but for optimal performance we recommend files under 50 MB. Larger files are processed efficiently, but very large datasets may temporarily slow down your browser.
-      </div>
-    </details>
-
-    <details class="group bg-surface border border-border-subtle rounded-lg open:bg-base transition-colors">
-      <summary class="flex items-center justify-between cursor-pointer p-4 font-medium text-text-primary">
-        Can I convert nested JSON objects?
-        <span class="transition group-open:rotate-180">
-          <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
-        </span>
-      </summary>
-      <div class="p-4 pt-0 text-text-secondary leading-relaxed">
-        Yes. The converter automatically detects nested structures and flattens them using dot-notation (e.g., <code class="text-sm bg-surface px-1 py-0.5 rounded">user.address.city</code> becomes a column).
-      </div>
-    </details>
-    
-    <details class="group bg-surface border border-border-subtle rounded-lg open:bg-base transition-colors">
-      <summary class="flex items-center justify-between cursor-pointer p-4 font-medium text-text-primary">
-        Does it work with JSON arrays of different structures?
-        <span class="transition group-open:rotate-180">
-          <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
-        </span>
-      </summary>
-      <div class="p-4 pt-0 text-text-secondary leading-relaxed">
-        Yes. The schema detector analyzes all objects in the array and creates a superset of all unique keys. Objects missing a key will have an empty value in that column.
-      </div>
-    </details>
-    
-    <details class="group bg-surface border border-border-subtle rounded-lg open:bg-base transition-colors">
-      <summary class="flex items-center justify-between cursor-pointer p-4 font-medium text-text-primary">
-        Can I use a custom delimiter instead of commas?
-        <span class="transition group-open:rotate-180">
-          <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
-        </span>
-      </summary>
-      <div class="p-4 pt-0 text-text-secondary leading-relaxed">
-        Yes. You can choose between comma (,), tab, or semicolon (;) as your delimiter in the options bar.
-      </div>
-    </details>
+    {faqs.map((faq, i) => (
+      <details class="group bg-surface border border-border-subtle rounded-lg open:bg-base transition-colors" open={i === 0}>
+        <summary class="flex items-center justify-between cursor-pointer p-4 font-medium text-text-primary">
+          {faq.question}
+          <span class="transition group-open:rotate-180">
+            <svg fill="none" height="24" shape-rendering="geometricPrecision" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+          </span>
+        </summary>
+        <div class="p-4 pt-0 text-text-secondary leading-relaxed" set:html={faq.answer}></div>
+      </details>
+    ))}
   </div>
 
-  <script type="application/ld+json" is:inline>
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "Is my data safe? Does the converter send data to a server?",
-          "acceptedAnswer": { "@type": "Answer", "text": "No. This converter runs entirely in your browser using client-side JavaScript. Your data never leaves your device — nothing is uploaded, stored, or transmitted." }
-        },
-        {
-          "@type": "Question",
-          "name": "What is the maximum file size I can convert?",
-          "acceptedAnswer": { "@type": "Answer", "text": "There is no hard limit, but for optimal performance we recommend files under 50 MB. Larger files are processed efficiently, but very large datasets may temporarily slow down your browser." }
-        },
-        {
-          "@type": "Question",
-          "name": "Can I convert nested JSON objects?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Yes. The converter automatically detects nested structures and flattens them using dot-notation (e.g., user.address.city becomes a column)." }
-        },
-        {
-          "@type": "Question",
-          "name": "Does it work with JSON arrays of different structures?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Yes. The schema detector analyzes all objects in the array and creates a superset of all unique keys. Objects missing a key will have an empty value in that column." }
-        },
-        {
-          "@type": "Question",
-          "name": "Can I use a custom delimiter instead of commas?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Yes. You can choose between comma (,), tab, or semicolon (;) as your delimiter in the options bar." }
-        }
-      ]
-    }
+  <script type="application/ld+json" is:inline set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.text
+      }
+    }))
+  })}>
   </script>
 </section>

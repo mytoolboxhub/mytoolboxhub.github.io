@@ -1,0 +1,302 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import HowToSection from '../../components/seo/HowToSection.astro';
+import FaqSection from '../../components/seo/FaqSection.astro';
+import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
+import { tools } from '../../lib/tool-registry';
+
+const tool = tools.find(t => t.id === 'json-formatter')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="space-y-6">
+    <!-- Controls -->
+    <div class="glass p-4 flex flex-wrap gap-4 items-center justify-between">
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2">
+          <label for="indent" class="text-sm font-medium text-text-secondary">Indent</label>
+          <select id="indent" class="bg-surface border border-border-default rounded-md px-2 py-1 text-sm text-text-primary focus-glow">
+            <option value="2">2 Spaces</option>
+            <option value="4">4 Spaces</option>
+            <option value="tab">Tab</option>
+          </select>
+        </div>
+        
+        <div class="flex items-center gap-2">
+          <input type="checkbox" id="sortKeys" class="w-4 h-4 rounded border-border-default bg-surface text-accent focus-glow" />
+          <label for="sortKeys" class="text-sm font-medium text-text-secondary">Sort Keys</label>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button id="formatBtn" class="px-4 py-1.5 bg-accent text-void font-medium text-sm rounded-lg hover:bg-accent-hover transition-colors focus-glow flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+          Format
+        </button>
+        <button id="minifyBtn" class="px-4 py-1.5 bg-surface border border-border-subtle text-text-primary font-medium text-sm rounded-lg hover:bg-elevated transition-colors focus-glow flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" /></svg>
+          Minify
+        </button>
+        <button id="clearBtn" class="px-3 py-1.5 text-text-muted hover:text-error transition-colors focus-glow rounded-lg">
+          Clear
+        </button>
+      </div>
+    </div>
+
+    <!-- Error Banner -->
+    <div id="errorBanner" class="hidden bg-error/10 border border-error/30 text-error px-4 py-3 rounded-lg text-sm flex items-start gap-3 animate-fade-in-down">
+      <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <div>
+        <strong class="block font-semibold mb-1">Invalid JSON</strong>
+        <span id="errorMessage"></span>
+      </div>
+    </div>
+
+    <!-- Layout Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      
+      <!-- Input Panel -->
+      <div class="flex flex-col h-[600px]">
+        <div class="flex justify-between items-center mb-2">
+          <label for="jsonInput" class="text-sm font-semibold text-text-primary">Input</label>
+          <span id="inputSize" class="text-xs text-text-muted">0 B</span>
+        </div>
+        <textarea 
+          id="jsonInput" 
+          class="flex-1 bg-surface/50 border border-border-subtle rounded-xl p-4 font-mono text-sm text-text-primary resize-none focus-glow transition-colors"
+          placeholder="Paste messy JSON here..."
+          spellcheck="false"
+        ></textarea>
+      </div>
+
+      <!-- Output Panel -->
+      <div class="flex flex-col h-[600px]">
+        <div class="flex justify-between items-center mb-2">
+          <div class="flex items-center gap-3">
+            <label for="jsonOutput" class="text-sm font-semibold text-text-primary">Output</label>
+            <div id="statsBar" class="hidden flex items-center gap-2 text-xs">
+              <span class="bg-surface px-1.5 py-0.5 rounded text-text-secondary border border-border-subtle">Depth: <span id="statDepth" class="text-text-primary font-medium">0</span></span>
+              <span class="bg-surface px-1.5 py-0.5 rounded text-text-secondary border border-border-subtle">Keys: <span id="statKeys" class="text-text-primary font-medium">0</span></span>
+            </div>
+          </div>
+          <div class="flex gap-3 items-center">
+            <span id="outputSize" class="text-xs text-accent hidden">0 B</span>
+            <button id="copyBtn" class="text-xs text-accent hover:text-accent-hover transition-colors flex items-center gap-1 font-medium">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+              Copy
+            </button>
+            <button id="downloadBtn" class="text-xs text-accent hover:text-accent-hover transition-colors flex items-center gap-1 font-medium">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+              Download
+            </button>
+          </div>
+        </div>
+        <textarea 
+          id="jsonOutput" 
+          class="flex-1 bg-void border border-border-subtle rounded-xl p-4 font-mono text-sm text-text-secondary resize-none focus-glow"
+          placeholder="Formatted JSON will appear here..."
+          readonly
+        ></textarea>
+      </div>
+    </div>
+  </div>
+
+  <Fragment slot="content">
+    <HowToSection 
+      title="How to Format and Validate JSON Online"
+      steps={[
+        {
+          name: "Paste Your JSON",
+          text: "Paste your raw or minified JSON directly into the input editor. The tool automatically handles large payloads.",
+          description: "Paste your raw or minified JSON directly into the input editor. The tool automatically handles large payloads."
+        },
+        {
+          name: "Choose Formatting Options",
+          text: "Select your preferred indentation (2 spaces, 4 spaces, or tabs). You can also choose to automatically sort all object keys alphabetically.",
+          description: "Select your preferred indentation (2 spaces, 4 spaces, or tabs). You can also choose to automatically sort all object keys alphabetically."
+        },
+        {
+          name: "Format or Minify",
+          text: "Click Format to pretty-print your JSON, or Minify to compress it by removing all unnecessary whitespace.",
+          description: "Click <strong>Format</strong> to pretty-print your JSON, or <strong>Minify</strong> to compress it by removing all unnecessary whitespace."
+        },
+        {
+          name: "Copy or Download",
+          text: "Copy the result to your clipboard or download it directly as a .json file.",
+          description: "Copy the result to your clipboard or download it directly as a <code>.json</code> file."
+        }
+      ]}
+    />
+    <TechnicalExplainer 
+      title="What Is JSON? Structure, Syntax Rules, and Common Errors"
+      sections={[
+        {
+          title: "JSON Structure",
+          content: "JSON is built on two universal structures: a collection of name/value pairs (objects) and an ordered list of values (arrays). These simple structures make JSON incredibly versatile for data interchange."
+        },
+        {
+          title: "Common Syntax Errors",
+          content: "<ul><li><strong>Trailing Commas:</strong> Unlike JavaScript, JSON does not allow trailing commas after the last element in an array or object.</li><li><strong>Unquoted Keys:</strong> All object keys must be wrapped in double quotes. <code>{name: \"John\"}</code> is invalid; <code>{\"name\": \"John\"}</code> is valid.</li><li><strong>Single Quotes:</strong> Strings and keys must use double quotes (<code>\"</code>), never single quotes (<code>'</code>).</li></ul>"
+        }
+      ]}
+    />
+    <FaqSection 
+      faqs={[
+        {
+          question: "Is my JSON data sent to a server?",
+          text: "No. This tool operates entirely in your browser using client-side JavaScript. Your data never leaves your device.",
+          answer: "No. This tool operates entirely in your browser using client-side JavaScript. Your data never leaves your device."
+        },
+        {
+          question: "How do I fix 'Unexpected token' errors?",
+          text: "These errors usually mean there is a syntax error like a missing comma, unquoted key, or trailing comma. The error banner will tell you exactly which line and column the parser failed on.",
+          answer: "These errors usually mean there is a syntax error like a missing comma, unquoted key, or trailing comma. The error banner will tell you exactly which line and column the parser failed on."
+        },
+        {
+          question: "What is the difference between JSON and JSONC?",
+          text: "JSONC is JSON with Comments. Standard JSON does not support comments, but JSONC allows you to include // or /* */ comments. This tool strictly validates standard JSON.",
+          answer: "JSONC is JSON with Comments. Standard JSON does not support comments, but JSONC allows you to include <code>//</code> or <code>/* */</code> comments. This tool strictly validates standard JSON."
+        }
+      ]}
+    />
+  </Fragment>
+
+  <script>
+    import { validateJson } from '../../lib/json-validator';
+    import { copyToClipboard } from '../../lib/clipboard';
+    import { downloadFile } from '../../lib/download';
+    import { formatJson, minifyJson, getJsonStats } from '../../tools/json-formatter';
+
+    const input = document.getElementById('jsonInput') as HTMLTextAreaElement;
+    const output = document.getElementById('jsonOutput') as HTMLTextAreaElement;
+    const errorBanner = document.getElementById('errorBanner')!;
+    const errorMessage = document.getElementById('errorMessage')!;
+    const indentSelect = document.getElementById('indent') as HTMLSelectElement;
+    const sortKeysCb = document.getElementById('sortKeys') as HTMLInputElement;
+    const formatBtn = document.getElementById('formatBtn')!;
+    const minifyBtn = document.getElementById('minifyBtn')!;
+    const clearBtn = document.getElementById('clearBtn')!;
+    const copyBtn = document.getElementById('copyBtn')!;
+    const downloadBtn = document.getElementById('downloadBtn')!;
+
+    // UI elements
+    const inputSize = document.getElementById('inputSize')!;
+    const outputSize = document.getElementById('outputSize')!;
+    const statsBar = document.getElementById('statsBar')!;
+    const statDepth = document.getElementById('statDepth')!;
+    const statKeys = document.getElementById('statKeys')!;
+
+    function formatBytes(bytes: number, decimals = 2) {
+      if (!+bytes) return '0 B';
+      const k = 1024;
+      const dm = decimals < 0 ? 0 : decimals;
+      const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+    }
+
+    let validationTimeout: ReturnType<typeof setTimeout>;
+
+    function updateStats() {
+      const inBytes = new Blob([input.value]).size;
+      inputSize.textContent = formatBytes(inBytes);
+
+      const outBytes = new Blob([output.value]).size;
+      if (outBytes > 0) {
+        outputSize.textContent = formatBytes(outBytes);
+        outputSize.classList.remove('hidden');
+      } else {
+        outputSize.classList.add('hidden');
+      }
+    }
+
+    function processInput(action: 'format' | 'minify') {
+      const val = input.value;
+      if (!val.trim()) {
+        output.value = '';
+        errorBanner.classList.add('hidden');
+        statsBar.classList.add('hidden');
+        updateStats();
+        return;
+      }
+
+      const validation = validateJson(val);
+      if (!validation.valid) {
+        errorBanner.classList.remove('hidden');
+        errorMessage.textContent = validation.error?.message || 'Invalid JSON syntax';
+        statsBar.classList.add('hidden');
+        updateStats();
+        return;
+      }
+
+      errorBanner.classList.add('hidden');
+
+      try {
+        if (action === 'format') {
+          const indentVal = indentSelect.value === 'tab' ? '\t' : parseInt(indentSelect.value, 10);
+          output.value = formatJson(val, indentVal as number, sortKeysCb.checked);
+        } else {
+          output.value = minifyJson(val);
+        }
+
+        const stats = getJsonStats(validation.data);
+        statDepth.textContent = stats.depth.toString();
+        statKeys.textContent = stats.keys.toString();
+        statsBar.classList.remove('hidden');
+
+      } catch (err: any) {
+        errorBanner.classList.remove('hidden');
+        errorMessage.textContent = 'Error: ' + err.message;
+      }
+      
+      updateStats();
+    }
+
+    // Live validation
+    input.addEventListener('input', () => {
+      updateStats();
+      clearTimeout(validationTimeout);
+      validationTimeout = setTimeout(() => {
+        if (!input.value.trim()) {
+          errorBanner.classList.add('hidden');
+          return;
+        }
+        const validation = validateJson(input.value);
+        if (!validation.valid) {
+          errorBanner.classList.remove('hidden');
+          errorMessage.textContent = validation.error?.message || 'Invalid JSON syntax';
+        } else {
+          errorBanner.classList.add('hidden');
+        }
+      }, 300);
+    });
+
+    formatBtn.addEventListener('click', () => processInput('format'));
+    minifyBtn.addEventListener('click', () => processInput('minify'));
+    
+    clearBtn.addEventListener('click', () => {
+      input.value = '';
+      output.value = '';
+      errorBanner.classList.add('hidden');
+      statsBar.classList.add('hidden');
+      updateStats();
+    });
+
+    copyBtn.addEventListener('click', () => {
+      if (output.value) {
+        copyToClipboard(output.value, copyBtn, `
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+          Copied!
+        `);
+      }
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      if (output.value) {
+        downloadFile(output.value, 'formatted.json', 'application/json');
+      }
+    });
+  </script>
+</ToolLayout>

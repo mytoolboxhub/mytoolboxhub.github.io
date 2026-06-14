@@ -1,0 +1,213 @@
+---
+import { tools } from '../../lib/tool-registry';
+
+// Pass tools to client
+const toolsJson = JSON.stringify(tools.filter(t => t.status !== 'coming-soon').map(t => ({
+  id: t.id,
+  name: t.name,
+  description: t.description,
+  slug: t.slug,
+  category: t.category,
+  keywords: t.keywords
+})));
+---
+
+<!-- Backdrop -->
+<div id="searchBackdrop" class="fixed inset-0 bg-void/80 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-200"></div>
+
+<!-- Modal -->
+<div id="searchModal" class="fixed inset-0 z-50 hidden items-start justify-center pt-[10vh] sm:pt-[20vh] px-4 pointer-events-none">
+  <div class="bg-surface border border-border-strong rounded-2xl w-full max-w-2xl shadow-glow-lg overflow-hidden transform scale-95 opacity-0 transition-all duration-200 pointer-events-auto flex flex-col max-h-[80vh]" id="searchContainer">
+    
+    <!-- Search Input -->
+    <div class="relative flex items-center px-4 border-b border-border-subtle">
+      <svg class="w-5 h-5 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+      <input 
+        type="text" 
+        id="searchInput" 
+        class="w-full bg-transparent border-none py-4 pl-3 pr-4 text-text-primary placeholder:text-text-muted focus:ring-0 outline-none text-lg"
+        placeholder="Search for tools..."
+        autocomplete="off"
+      >
+      <button id="closeSearchBtn" class="p-1 rounded-md text-text-muted hover:text-text-primary hover:bg-elevated transition-colors">
+        <kbd class="hidden sm:inline-flex items-center gap-1 font-sans text-[10px] uppercase">ESC</kbd>
+      </button>
+    </div>
+
+    <!-- Results List -->
+    <div class="overflow-y-auto p-2" id="searchResults">
+      <!-- Injected via JS -->
+      <div class="py-12 text-center text-text-muted text-sm hidden" id="noResults">
+        No tools found. Try a different search term.
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+<script define:vars={{ toolsJson }}>
+  const tools = JSON.parse(toolsJson);
+  
+  const searchBackdrop = document.getElementById('searchBackdrop');
+  const searchModal = document.getElementById('searchModal');
+  const searchContainer = document.getElementById('searchContainer');
+  const searchInput = document.getElementById('searchInput');
+  const searchResults = document.getElementById('searchResults');
+  const noResults = document.getElementById('noResults');
+  const closeSearchBtn = document.getElementById('closeSearchBtn');
+
+  // Triggers
+  const headerSearchBtn = document.getElementById('headerSearchBtn');
+  const heroSearchInput = document.getElementById('heroSearchInput');
+
+  let isOpen = false;
+
+  function openSearch(initialValue = '') {
+    if (isOpen) return;
+    isOpen = true;
+    
+    searchBackdrop.classList.remove('hidden');
+    searchModal.classList.remove('hidden');
+    searchModal.classList.add('flex');
+    
+    // Force reflow
+    void searchModal.offsetWidth;
+    
+    searchBackdrop.classList.remove('opacity-0');
+    searchContainer.classList.remove('scale-95', 'opacity-0');
+    
+    searchInput.value = initialValue;
+    searchInput.focus();
+    renderResults(initialValue);
+  }
+
+  function closeSearch() {
+    if (!isOpen) return;
+    isOpen = false;
+    
+    searchBackdrop.classList.add('opacity-0');
+    searchContainer.classList.add('scale-95', 'opacity-0');
+    
+    setTimeout(() => {
+      searchBackdrop.classList.add('hidden');
+      searchModal.classList.add('hidden');
+      searchModal.classList.remove('flex');
+    }, 200);
+  }
+
+  function renderResults(query) {
+    const q = query.toLowerCase().trim();
+    
+    // Clear old results except noResults message
+    Array.from(searchResults.children).forEach(child => {
+      if (child.id !== 'noResults') {
+        child.remove();
+      }
+    });
+
+    if (!q) {
+      noResults.classList.add('hidden');
+      return;
+    }
+
+    const matched = tools.filter(t => {
+      return t.name.toLowerCase().includes(q) || 
+             t.description.toLowerCase().includes(q) || 
+             t.keywords.some(k => k.toLowerCase().includes(q)) ||
+             t.category.toLowerCase().includes(q);
+    });
+
+    if (matched.length === 0) {
+      noResults.classList.remove('hidden');
+    } else {
+      noResults.classList.add('hidden');
+      
+      matched.forEach((t, i) => {
+        const a = document.createElement('a');
+        a.href = `/${t.slug}`;
+        a.className = 'flex flex-col p-3 rounded-lg hover:bg-elevated transition-colors mb-1 focus-glow focus:bg-elevated outline-none group';
+        // Add tabindex for keyboard navigation
+        a.tabIndex = 0;
+        
+        // Add keyboard listener for 'Enter'
+        a.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            window.location.href = a.href;
+          }
+        });
+
+        a.innerHTML = `
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-text-primary font-medium group-hover:text-accent transition-colors">${t.name}</span>
+            <span class="text-[10px] uppercase tracking-wider text-text-muted bg-surface border border-border-subtle px-1.5 py-0.5 rounded">${t.category.replace('-', ' ')}</span>
+          </div>
+          <p class="text-xs text-text-secondary line-clamp-1">${t.description}</p>
+        `;
+        searchResults.appendChild(a);
+      });
+    }
+  }
+
+  // Events
+  if (headerSearchBtn) {
+    headerSearchBtn.addEventListener('click', () => openSearch());
+  }
+
+  if (heroSearchInput) {
+    heroSearchInput.addEventListener('focus', () => {
+      heroSearchInput.blur(); // Prevent mobile keyboard from opening on the main page
+      openSearch();
+    });
+  }
+
+  closeSearchBtn.addEventListener('click', closeSearch);
+  searchBackdrop.addEventListener('click', closeSearch);
+  
+  searchInput.addEventListener('input', (e) => {
+    renderResults(e.target.value);
+  });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    // Cmd+K or Ctrl+K to open
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      openSearch();
+    }
+    
+    if (!isOpen) return;
+    
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      closeSearch();
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      const focusable = Array.from(searchResults.querySelectorAll('a'));
+      if (focusable.length === 0) return;
+      
+      const current = document.activeElement;
+      const idx = focusable.indexOf(current);
+      
+      if (idx === -1 || idx === focusable.length - 1) {
+        focusable[0].focus();
+      } else {
+        focusable[idx + 1].focus();
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      const focusable = Array.from(searchResults.querySelectorAll('a'));
+      if (focusable.length === 0) return;
+      
+      const current = document.activeElement;
+      const idx = focusable.indexOf(current);
+      
+      if (idx === -1 || idx === 0) {
+        searchInput.focus();
+      } else {
+        focusable[idx - 1].focus();
+      }
+    }
+  });
+</script>

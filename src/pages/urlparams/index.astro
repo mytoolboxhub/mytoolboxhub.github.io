@@ -1,0 +1,252 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import HowToSection from '../../components/seo/HowToSection.astro';
+import FaqSection from '../../components/seo/FaqSection.astro';
+import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
+import { tools } from '../../lib/tool-registry';
+
+const tool = tools.find(t => t.id === 'url-params')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="space-y-6">
+    
+    <!-- Input Section -->
+    <div class="flex flex-col">
+      <div class="flex justify-between items-center mb-2 px-1">
+        <label for="urlInput" class="text-sm font-semibold text-text-primary">Paste URL</label>
+        <button id="clearBtn" class="text-xs text-text-muted hover:text-error transition-colors font-medium">Clear</button>
+      </div>
+      <textarea 
+        id="urlInput" 
+        class="w-full h-24 bg-surface/50 border border-border-subtle rounded-xl p-4 text-sm font-mono text-text-primary resize-none focus-glow transition-colors break-all"
+        placeholder="https://example.com/product?utm_source=newsletter&utm_medium=email&id=12345"
+      ></textarea>
+    </div>
+
+    <div id="errorBanner" class="hidden text-error text-sm font-medium px-2"></div>
+
+    <!-- Results Section (Hidden until valid URL) -->
+    <div id="resultsPanel" class="hidden space-y-6">
+      
+      <!-- Clean URL Output -->
+      <div class="bg-surface/30 border border-border-subtle rounded-xl overflow-hidden">
+        <div class="bg-surface/50 px-4 py-2 border-b border-border-subtle flex justify-between items-center">
+          <span class="text-xs font-bold uppercase tracking-wider text-text-muted">Clean URL <span class="font-normal opacity-75 ml-1">(Tracking Removed)</span></span>
+          <button id="copyCleanBtn" class="text-xs text-accent hover:text-accent-hover transition-colors flex items-center gap-1 font-medium">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+            Copy
+          </button>
+        </div>
+        <div class="p-4 bg-void">
+          <div id="cleanUrlOutput" class="text-sm font-mono text-success break-all select-all"></div>
+        </div>
+      </div>
+
+      <!-- Parameters Table -->
+      <div class="bg-surface/30 border border-border-subtle rounded-xl overflow-hidden">
+        <div class="bg-surface/50 px-4 py-3 border-b border-border-subtle flex justify-between items-center">
+          <span class="text-xs font-bold uppercase tracking-wider text-text-muted flex items-center gap-2">
+            Extracted Parameters
+            <span id="paramCount" class="bg-void px-2 py-0.5 rounded-full text-text-primary border border-border-default">0</span>
+          </span>
+          <span id="trackingBadge" class="hidden bg-error/20 text-error px-2 py-0.5 rounded text-xs font-bold">Contains Tracking</span>
+        </div>
+        
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm whitespace-nowrap">
+            <thead class="text-xs text-text-muted uppercase bg-void border-b border-border-subtle">
+              <tr>
+                <th scope="col" class="px-4 py-3 font-medium">Parameter Key</th>
+                <th scope="col" class="px-4 py-3 font-medium">Value (Decoded)</th>
+                <th scope="col" class="px-4 py-3 font-medium text-right">Status</th>
+              </tr>
+            </thead>
+            <tbody id="paramsTableBody" class="divide-y divide-border-subtle">
+              <!-- Rows injected by JS -->
+            </tbody>
+          </table>
+          <div id="noParamsMsg" class="hidden text-center py-8 text-text-muted text-sm italic">
+            No parameters found in this URL.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <Fragment slot="content">
+    <HowToSection 
+      title="How to Extract and Clean URL Parameters"
+      steps={[
+        {
+          name: "Paste Your URL",
+          text: "Copy any long URL and paste it into the input box. The tool works instantly as you type or paste.",
+          description: "Copy any long URL and paste it into the input box. The tool works instantly as you type or paste."
+        },
+        {
+          name: "View the Data Table",
+          text: "The tool parses the query string (everything after the '?') and organizes each parameter into a neat, easily readable table.",
+          description: "The tool parses the query string (everything after the <code>?</code>) and organizes each parameter into a neat, easily readable table."
+        },
+        {
+          name: "Identify Tracking Tags",
+          text: "If the URL contains marketing tracking parameters like 'utm_source' or 'fbclid', they will be highlighted in red.",
+          description: "If the URL contains marketing tracking parameters like <code>utm_source</code> or <code>fbclid</code>, they will be highlighted in red."
+        },
+        {
+          name: "Copy the Clean URL",
+          text: "At the top of the results, you'll find a 'Clean URL'. This is the exact same URL but with all known privacy-invasive tracking parameters automatically removed.",
+          description: "At the top of the results, you'll find a 'Clean URL'. This is the exact same URL but with all known privacy-invasive tracking parameters automatically removed."
+        }
+      ]}
+    />
+    <TechnicalExplainer 
+      title="Understanding URL Queries"
+      sections={[
+        {
+          title: "The Query String",
+          content: "In a URL like <code>https://example.com/page?id=123&sort=asc</code>, the query string is everything after the question mark. It consists of key-value pairs separated by an ampersand (<code>&</code>). These parameters are used by the web server or frontend application to load specific data."
+        },
+        {
+          title: "URL Encoding",
+          content: "Because URLs cannot contain spaces or special characters, they are 'URL Encoded'. A space becomes <code>%20</code> or <code>+</code>. This extractor automatically decodes these values so you can read them normally."
+        },
+        {
+          title: "UTM Parameters",
+          content: "Urchin Tracking Module (UTM) parameters are five variants of URL parameters used by marketers to track the effectiveness of online marketing campaigns across traffic sources and publishing media. They do not affect the functionality of the website."
+        }
+      ]}
+    />
+    <FaqSection 
+      faqs={[
+        {
+          question: "What tracking tags does this tool remove?",
+          text: "The tool removes over 20 known tracking tags, including Google Analytics (utm_*), Facebook (fbclid), Instagram (igshid), Twitter (twclid), TikTok (ttclid), and Mailchimp (mc_cid).",
+          answer: "The tool removes over 20 known tracking tags, including Google Analytics (<code>utm_*</code>), Facebook (<code>fbclid</code>), Instagram (<code>igshid</code>), Twitter (<code>twclid</code>), TikTok (<code>ttclid</code>), and Mailchimp (<code>mc_cid</code>)."
+        },
+        {
+          question: "Will stripping these parameters break the link?",
+          text: "No. Marketing parameters are designed specifically to be ignored by the actual application logic. Stripping them will simply prevent the destination site from knowing exactly which ad or newsletter you clicked to get there.",
+          answer: "No. Marketing parameters are designed specifically to be ignored by the actual application logic. Stripping them will simply prevent the destination site from knowing exactly which ad or newsletter you clicked to get there."
+        },
+        {
+          question: "Is my URL sent to a server?",
+          text: "No. The parsing and cleaning happens entirely in your browser using the native URLSearchParams API. Your links are completely private.",
+          answer: "No. The parsing and cleaning happens entirely in your browser using the native <code>URLSearchParams</code> API. Your links are completely private."
+        }
+      ]}
+    />
+  </Fragment>
+
+  <script>
+    import { copyToClipboard } from '../../lib/clipboard';
+    import { extractUrlParams } from '../../tools/url-params';
+
+    const urlInput = document.getElementById('urlInput') as HTMLTextAreaElement;
+    const clearBtn = document.getElementById('clearBtn')!;
+    const errorBanner = document.getElementById('errorBanner')!;
+    
+    const resultsPanel = document.getElementById('resultsPanel')!;
+    const cleanUrlOutput = document.getElementById('cleanUrlOutput')!;
+    const copyCleanBtn = document.getElementById('copyCleanBtn')!;
+    
+    const paramsTableBody = document.getElementById('paramsTableBody')!;
+    const paramCount = document.getElementById('paramCount')!;
+    const trackingBadge = document.getElementById('trackingBadge')!;
+    const noParamsMsg = document.getElementById('noParamsMsg')!;
+
+    function escapeHtml(unsafe: string) {
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function processUrl() {
+      const val = urlInput.value.trim();
+      
+      if (!val) {
+        errorBanner.classList.add('hidden');
+        resultsPanel.classList.add('hidden');
+        return;
+      }
+
+      const result = extractUrlParams(val);
+
+      if (result.error) {
+        errorBanner.textContent = result.error;
+        errorBanner.classList.remove('hidden');
+        resultsPanel.classList.add('hidden');
+        return;
+      }
+
+      errorBanner.classList.add('hidden');
+      resultsPanel.classList.remove('hidden');
+
+      // Update Clean URL
+      cleanUrlOutput.textContent = result.cleanUrl;
+
+      // Update Table
+      paramCount.textContent = result.params.length.toString();
+      
+      if (result.params.length === 0) {
+        paramsTableBody.innerHTML = '';
+        noParamsMsg.classList.remove('hidden');
+        trackingBadge.classList.add('hidden');
+        return;
+      }
+
+      noParamsMsg.classList.add('hidden');
+      
+      let hasTracking = false;
+      let rowsHtml = '';
+
+      for (const p of result.params) {
+        if (p.isTracking) hasTracking = true;
+        
+        const rowClass = p.isTracking ? 'bg-error/5' : '';
+        const keyClass = p.isTracking ? 'text-error font-bold' : 'text-text-primary font-medium';
+        const statusHtml = p.isTracking 
+          ? `<span class="bg-error/20 text-error px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider">Removed</span>`
+          : `<span class="bg-surface border border-border-default text-text-muted px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider">Kept</span>`;
+
+        rowsHtml += `
+          <tr class="${rowClass} hover:bg-surface-hover transition-colors">
+            <td class="px-4 py-3 font-mono text-xs ${keyClass}">${escapeHtml(p.key)}</td>
+            <td class="px-4 py-3 font-mono text-xs text-text-secondary whitespace-normal break-all max-w-md">${escapeHtml(p.decodedValue)}</td>
+            <td class="px-4 py-3 text-right">${statusHtml}</td>
+          </tr>
+        `;
+      }
+
+      paramsTableBody.innerHTML = rowsHtml;
+
+      if (hasTracking) {
+        trackingBadge.classList.remove('hidden');
+      } else {
+        trackingBadge.classList.add('hidden');
+      }
+    }
+
+    urlInput.addEventListener('input', processUrl);
+
+    clearBtn.addEventListener('click', () => {
+      urlInput.value = '';
+      processUrl();
+      urlInput.focus();
+    });
+
+    copyCleanBtn.addEventListener('click', () => {
+      if (cleanUrlOutput.textContent) {
+        copyToClipboard(cleanUrlOutput.textContent, copyCleanBtn, `
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+          Copied
+        `);
+      }
+    });
+
+  </script>
+</ToolLayout>

@@ -1,0 +1,228 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import HowToSection from '../../components/seo/HowToSection.astro';
+import FaqSection from '../../components/seo/FaqSection.astro';
+import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
+import { tools } from '../../lib/tool-registry';
+
+const tool = tools.find(t => t.id === 'html-escaper')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="space-y-6">
+    
+    <!-- Controls Bar -->
+    <div class="glass p-4 rounded-2xl flex flex-wrap gap-4 items-center justify-between">
+      
+      <div class="flex items-center gap-4 bg-surface/50 p-1.5 rounded-lg border border-border-default">
+        <button id="modeEscape" class="px-4 py-1.5 text-sm font-bold rounded-md transition-colors bg-accent text-void shadow-sm">
+          Escape (Encode)
+        </button>
+        <button id="modeUnescape" class="px-4 py-1.5 text-sm font-bold rounded-md transition-colors text-text-secondary hover:text-text-primary">
+          Unescape (Decode)
+        </button>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <label class="flex items-center gap-2 cursor-pointer group">
+          <input type="checkbox" id="cbExtended" class="w-4 h-4 rounded border-border-default bg-surface text-accent focus-glow" />
+          <span class="text-sm text-text-primary group-hover:text-accent transition-colors">Extended Entities (©, €, ™)</span>
+        </label>
+      </div>
+
+    </div>
+
+    <!-- Panels -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      
+      <!-- Input Panel -->
+      <div class="flex flex-col h-[500px]">
+        <div class="flex justify-between items-center mb-2 px-1">
+          <label id="inputLabel" for="inputArea" class="text-sm font-semibold text-text-primary">Raw Text (Input)</label>
+          <button id="clearBtn" class="text-xs text-text-muted hover:text-error transition-colors font-medium">Clear</button>
+        </div>
+        <textarea 
+          id="inputArea" 
+          class="flex-1 w-full bg-surface/50 border border-border-subtle rounded-xl p-4 font-mono text-sm text-text-primary resize-none focus-glow transition-colors whitespace-pre overflow-auto"
+          placeholder="<div>Hello & Welcome!</div>"
+        ></textarea>
+      </div>
+
+      <!-- Output Panel -->
+      <div class="flex flex-col h-[500px]">
+        <div class="flex justify-between items-center mb-2 px-1">
+          <label id="outputLabel" for="outputArea" class="text-sm font-semibold text-text-primary">Escaped HTML (Output)</label>
+          <div class="flex gap-3">
+            <button id="copyBtn" class="text-xs text-accent hover:text-accent-hover transition-colors flex items-center gap-1 font-medium">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+              Copy
+            </button>
+            <button id="downloadBtn" class="text-xs text-accent hover:text-accent-hover transition-colors flex items-center gap-1 font-medium">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+              Download
+            </button>
+          </div>
+        </div>
+        <textarea 
+          id="outputArea" 
+          class="flex-1 w-full bg-void border border-border-subtle rounded-xl p-4 font-mono text-sm text-text-secondary resize-none focus-glow whitespace-pre overflow-auto"
+          readonly
+        ></textarea>
+      </div>
+      
+    </div>
+  </div>
+
+  <Fragment slot="content">
+    <HowToSection 
+      title="How to Escape HTML Entities"
+      steps={[
+        {
+          name: "Select Your Mode",
+          text: "Use the toggle at the top to choose between Escaping (converting characters into code) or Unescaping (converting code back into readable characters).",
+          description: "Use the toggle at the top to choose between Escaping (converting characters into code) or Unescaping (converting code back into readable characters)."
+        },
+        {
+          name: "Paste Your Text",
+          text: "Paste your raw text or HTML code into the left text area. The tool will process it instantly as you type.",
+          description: "Paste your raw text or HTML code into the left text area. The tool will process it instantly as you type."
+        },
+        {
+          name: "Extended Entities",
+          text: "If you want to encode special symbols like the copyright sign (©) or currency symbols (€), check the 'Extended Entities' box.",
+          description: "If you want to encode special symbols like the copyright sign (©) or currency symbols (€), check the 'Extended Entities' box."
+        },
+        {
+          name: "Copy Output",
+          text: "Click the Copy button to copy the safely escaped string to your clipboard for use in your application.",
+          description: "Click the Copy button to copy the safely escaped string to your clipboard for use in your application."
+        }
+      ]}
+    />
+    <TechnicalExplainer 
+      title="Why do we escape HTML?"
+      sections={[
+        {
+          title: "Preventing XSS Attacks",
+          content: "Cross-Site Scripting (XSS) is a major security vulnerability where users can inject malicious JavaScript into a website via input forms. By escaping characters like <code>&lt;</code> and <code>&gt;</code> into <code>&amp;lt;</code> and <code>&amp;gt;</code>, the browser treats the input as plain text rather than executable code."
+        },
+        {
+          title: "Displaying Code Snippets",
+          content: "If you are building a blog or documentation site and want to show HTML code on the screen (like a tutorial), you must escape it first. Otherwise, the browser will literally render the HTML instead of displaying the raw code."
+        },
+        {
+          title: "XML Compatibility",
+          content: "In XML and older XHTML specifications, five characters are strictly reserved and must always be escaped: Ampersand (<code>&amp;</code>), Less Than (<code>&lt;</code>), Greater Than (<code>&gt;</code>), Double Quote (<code>&quot;</code>), and Apostrophe (<code>&apos;</code> or <code>&#039;</code>)."
+        }
+      ]}
+    />
+    <FaqSection 
+      faqs={[
+        {
+          question: "What is an HTML Entity?",
+          text: "An HTML entity is a piece of text (string) that begins with an ampersand (&) and ends with a semicolon (;). Entities are frequently used to display reserved characters (which would otherwise be interpreted as HTML code) or invisible characters (like non-breaking spaces).",
+          answer: "An HTML entity is a piece of text (string) that begins with an ampersand (<code>&amp;</code>) and ends with a semicolon (<code>;</code>). Entities are frequently used to display reserved characters (which would otherwise be interpreted as HTML code) or invisible characters (like non-breaking spaces)."
+        },
+        {
+          question: "Can this unescape numeric entities like &#169;?",
+          text: "Yes. When set to 'Unescape (Decode)' mode, the tool acts like a standard browser and will accurately decode both named entities (like &copy;) and numeric/hex entities (like &#169; or &#xA9;) back into their original characters.",
+          answer: "Yes. When set to 'Unescape (Decode)' mode, the tool acts like a standard browser and will accurately decode both named entities (like <code>&copy;</code>) and numeric/hex entities (like <code>&#169;</code> or <code>&#xA9;</code>) back into their original characters."
+        },
+        {
+          question: "Is it safe to paste sensitive data here?",
+          text: "Yes. All processing is done locally in your browser via JavaScript. The data never leaves your computer.",
+          answer: "Yes. All processing is done locally in your browser via JavaScript. The data never leaves your computer."
+        }
+      ]}
+    />
+  </Fragment>
+
+  <script>
+    import { copyToClipboard } from '../../lib/clipboard';
+    import { downloadFile } from '../../lib/download';
+    import { processHtmlEntities, type EscaperOptions } from '../../tools/html-escaper';
+
+    const inputArea = document.getElementById('inputArea') as HTMLTextAreaElement;
+    const outputArea = document.getElementById('outputArea') as HTMLTextAreaElement;
+    const clearBtn = document.getElementById('clearBtn')!;
+    const copyBtn = document.getElementById('copyBtn')!;
+    const downloadBtn = document.getElementById('downloadBtn')!;
+
+    const modeEscape = document.getElementById('modeEscape')!;
+    const modeUnescape = document.getElementById('modeUnescape')!;
+    const cbExtended = document.getElementById('cbExtended') as HTMLInputElement;
+    
+    const inputLabel = document.getElementById('inputLabel')!;
+    const outputLabel = document.getElementById('outputLabel')!;
+
+    let currentMode: 'escape' | 'unescape' = 'escape';
+
+    function setMode(mode: 'escape' | 'unescape') {
+      currentMode = mode;
+      
+      if (mode === 'escape') {
+        modeEscape.className = 'px-4 py-1.5 text-sm font-bold rounded-md transition-colors bg-accent text-void shadow-sm';
+        modeUnescape.className = 'px-4 py-1.5 text-sm font-bold rounded-md transition-colors text-text-secondary hover:text-text-primary';
+        inputLabel.textContent = 'Raw Text (Input)';
+        outputLabel.textContent = 'Escaped HTML (Output)';
+        inputArea.placeholder = '<div>Hello & Welcome!</div>';
+      } else {
+        modeUnescape.className = 'px-4 py-1.5 text-sm font-bold rounded-md transition-colors bg-accent text-void shadow-sm';
+        modeEscape.className = 'px-4 py-1.5 text-sm font-bold rounded-md transition-colors text-text-secondary hover:text-text-primary';
+        inputLabel.textContent = 'Escaped HTML (Input)';
+        outputLabel.textContent = 'Raw Text (Output)';
+        inputArea.placeholder = '&lt;div&gt;Hello &amp; Welcome!&lt;/div&gt;';
+      }
+      
+      // Swap contents
+      const temp = inputArea.value;
+      inputArea.value = outputArea.value;
+      
+      runProcess();
+    }
+
+    modeEscape.addEventListener('click', () => { if (currentMode !== 'escape') setMode('escape'); });
+    modeUnescape.addEventListener('click', () => { if (currentMode !== 'unescape') setMode('unescape'); });
+    cbExtended.addEventListener('change', runProcess);
+
+    function runProcess() {
+      const val = inputArea.value;
+      if (!val) {
+        outputArea.value = '';
+        return;
+      }
+
+      const options: EscaperOptions = {
+        mode: currentMode,
+        useFullList: cbExtended.checked
+      };
+
+      const res = processHtmlEntities(val, options);
+      outputArea.value = res;
+    }
+
+    inputArea.addEventListener('input', runProcess);
+
+    clearBtn.addEventListener('click', () => {
+      inputArea.value = '';
+      outputArea.value = '';
+      inputArea.focus();
+    });
+
+    copyBtn.addEventListener('click', () => {
+      if (outputArea.value) {
+        copyToClipboard(outputArea.value, copyBtn, `
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+          Copied
+        `);
+      }
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      if (outputArea.value) {
+        downloadFile(outputArea.value, 'encoded.txt', 'text/plain;charset=utf-8;');
+      }
+    });
+
+  </script>
+</ToolLayout>

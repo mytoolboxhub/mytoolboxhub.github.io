@@ -1,0 +1,297 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import HowToSection from '../../components/seo/HowToSection.astro';
+import FaqSection from '../../components/seo/FaqSection.astro';
+import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
+import { tools } from '../../lib/tool-registry';
+
+const tool = tools.find(t => t.id === 'srt-cleaner')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="space-y-6">
+    
+    <!-- Controls Bar -->
+    <div class="glass p-6 rounded-2xl flex flex-wrap gap-6 items-center justify-between">
+      
+      <div class="flex flex-wrap items-start gap-8">
+        
+        <!-- Cleanup Toggles -->
+        <div class="flex flex-col gap-3">
+          <span class="text-xs font-bold uppercase tracking-wider text-text-muted mb-1 block">Cleanup Options</span>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+            <label class="flex items-center gap-2 cursor-pointer group">
+              <input type="checkbox" id="cbHtml" checked class="w-4 h-4 rounded border-border-default bg-surface text-accent focus-glow" />
+              <span class="text-sm text-text-primary group-hover:text-accent transition-colors">Strip HTML Tags (&lt;i&gt;, &lt;b&gt;)</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer group">
+              <input type="checkbox" id="cbSpeaker" checked class="w-4 h-4 rounded border-border-default bg-surface text-accent focus-glow" />
+              <span class="text-sm text-text-primary group-hover:text-accent transition-colors">Strip Speaker Labels (John:)</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer group">
+              <input type="checkbox" id="cbDesc" checked class="w-4 h-4 rounded border-border-default bg-surface text-accent focus-glow" />
+              <span class="text-sm text-text-primary group-hover:text-accent transition-colors">Strip Descriptions ([MUSIC])</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer group">
+              <input type="checkbox" id="cbMerge" checked class="w-4 h-4 rounded border-border-default bg-surface text-accent focus-glow" />
+              <span class="text-sm text-text-primary group-hover:text-accent transition-colors">Merge Duplicate Lines</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer group">
+              <input type="checkbox" id="cbEmpty" checked class="w-4 h-4 rounded border-border-default bg-surface text-accent focus-glow" />
+              <span class="text-sm text-text-primary group-hover:text-accent transition-colors">Remove Empty Cues</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Output Format -->
+        <div class="flex flex-col gap-3">
+          <span class="text-xs font-bold uppercase tracking-wider text-text-muted mb-1 block">Export Format</span>
+          <div class="flex flex-col gap-3">
+            <label class="flex items-center gap-2 cursor-pointer group">
+              <input type="radio" name="outFormat" value="srt" checked class="w-4 h-4 rounded-full border-border-default bg-surface text-accent focus-glow" />
+              <span class="text-sm text-text-primary group-hover:text-accent transition-colors">Clean SRT (.srt)</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer group">
+              <input type="radio" name="outFormat" value="text" class="w-4 h-4 rounded-full border-border-default bg-surface text-accent focus-glow" />
+              <span class="text-sm text-text-primary group-hover:text-accent transition-colors">Plain Text Transcript (.txt)</span>
+            </label>
+          </div>
+        </div>
+
+      </div>
+
+      <button id="cleanBtn" class="px-8 py-3 bg-accent text-void font-bold text-sm rounded-lg hover:bg-accent-hover transition-colors focus-glow flex items-center gap-2 shadow-lg shadow-accent/20 h-fit">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+        Clean Subtitles
+      </button>
+
+    </div>
+
+    <!-- Stats Bar -->
+    <div id="statsBar" class="hidden flex justify-between items-center px-4 py-2 bg-success/10 border border-success/30 text-success rounded-lg text-sm font-medium animate-fade-in-down">
+      <div class="flex gap-4">
+        <span><strong id="statTags">0</strong> tags removed</span>
+        <span><strong id="statLabels">0</strong> labels removed</span>
+        <span><strong id="statDesc">0</strong> descriptions removed</span>
+        <span><strong id="statEmpty">0</strong> empty cues removed</span>
+      </div>
+      <div>
+        Processed <strong id="statCues">0</strong> total cues
+      </div>
+    </div>
+
+    <!-- Panels -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      
+      <!-- Input Panel -->
+      <div class="flex flex-col h-[500px]">
+        <div class="flex justify-between items-center mb-2 px-1">
+          <label for="inputArea" class="text-sm font-semibold text-text-primary">Original SRT</label>
+          <div class="flex items-center gap-2">
+            <label class="text-xs text-accent hover:text-accent-hover cursor-pointer transition-colors font-medium flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+              Upload .srt
+              <input type="file" id="fileUpload" accept=".srt,.txt" class="hidden" />
+            </label>
+            <span class="text-border-subtle">|</span>
+            <button id="clearBtn" class="text-xs text-text-muted hover:text-error transition-colors font-medium">Clear</button>
+          </div>
+        </div>
+        <textarea 
+          id="inputArea" 
+          class="flex-1 w-full bg-surface/50 border border-border-subtle rounded-xl p-4 font-mono text-sm text-text-primary resize-none focus-glow transition-colors whitespace-pre overflow-auto"
+          placeholder="Paste your .srt contents here...&#10;&#10;1&#10;00:00:01,000 --> 00:00:04,000&#10;[MUSIC PLAYING]&#10;<i>Hello!</i>&#10;&#10;2&#10;00:00:05,000 --> 00:00:07,000&#10;John: Welcome to the show."
+        ></textarea>
+      </div>
+
+      <!-- Output Panel -->
+      <div class="flex flex-col h-[500px]">
+        <div class="flex justify-between items-center mb-2 px-1">
+          <label for="outputArea" class="text-sm font-semibold text-text-primary">Cleaned Output</label>
+          <div class="flex gap-3">
+            <button id="copyBtn" class="text-xs text-accent hover:text-accent-hover transition-colors flex items-center gap-1 font-medium">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+              Copy
+            </button>
+            <button id="downloadBtn" class="text-xs text-accent hover:text-accent-hover transition-colors flex items-center gap-1 font-medium">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+              Download
+            </button>
+          </div>
+        </div>
+        <textarea 
+          id="outputArea" 
+          class="flex-1 w-full bg-void border border-border-subtle rounded-xl p-4 font-mono text-sm text-text-secondary resize-none focus-glow whitespace-pre overflow-auto"
+          readonly
+        ></textarea>
+      </div>
+      
+    </div>
+  </div>
+
+  <Fragment slot="content">
+    <HowToSection 
+      title="How to Clean SRT Subtitles"
+      steps={[
+        {
+          name: "Upload or Paste",
+          text: "Click the 'Upload .srt' button to load a file directly from your computer, or copy and paste the raw text into the left text box.",
+          description: "Click the 'Upload .srt' button to load a file directly from your computer, or copy and paste the raw text into the left text box."
+        },
+        {
+          name: "Select Cleaning Options",
+          text: "Toggle which elements you want to remove. You can strip out HTML tags (like italics), speaker names (e.g. 'John:'), and audio descriptions in brackets (e.g. '[MUSIC]').",
+          description: "Toggle which elements you want to remove. You can strip out HTML tags (like italics), speaker names (e.g. <code>John:</code>), and audio descriptions in brackets (e.g. <code>[MUSIC]</code>)."
+        },
+        {
+          name: "Choose Export Format",
+          text: "Select 'Clean SRT' if you want to keep the timestamps and use it as a subtitle file. Select 'Plain Text Transcript' to strip ALL timestamps and output pure readable dialogue.",
+          description: "Select 'Clean SRT' if you want to keep the timestamps and use it as a subtitle file. Select 'Plain Text Transcript' to strip ALL timestamps and output pure readable dialogue."
+        },
+        {
+          name: "Clean and Download",
+          text: "Click 'Clean Subtitles'. The stats bar will show you exactly how many tags were removed. Click Download to save your new file.",
+          description: "Click 'Clean Subtitles'. The stats bar will show you exactly how many tags were removed. Click Download to save your new file."
+        }
+      ]}
+    />
+    <TechnicalExplainer 
+      title="What is an SRT File?"
+      sections={[
+        {
+          title: "The SubRip Text Format",
+          content: "SRT is the most basic and widely used format for video subtitles. It consists of sequential numeric blocks. Each block contains an index number, a start and end timecode (in `HH:MM:SS,MIL`), and one or more lines of dialogue text."
+        },
+        {
+          title: "Hidden HTML Formatting",
+          content: "Many SRT files generated by YouTube or Premiere Pro include basic HTML tags like `<i>` for italics or `<font color=\"red\">`. While supported by some advanced video players, these tags often show up as literal text when uploaded to basic social media platforms. Stripping them ensures maximum compatibility."
+        },
+        {
+          title: "Plain Text Extraction",
+          content: "Video editors and content marketers often need the pure dialogue from a video to write a blog post or summary. By selecting 'Plain Text Transcript', this tool safely deletes all index numbers and timecodes, concatenating the remaining dialogue into a readable paragraph format."
+        }
+      ]}
+    />
+    <FaqSection 
+      faqs={[
+        {
+          question: "Does this tool fix timing or sync issues?",
+          text: "No. This tool only cleans the text/dialogue portion of the subtitle file. It does not alter the timecodes (e.g. shifting the sync forward or backward by 5 seconds).",
+          answer: "No. This tool only cleans the text/dialogue portion of the subtitle file. It does not alter the timecodes (e.g. shifting the sync forward or backward by 5 seconds)."
+        },
+        {
+          question: "Can I convert VTT files instead?",
+          text: "Currently, this tool is strictly designed for the SRT format. However, you can often convert a VTT to SRT by simply removing the 'WEBVTT' header at the top and replacing periods with commas in the timestamps.",
+          answer: "Currently, this tool is strictly designed for the SRT format. However, you can often convert a VTT to SRT by simply removing the <code>WEBVTT</code> header at the top and replacing periods with commas in the timestamps."
+        },
+        {
+          question: "Will it mess up the numbering if it removes empty cues?",
+          text: "No! The tool automatically re-indexes the entire file from 1 to N before exporting. If cue #45 is deleted because it was empty, cue #46 automatically becomes the new #45, ensuring the file remains valid.",
+          answer: "No! The tool automatically re-indexes the entire file from 1 to N before exporting. If cue #45 is deleted because it was empty, cue #46 automatically becomes the new #45, ensuring the file remains valid."
+        }
+      ]}
+    />
+  </Fragment>
+
+  <script>
+    import { copyToClipboard } from '../../lib/clipboard';
+    import { downloadFile } from '../../lib/download';
+    import { cleanSrt, type SrtCleanOptions } from '../../tools/srt-cleaner';
+
+    const inputArea = document.getElementById('inputArea') as HTMLTextAreaElement;
+    const outputArea = document.getElementById('outputArea') as HTMLTextAreaElement;
+    const fileUpload = document.getElementById('fileUpload') as HTMLInputElement;
+    const clearBtn = document.getElementById('clearBtn')!;
+    const copyBtn = document.getElementById('copyBtn')!;
+    const downloadBtn = document.getElementById('downloadBtn')!;
+    const cleanBtn = document.getElementById('cleanBtn')!;
+
+    const cbHtml = document.getElementById('cbHtml') as HTMLInputElement;
+    const cbSpeaker = document.getElementById('cbSpeaker') as HTMLInputElement;
+    const cbDesc = document.getElementById('cbDesc') as HTMLInputElement;
+    const cbMerge = document.getElementById('cbMerge') as HTMLInputElement;
+    const cbEmpty = document.getElementById('cbEmpty') as HTMLInputElement;
+
+    const statsBar = document.getElementById('statsBar')!;
+    const statTags = document.getElementById('statTags')!;
+    const statLabels = document.getElementById('statLabels')!;
+    const statDesc = document.getElementById('statDesc')!;
+    const statEmpty = document.getElementById('statEmpty')!;
+    const statCues = document.getElementById('statCues')!;
+
+    function runProcess() {
+      const val = inputArea.value;
+      if (!val) {
+        outputArea.value = '';
+        statsBar.classList.add('hidden');
+        return;
+      }
+
+      const outFormat = (document.querySelector('input[name="outFormat"]:checked') as HTMLInputElement).value as 'srt' | 'text';
+
+      const options: SrtCleanOptions = {
+        stripHtml: cbHtml.checked,
+        stripSpeakerLabels: cbSpeaker.checked,
+        stripDescriptions: cbDesc.checked,
+        mergeDuplicateLines: cbMerge.checked,
+        removeEmptyCues: cbEmpty.checked,
+        outputFormat: outFormat
+      };
+
+      const res = cleanSrt(val, options);
+
+      outputArea.value = res.output;
+
+      if (res.stats.cuesProcessed > 0) {
+        statsBar.classList.remove('hidden');
+        statTags.textContent = res.stats.tagsRemoved.toString();
+        statLabels.textContent = res.stats.labelsRemoved.toString();
+        statDesc.textContent = res.stats.descriptionsRemoved.toString();
+        statEmpty.textContent = res.stats.emptyCuesRemoved.toString();
+        statCues.textContent = res.stats.cuesProcessed.toString();
+      } else {
+        statsBar.classList.add('hidden');
+      }
+    }
+
+    cleanBtn.addEventListener('click', runProcess);
+
+    fileUpload.addEventListener('change', (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const text = ev.target?.result as string;
+        inputArea.value = text;
+        runProcess();
+      };
+      reader.readAsText(file);
+    });
+
+    clearBtn.addEventListener('click', () => {
+      inputArea.value = '';
+      runProcess();
+      fileUpload.value = '';
+      inputArea.focus();
+    });
+
+    copyBtn.addEventListener('click', () => {
+      if (outputArea.value) {
+        copyToClipboard(outputArea.value, copyBtn, `
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+          Copied!
+        `);
+      }
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      if (!outputArea.value) return;
+      const format = (document.querySelector('input[name="outFormat"]:checked') as HTMLInputElement).value;
+      
+      const ext = format === 'text' ? 'txt' : 'srt';
+      downloadFile(outputArea.value, `cleaned_subtitles.${ext}`, 'text/plain;charset=utf-8;');
+    });
+
+  </script>
+</ToolLayout>

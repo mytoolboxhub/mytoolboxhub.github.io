@@ -1,0 +1,258 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import HowToSection from '../../components/seo/HowToSection.astro';
+import FaqSection from '../../components/seo/FaqSection.astro';
+import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
+import { tools } from '../../lib/tool-registry';
+
+const tool = tools.find(t => t.id === 'yaml-json')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="space-y-6">
+    
+    <!-- Controls Bar -->
+    <div class="glass p-4 rounded-2xl flex flex-wrap gap-4 items-center justify-between">
+      
+      <div class="flex items-center gap-4 bg-surface/50 p-1.5 rounded-lg border border-border-default">
+        <button id="modeYamlToJson" class="px-4 py-1.5 text-sm font-bold rounded-md transition-colors bg-accent text-void shadow-sm">
+          YAML → JSON
+        </button>
+        <button id="modeJsonToYaml" class="px-4 py-1.5 text-sm font-bold rounded-md transition-colors text-text-secondary hover:text-text-primary">
+          JSON → YAML
+        </button>
+      </div>
+
+      <div id="jsonOpts" class="hidden flex items-center gap-3">
+        <label for="indentSelect" class="text-xs font-medium text-text-secondary">YAML Indent:</label>
+        <select id="indentSelect" class="bg-surface border border-border-default rounded px-2 py-1 text-xs text-text-primary focus-glow outline-none">
+          <option value="2">2 Spaces</option>
+          <option value="4">4 Spaces</option>
+        </select>
+      </div>
+
+      <button id="convertBtn" class="px-6 py-2 bg-accent text-void font-bold text-sm rounded-lg hover:bg-accent-hover transition-colors focus-glow flex items-center gap-2 shadow-lg shadow-accent/20">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+        Convert
+      </button>
+    </div>
+
+    <!-- Error Banner -->
+    <div id="errorBanner" class="hidden bg-error/10 border border-error/30 text-error px-4 py-3 rounded-lg text-sm flex items-start gap-3 animate-fade-in-down">
+      <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      <div>
+        <strong class="block font-semibold mb-1">Conversion Failed</strong>
+        <span id="errorMessage" class="font-mono text-xs break-all"></span>
+      </div>
+    </div>
+
+    <!-- Panels -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      
+      <!-- Input Panel -->
+      <div class="flex flex-col h-[500px]">
+        <div class="flex justify-between items-center mb-2 px-1">
+          <label id="inputLabel" for="inputArea" class="text-sm font-semibold text-text-primary">YAML Input</label>
+          <button id="clearBtn" class="text-xs text-text-muted hover:text-error transition-colors font-medium">Clear</button>
+        </div>
+        <textarea 
+          id="inputArea" 
+          class="flex-1 w-full bg-surface/50 border border-border-subtle rounded-xl p-4 font-mono text-sm text-text-primary resize-none focus-glow transition-colors whitespace-pre overflow-auto"
+          placeholder="name: MyToolboxHub&#10;type: website&#10;features:&#10;  - fast&#10;  - local&#10;  - secure"
+        ></textarea>
+      </div>
+
+      <!-- Output Panel -->
+      <div class="flex flex-col h-[500px]">
+        <div class="flex justify-between items-center mb-2 px-1">
+          <label id="outputLabel" for="outputArea" class="text-sm font-semibold text-text-primary">JSON Output</label>
+          <div class="flex gap-3">
+            <button id="copyBtn" class="text-xs text-accent hover:text-accent-hover transition-colors flex items-center gap-1 font-medium">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+              Copy
+            </button>
+            <button id="downloadBtn" class="text-xs text-accent hover:text-accent-hover transition-colors flex items-center gap-1 font-medium">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+              Download
+            </button>
+          </div>
+        </div>
+        <textarea 
+          id="outputArea" 
+          class="flex-1 w-full bg-void border border-border-subtle rounded-xl p-4 font-mono text-sm text-text-secondary resize-none focus-glow whitespace-pre overflow-auto"
+          readonly
+        ></textarea>
+      </div>
+      
+    </div>
+  </div>
+
+  <Fragment slot="content">
+    <HowToSection 
+      title="How to Convert Between YAML and JSON"
+      steps={[
+        {
+          name: "Select Conversion Mode",
+          text: "Use the toggle buttons at the top to choose your desired direction: 'YAML to JSON' or 'JSON to YAML'.",
+          description: "Use the toggle buttons at the top to choose your desired direction: 'YAML to JSON' or 'JSON to YAML'."
+        },
+        {
+          name: "Paste Your Data",
+          text: "Paste your source code into the left text area. If you are pasting JSON, ensure it is completely valid (no trailing commas).",
+          description: "Paste your source code into the left text area. If you are pasting JSON, ensure it is completely valid (no trailing commas)."
+        },
+        {
+          name: "Convert",
+          text: "Click 'Convert'. If your input has syntax errors, a red warning box will appear indicating where the problem is.",
+          description: "Click 'Convert'. If your input has syntax errors, a red warning box will appear indicating where the problem is."
+        },
+        {
+          name: "Export",
+          text: "Once successfully converted, you can copy the result directly to your clipboard or download it as a .json or .yml file.",
+          description: "Once successfully converted, you can copy the result directly to your clipboard or download it as a .json or .yml file."
+        }
+      ]}
+    />
+    <TechnicalExplainer 
+      title="YAML vs JSON"
+      sections={[
+        {
+          title: "JSON (JavaScript Object Notation)",
+          content: "JSON is the standard for data interchange on the web. It is incredibly strict (requires double quotes, no trailing commas, no comments). Because of its strictness, it is extremely fast for machines to parse, but can be annoying for humans to write manually."
+        },
+        {
+          title: "YAML (YAML Ain't Markup Language)",
+          content: "YAML is designed specifically for human readability. It relies heavily on indentation (spaces, never tabs) rather than brackets and braces. It allows for comments and doesn't require quotes around most strings. It is widely used for configuration files (Docker, Kubernetes, GitHub Actions)."
+        },
+        {
+          title: "Compatibility limitations",
+          content: "JSON is essentially a subset of YAML. Any valid JSON file can usually be parsed by a YAML parser. However, YAML has advanced features (like anchors, aliases, and multi-document streams) that cannot be directly translated into a single JSON object."
+        }
+      ]}
+    />
+    <FaqSection 
+      faqs={[
+        {
+          question: "Does this tool support YAML Anchors and Aliases?",
+          text: "No. To keep this tool lightweight, secure, and 100% client-side without heavy dependencies, it implements a simplified YAML parser. Advanced features like anchors (&) and aliases (*) are not supported.",
+          answer: "No. To keep this tool lightweight, secure, and 100% client-side without heavy dependencies, it implements a simplified YAML parser. Advanced features like anchors (<code>&</code>) and aliases (<code>*</code>) are not supported."
+        },
+        {
+          question: "Can I convert JSON with comments?",
+          text: "No. Standard JSON does not support comments. If you try to parse JSON that contains '//' or '/* */', the converter will throw a syntax error.",
+          answer: "No. Standard JSON does not support comments. If you try to parse JSON that contains <code>//</code> or <code>/* */</code>, the converter will throw a syntax error."
+        },
+        {
+          question: "Why did my numbers turn into strings?",
+          text: "If you enclose a number in quotes in JSON (e.g., '123'), it is a string. When converted to YAML, it might be unquoted if it's safe, but it retains its string type in memory. Be mindful of types when converting back and forth.",
+          answer: "If you enclose a number in quotes in JSON (e.g., <code>\"123\"</code>), it is a string. When converted to YAML, it might be unquoted if it's safe, but it retains its string type in memory. Be mindful of types when converting back and forth."
+        }
+      ]}
+    />
+  </Fragment>
+
+  <script>
+    import { copyToClipboard } from '../../lib/clipboard';
+    import { downloadFile } from '../../lib/download';
+    import { yamlToJson, jsonToYaml } from '../../tools/yaml-json';
+
+    const inputArea = document.getElementById('inputArea') as HTMLTextAreaElement;
+    const outputArea = document.getElementById('outputArea') as HTMLTextAreaElement;
+    const clearBtn = document.getElementById('clearBtn')!;
+    const copyBtn = document.getElementById('copyBtn')!;
+    const downloadBtn = document.getElementById('downloadBtn')!;
+    const convertBtn = document.getElementById('convertBtn')!;
+
+    const modeYamlToJson = document.getElementById('modeYamlToJson')!;
+    const modeJsonToYaml = document.getElementById('modeJsonToYaml')!;
+    const jsonOpts = document.getElementById('jsonOpts')!;
+    const indentSelect = document.getElementById('indentSelect') as HTMLSelectElement;
+    
+    const inputLabel = document.getElementById('inputLabel')!;
+    const outputLabel = document.getElementById('outputLabel')!;
+    
+    const errorBanner = document.getElementById('errorBanner')!;
+    const errorMessage = document.getElementById('errorMessage')!;
+
+    let currentMode: 'yaml2json' | 'json2yaml' = 'yaml2json';
+
+    function setMode(mode: 'yaml2json' | 'json2yaml') {
+      currentMode = mode;
+      
+      if (mode === 'yaml2json') {
+        modeYamlToJson.className = 'px-4 py-1.5 text-sm font-bold rounded-md transition-colors bg-accent text-void shadow-sm';
+        modeJsonToYaml.className = 'px-4 py-1.5 text-sm font-bold rounded-md transition-colors text-text-secondary hover:text-text-primary';
+        jsonOpts.classList.add('hidden');
+        inputLabel.textContent = 'YAML Input';
+        outputLabel.textContent = 'JSON Output';
+        inputArea.placeholder = "name: MyToolboxHub\ntype: website\nfeatures:\n  - fast\n  - local\n  - secure";
+      } else {
+        modeJsonToYaml.className = 'px-4 py-1.5 text-sm font-bold rounded-md transition-colors bg-accent text-void shadow-sm';
+        modeYamlToJson.className = 'px-4 py-1.5 text-sm font-bold rounded-md transition-colors text-text-secondary hover:text-text-primary';
+        jsonOpts.classList.remove('hidden');
+        inputLabel.textContent = 'JSON Input';
+        outputLabel.textContent = 'YAML Output';
+        inputArea.placeholder = '{\n  "name": "MyToolboxHub",\n  "type": "website",\n  "features": [\n    "fast",\n    "local",\n    "secure"\n  ]\n}';
+      }
+      
+      // Swap contents
+      const temp = inputArea.value;
+      inputArea.value = outputArea.value;
+      outputArea.value = temp;
+      
+      errorBanner.classList.add('hidden');
+    }
+
+    modeYamlToJson.addEventListener('click', () => { if (currentMode !== 'yaml2json') setMode('yaml2json'); });
+    modeJsonToYaml.addEventListener('click', () => { if (currentMode !== 'json2yaml') setMode('json2yaml'); });
+
+    function runConvert() {
+      const val = inputArea.value;
+      if (!val) {
+        outputArea.value = '';
+        errorBanner.classList.add('hidden');
+        return;
+      }
+
+      const res = currentMode === 'yaml2json' 
+        ? yamlToJson(val) 
+        : jsonToYaml(val, parseInt(indentSelect.value, 10) || 2);
+
+      if (res.error) {
+        errorBanner.classList.remove('hidden');
+        errorMessage.textContent = res.error;
+        outputArea.value = '';
+      } else {
+        errorBanner.classList.add('hidden');
+        outputArea.value = res.output;
+      }
+    }
+
+    convertBtn.addEventListener('click', runConvert);
+
+    clearBtn.addEventListener('click', () => {
+      inputArea.value = '';
+      outputArea.value = '';
+      errorBanner.classList.add('hidden');
+      inputArea.focus();
+    });
+
+    copyBtn.addEventListener('click', () => {
+      if (outputArea.value) {
+        copyToClipboard(outputArea.value, copyBtn, `
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+          Copied
+        `);
+      }
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      if (outputArea.value) {
+        const ext = currentMode === 'yaml2json' ? 'json' : 'yml';
+        const mime = currentMode === 'yaml2json' ? 'application/json' : 'text/yaml';
+        downloadFile(outputArea.value, `converted.${ext}`, `${mime};charset=utf-8;`);
+      }
+    });
+
+  </script>
+</ToolLayout>

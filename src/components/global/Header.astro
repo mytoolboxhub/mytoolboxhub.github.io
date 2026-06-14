@@ -1,4 +1,5 @@
 ---
+import SearchModal from './SearchModal.astro';
 ---
 <header class="sticky top-0 z-40 w-full backdrop-blur-xl bg-void/80 border-b border-border-subtle">
   <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -16,6 +17,7 @@
     <div class="flex items-center gap-4">
       <!-- Search Trigger (Cmd+K) -->
       <button 
+        id="headerSearchBtn"
         type="button" 
         class="hidden sm:flex items-center gap-2 px-3 py-1.5 text-sm text-text-muted bg-surface hover:bg-elevated border border-border-subtle rounded-lg transition-colors focus-glow w-64 justify-between"
       >
@@ -39,3 +41,4 @@
     </div>
   </div>
 </header>
+<SearchModal />

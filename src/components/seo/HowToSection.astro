@@ -1,41 +1,35 @@
 ---
+interface Props {
+  title: string;
+  steps: {
+    name: string;
+    text: string;
+    description: string; // HTML content
+  }[];
+}
+const { title, steps } = Astro.props;
 ---
 <section class="mb-12">
-  <h2 class="text-2xl font-bold mb-6 text-text-primary">How to Convert JSON to CSV</h2>
+  <h2 class="text-2xl font-bold mb-6 text-text-primary">{title}</h2>
   
   <div class="space-y-6">
-    <div class="glass p-6">
-      <h3 class="text-lg font-semibold text-accent mb-2">Step 1: Paste or Upload Your JSON Data</h3>
-      <p class="text-text-secondary leading-relaxed">Paste your JSON directly into the editor on the left, or drag and drop a <code class="bg-base px-1.5 py-0.5 rounded text-text-primary">.json</code> file onto the upload area. The converter accepts arrays of objects, nested objects, and mixed-type datasets.</p>
-    </div>
-
-    <div class="glass p-6">
-      <h3 class="text-lg font-semibold text-accent mb-2">Step 2: Configure Conversion Options</h3>
-      <p class="text-text-secondary leading-relaxed">Choose your preferred delimiter (comma, tab, or semicolon), toggle column headers on or off, and select whether to flatten nested objects into dot-notation columns (e.g., <code class="bg-base px-1.5 py-0.5 rounded text-text-primary">address.city</code>).</p>
-    </div>
-
-    <div class="glass p-6">
-      <h3 class="text-lg font-semibold text-accent mb-2">Step 3: Preview & Validate</h3>
-      <p class="text-text-secondary leading-relaxed">Click "Convert" to see an instant preview of your CSV data in the interactive grid below. The converter validates your JSON syntax in real-time and highlights any errors with line numbers.</p>
-    </div>
-
-    <div class="glass p-6">
-      <h3 class="text-lg font-semibold text-accent mb-2">Step 4: Download or Copy</h3>
-      <p class="text-text-secondary leading-relaxed">Click "Download .csv" to save the file to your device, or use "Copy to Clipboard" to paste it directly into Excel, Google Sheets, or your database import tool.</p>
-    </div>
+    {steps.map((step, index) => (
+      <div class="glass p-6">
+        <h3 class="text-lg font-semibold text-accent mb-2">Step {index + 1}: {step.name}</h3>
+        <div class="text-text-secondary leading-relaxed" set:html={step.description}></div>
+      </div>
+    ))}
   </div>
 
-  <script type="application/ld+json" is:inline>
-    {
-      "@context": "https://schema.org",
-      "@type": "HowTo",
-      "name": "How to Convert JSON to CSV",
-      "step": [
-        { "@type": "HowToStep", "name": "Paste or Upload Your JSON Data", "text": "Paste your JSON directly into the editor on the left, or drag and drop a .json file onto the upload area. The converter accepts arrays of objects, nested objects, and mixed-type datasets." },
-        { "@type": "HowToStep", "name": "Configure Conversion Options", "text": "Choose your preferred delimiter (comma, tab, or semicolon), toggle column headers on or off, and select whether to flatten nested objects into dot-notation columns." },
-        { "@type": "HowToStep", "name": "Preview & Validate", "text": "Click Convert to see an instant preview of your CSV data in the interactive grid below. The converter validates your JSON syntax in real-time and highlights any errors with line numbers." },
-        { "@type": "HowToStep", "name": "Download or Copy", "text": "Click Download .csv to save the file to your device, or use Copy to Clipboard to paste it directly into Excel, Google Sheets, or your database import tool." }
-      ]
-    }
+  <script type="application/ld+json" is:inline set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": title,
+    "step": steps.map(s => ({
+      "@type": "HowToStep",
+      "name": s.name,
+      "text": s.text
+    }))
+  })}>
   </script>
 </section>

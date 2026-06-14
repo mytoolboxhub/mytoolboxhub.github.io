@@ -86,13 +86,88 @@ const tool = tools.find(t => t.id === 'json-to-csv')!;
   </div>
 
   <Fragment slot="content">
-    <HowToSection />
-    <TechnicalExplainer />
-    <FaqSection />
+    <HowToSection 
+      title="How to Convert JSON to CSV"
+      steps={[
+        {
+          name: "Paste or Upload Your JSON Data",
+          text: "Paste your JSON directly into the editor on the left, or drag and drop a .json file onto the upload area. The converter accepts arrays of objects, nested objects, and mixed-type datasets.",
+          description: "Paste your JSON directly into the editor on the left, or drag and drop a <code class=\"bg-base px-1.5 py-0.5 rounded text-text-primary\">.json</code> file onto the upload area. The converter accepts arrays of objects, nested objects, and mixed-type datasets."
+        },
+        {
+          name: "Configure Conversion Options",
+          text: "Choose your preferred delimiter (comma, tab, or semicolon), toggle column headers on or off, and select whether to flatten nested objects into dot-notation columns.",
+          description: "Choose your preferred delimiter (comma, tab, or semicolon), toggle column headers on or off, and select whether to flatten nested objects into dot-notation columns (e.g., <code class=\"bg-base px-1.5 py-0.5 rounded text-text-primary\">address.city</code>)."
+        },
+        {
+          name: "Preview & Validate",
+          text: "Click Convert to see an instant preview of your CSV data in the interactive grid below. The converter validates your JSON syntax in real-time and highlights any errors with line numbers.",
+          description: "Click \"Convert\" to see an instant preview of your CSV data in the interactive grid below. The converter validates your JSON syntax in real-time and highlights any errors with line numbers."
+        },
+        {
+          name: "Download or Copy",
+          text: "Click Download .csv to save the file to your device, or use Copy to Clipboard to paste it directly into Excel, Google Sheets, or your database import tool.",
+          description: "Click \"Download .csv\" to save the file to your device, or use \"Copy to Clipboard\" to paste it directly into Excel, Google Sheets, or your database import tool."
+        }
+      ]}
+    />
+    <TechnicalExplainer 
+      title="Understanding JSON and CSV: Formats, Use Cases, and Trade-offs"
+      sections={[
+        {
+          title: "What is JSON?",
+          content: "JSON (JavaScript Object Notation) is a lightweight data interchange format that is easy for humans to read and write, and easy for machines to parse and generate. It is built on two structures: a collection of name/value pairs (often realized as an object, record, struct, dictionary, hash table, keyed list, or associative array), and an ordered list of values (an array, vector, list, or sequence). Because it supports nested structures, it's the dominant format for web APIs."
+        },
+        {
+          title: "What is CSV?",
+          content: "CSV (Comma-Separated Values) is a plain-text tabular format. It stores tabular data (numbers and text) in plain text, where each line of the file is a data record, and each record consists of one or more fields, separated by commas. It is widely supported by consumer, business, and scientific applications (like Microsoft Excel, Google Sheets, and databases)."
+        },
+        {
+          title: "When Should You Convert JSON to CSV?",
+          content: "<ul class=\"space-y-2 list-disc pl-5 mb-4 marker:text-accent\"><li><strong class=\"text-text-primary\">Spreadsheet analysis:</strong> Import API data into Excel or Google Sheets for financial modeling, charting, or pivot tables.</li><li><strong class=\"text-text-primary\">Database imports:</strong> Bulk-load data into SQL databases via CSV, which is often much faster and natively supported by tools like PostgreSQL's <code>COPY</code> command.</li><li><strong class=\"text-text-primary\">Reporting:</strong> Generate human-readable tabular reports from complex, nested API responses.</li><li><strong class=\"text-text-primary\">Legacy system integration:</strong> Interface with older business systems that only accept flat CSV files.</li></ul>"
+        },
+        {
+          title: "How This Converter Handles Edge Cases",
+          content: "<ul class=\"space-y-2 list-disc pl-5 mb-4 marker:text-accent\"><li><strong class=\"text-text-primary\">Nested Objects:</strong> Flattened using dot-notation (`user.address.city`), making them perfectly suited for column-based databases.</li><li><strong class=\"text-text-primary\">Arrays:</strong> Serialized as quoted strings to preserve their content without breaking the CSV structure.</li><li><strong class=\"text-text-primary\">Null/Undefined:</strong> Rendered as empty fields to maintain column alignment.</li><li><strong class=\"text-text-primary\">Mixed Types:</strong> Coerced to strings with type preservation where possible.</li></ul>"
+        }
+      ]}
+    />
+    <FaqSection 
+      faqs={[
+        {
+          question: "Is my data safe? Does the converter send data to a server?",
+          text: "No. This converter runs entirely in your browser using client-side JavaScript. Your data never leaves your device — nothing is uploaded, stored, or transmitted.",
+          answer: "No. This converter runs entirely in your browser using client-side JavaScript. Your data never leaves your device — nothing is uploaded, stored, or transmitted."
+        },
+        {
+          question: "What is the maximum file size I can convert?",
+          text: "There is no hard limit, but for optimal performance we recommend files under 50 MB. Larger files are processed efficiently, but very large datasets may temporarily slow down your browser.",
+          answer: "There is no hard limit, but for optimal performance we recommend files under 50 MB. Larger files are processed efficiently, but very large datasets may temporarily slow down your browser."
+        },
+        {
+          question: "Can I convert nested JSON objects?",
+          text: "Yes. The converter automatically detects nested structures and flattens them using dot-notation (e.g., user.address.city becomes a column).",
+          answer: "Yes. The converter automatically detects nested structures and flattens them using dot-notation (e.g., <code class=\"text-sm bg-surface px-1 py-0.5 rounded\">user.address.city</code> becomes a column)."
+        },
+        {
+          question: "Does it work with JSON arrays of different structures?",
+          text: "Yes. The schema detector analyzes all objects in the array and creates a superset of all unique keys. Objects missing a key will have an empty value in that column.",
+          answer: "Yes. The schema detector analyzes all objects in the array and creates a superset of all unique keys. Objects missing a key will have an empty value in that column."
+        },
+        {
+          question: "Can I use a custom delimiter instead of commas?",
+          text: "Yes. You can choose between comma (,), tab, or semicolon (;) as your delimiter in the options bar.",
+          answer: "Yes. You can choose between comma (,), tab, or semicolon (;) as your delimiter in the options bar."
+        }
+      ]}
+    />
   </Fragment>
 
   <script>
-    import { validateJson, convertJsonToCsv } from '../../tools/json-to-csv';
+    import { validateJson } from '../../lib/json-validator';
+    import { copyToClipboard } from '../../lib/clipboard';
+    import { downloadFile } from '../../lib/download';
+    import { convertJsonToCsv } from '../../tools/json-to-csv';
 
     const input = document.getElementById('jsonInput') as HTMLTextAreaElement;
     const output = document.getElementById('csvOutput') as HTMLTextAreaElement;
@@ -150,29 +225,19 @@ const tool = tools.find(t => t.id === 'json-to-csv')!;
       }
     });
 
-    copyBtn.addEventListener('click', async () => {
-      if (!output.value) return;
-      try {
-        await navigator.clipboard.writeText(output.value);
-        const originalText = copyBtn.innerHTML;
-        copyBtn.innerHTML = 'Copied!';
-        setTimeout(() => copyBtn.innerHTML = originalText, 2000);
-      } catch (err) {
-        alert('Failed to copy text');
+    copyBtn.addEventListener('click', () => {
+      if (output.value) {
+        copyToClipboard(output.value, copyBtn, `
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+          Copied!
+        `);
       }
     });
 
     downloadBtn.addEventListener('click', () => {
-      if (!output.value) return;
-      const blob = new Blob([output.value], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.setAttribute('href', url);
-      link.setAttribute('download', 'data.csv');
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      if (output.value) {
+        downloadFile(output.value, 'data.csv', 'text/csv;charset=utf-8;');
+      }
     });
 
     // Handle Drag & Drop

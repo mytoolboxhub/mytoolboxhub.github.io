@@ -3,7 +3,6 @@ import BaseLayout from './BaseLayout.astro';
 import Header from '../components/global/Header.astro';
 import Footer from '../components/global/Footer.astro';
 import Sidebar from '../components/global/Sidebar.astro';
-import AdSlot from '../components/global/AdSlot.astro';
 import type { ToolDefinition } from '../types/tool';
 
 interface Props {
@@ -58,18 +57,7 @@ const title = `${tool.name} — Free Online Tool | MyToolboxHub`;
         <slot name="content" />
       </div>
       
-      <!-- Bottom Ad Placement -->
-      <div class="mt-12">
-        <AdSlot slot="in-content" />
-      </div>
     </main>
-    
-    <!-- Right Sidebar: Ads & Promos -->
-    <aside class="hidden xl:block w-80 pl-8 pr-4 py-8 border-l border-border-subtle">
-      <div class="sticky top-24 space-y-8">
-        <AdSlot slot="sidebar" />
-      </div>
-    </aside>
   </div>
   
   <Footer />

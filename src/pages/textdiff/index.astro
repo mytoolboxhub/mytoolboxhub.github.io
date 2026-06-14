@@ -1,0 +1,342 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import HowToSection from '../../components/seo/HowToSection.astro';
+import FaqSection from '../../components/seo/FaqSection.astro';
+import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
+import { tools } from '../../lib/tool-registry';
+
+const tool = tools.find(t => t.id === 'text-diff')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="space-y-6">
+    
+    <!-- Controls -->
+    <div class="glass p-6 rounded-2xl flex flex-wrap gap-6 items-center justify-between">
+      <div class="flex flex-wrap items-center gap-6">
+        <div class="flex flex-col gap-2">
+          <label for="diffMode" class="text-sm font-medium text-text-secondary">Compare Mode</label>
+          <select id="diffMode" class="bg-surface border border-border-default rounded-md px-3 py-1.5 text-sm text-text-primary focus-glow outline-none">
+            <option value="line">Line by Line</option>
+            <option value="word">Word by Word</option>
+            <option value="char">Character by Character</option>
+          </select>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <span class="text-sm font-medium text-text-secondary">Options</span>
+          <div class="flex gap-4">
+            <label class="flex items-center gap-2 cursor-pointer group">
+              <input type="checkbox" id="cbIgnoreWhitespace" class="w-4 h-4 rounded border-border-default bg-surface text-accent focus-glow" />
+              <span class="text-sm text-text-primary group-hover:text-accent transition-colors">Ignore Whitespace</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer group">
+              <input type="checkbox" id="cbIgnoreCase" class="w-4 h-4 rounded border-border-default bg-surface text-accent focus-glow" />
+              <span class="text-sm text-text-primary group-hover:text-accent transition-colors">Ignore Case</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <button id="compareBtn" class="px-6 py-2.5 bg-accent text-void font-bold text-sm rounded-lg hover:bg-accent-hover transition-colors focus-glow flex items-center gap-2 shadow-lg shadow-accent/20">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        Compare
+      </button>
+    </div>
+
+    <!-- Input Panels -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="flex flex-col h-[400px]">
+        <div class="flex justify-between items-center mb-2 px-1">
+          <label for="originalText" class="text-sm font-semibold text-text-primary">Original Text</label>
+          <button id="clearOrigBtn" class="text-xs text-text-muted hover:text-error transition-colors font-medium">Clear</button>
+        </div>
+        <textarea 
+          id="originalText" 
+          class="flex-1 w-full bg-surface/50 border border-border-subtle rounded-xl p-4 font-mono text-sm text-text-primary resize-none focus-glow transition-colors"
+          placeholder="Paste original text here..."
+        ></textarea>
+      </div>
+
+      <div class="flex flex-col h-[400px]">
+        <div class="flex justify-between items-center mb-2 px-1">
+          <label for="modifiedText" class="text-sm font-semibold text-text-primary">Modified Text</label>
+          <button id="clearModBtn" class="text-xs text-text-muted hover:text-error transition-colors font-medium">Clear</button>
+        </div>
+        <textarea 
+          id="modifiedText" 
+          class="flex-1 w-full bg-surface/50 border border-border-subtle rounded-xl p-4 font-mono text-sm text-text-primary resize-none focus-glow transition-colors"
+          placeholder="Paste modified text here..."
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Output Panel -->
+    <div class="flex flex-col">
+      <div class="flex justify-between items-center mb-2 px-1">
+        <label class="text-sm font-semibold text-text-primary">Diff Result</label>
+        <div class="flex gap-3 items-center">
+          <span id="diffStats" class="text-xs font-mono text-text-muted">No comparison run yet.</span>
+        </div>
+      </div>
+      
+      <div id="diffOutputContainer" class="min-h-[200px] w-full bg-void border border-border-subtle rounded-xl p-0 font-mono text-sm text-text-secondary overflow-auto relative">
+        <div id="diffPlaceholder" class="absolute inset-0 flex items-center justify-center text-text-muted italic">
+          Click Compare to see differences
+        </div>
+        <pre id="diffOutput" class="hidden m-0 p-0 w-full min-w-max"></pre>
+      </div>
+    </div>
+  </div>
+
+  <Fragment slot="content">
+    <HowToSection 
+      title="How to Compare Text Documents"
+      steps={[
+        {
+          name: "Paste Original Text",
+          text: "Copy and paste your original (older) document into the left text area.",
+          description: "Copy and paste your original (older) document into the left text area."
+        },
+        {
+          name: "Paste Modified Text",
+          text: "Copy and paste your modified (newer) document into the right text area.",
+          description: "Copy and paste your modified (newer) document into the right text area."
+        },
+        {
+          name: "Configure Options",
+          text: "Select your preferred comparison mode (Line, Word, or Character) and toggle 'Ignore Whitespace' or 'Ignore Case' if needed.",
+          description: "Select your preferred comparison mode (Line, Word, or Character) and toggle 'Ignore Whitespace' or 'Ignore Case' if needed."
+        },
+        {
+          name: "View Differences",
+          text: "Click 'Compare'. The tool will highlight additions in green, deletions in red, and show unchanged text in default color.",
+          description: "Click 'Compare'. The tool will highlight additions in green, deletions in red, and show unchanged text in default color."
+        }
+      ]}
+    />
+    <TechnicalExplainer 
+      title="Understanding Diff Algorithms"
+      sections={[
+        {
+          title: "Longest Common Subsequence (LCS)",
+          content: "This tool uses a dynamic programming approach based on the Longest Common Subsequence algorithm. It mathematically calculates the longest sequence of lines (or words/characters) that appear in the exact same order in both documents, establishing a baseline of 'unchanged' text."
+        },
+        {
+          title: "Additions vs Deletions",
+          content: "Once the LCS is found, anything in the original document that is NOT in the LCS is marked as a <strong>Deletion</strong> (highlighted red). Anything in the modified document that is NOT in the LCS is marked as an <strong>Addition</strong> (highlighted green)."
+        },
+        {
+          title: "Client-Side Processing",
+          content: "Like all tools on MyToolboxHub, the diff calculation happens entirely in your browser using JavaScript. This means your sensitive documents, source code, or private notes are never sent over the internet to a server."
+        }
+      ]}
+    />
+    <FaqSection 
+      faqs={[
+        {
+          question: "Why does Word or Character mode take longer?",
+          text: "The LCS algorithm's time complexity is O(N*M), where N and M are the number of items being compared. A document might have 1,000 lines, but 10,000 words or 50,000 characters. Comparing larger sets requires significantly more computation.",
+          answer: "The LCS algorithm's time complexity is O(N*M), where N and M are the number of items being compared. A document might have 1,000 lines, but 10,000 words or 50,000 characters. Comparing larger sets requires significantly more computation."
+        },
+        {
+          question: "Can I compare code files?",
+          text: "Yes! Paste your source code into the boxes. The 'Line by Line' mode is identical to how 'git diff' works, making it perfect for reviewing code changes before committing.",
+          answer: "Yes! Paste your source code into the boxes. The 'Line by Line' mode is identical to how <code>git diff</code> works, making it perfect for reviewing code changes before committing."
+        },
+        {
+          question: "What does 'Ignore Whitespace' do?",
+          text: "When checked, the algorithm will ignore changes involving spaces, tabs, or newlines. This is useful when code formatting has changed but the actual content remains identical.",
+          answer: "When checked, the algorithm will ignore changes involving spaces, tabs, or newlines. This is useful when code formatting has changed but the actual content remains identical."
+        }
+      ]}
+    />
+  </Fragment>
+
+  <style>
+    /* Diff specific styles */
+    .diff-line {
+      display: flex;
+      line-height: 1.5;
+    }
+    .diff-line-number {
+      width: 40px;
+      min-width: 40px;
+      padding-right: 8px;
+      text-align: right;
+      color: var(--color-text-muted);
+      user-select: none;
+      border-right: 1px solid var(--color-border-subtle);
+      background: var(--color-surface);
+      flex-shrink: 0;
+    }
+    .diff-line-content {
+      padding-left: 12px;
+      padding-right: 12px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      flex-grow: 1;
+    }
+    
+    .diff-add {
+      background-color: rgba(34, 197, 94, 0.1);
+      color: #4ade80;
+    }
+    .diff-add .diff-line-number {
+      background-color: rgba(34, 197, 94, 0.15);
+      border-right-color: #22c55e;
+      color: #4ade80;
+    }
+    
+    .diff-remove {
+      background-color: rgba(239, 68, 68, 0.1);
+      color: #f87171;
+    }
+    .diff-remove .diff-line-number {
+      background-color: rgba(239, 68, 68, 0.15);
+      border-right-color: #ef4444;
+      color: #f87171;
+    }
+    
+    .diff-same {
+      color: var(--color-text-primary);
+    }
+  </style>
+
+  <script>
+    import { computeDiff } from '../../tools/text-diff';
+
+    const originalText = document.getElementById('originalText') as HTMLTextAreaElement;
+    const modifiedText = document.getElementById('modifiedText') as HTMLTextAreaElement;
+    const clearOrigBtn = document.getElementById('clearOrigBtn')!;
+    const clearModBtn = document.getElementById('clearModBtn')!;
+    
+    const diffMode = document.getElementById('diffMode') as HTMLSelectElement;
+    const cbIgnoreWhitespace = document.getElementById('cbIgnoreWhitespace') as HTMLInputElement;
+    const cbIgnoreCase = document.getElementById('cbIgnoreCase') as HTMLInputElement;
+    const compareBtn = document.getElementById('compareBtn')!;
+    
+    const diffPlaceholder = document.getElementById('diffPlaceholder')!;
+    const diffOutput = document.getElementById('diffOutput')!;
+    const diffStats = document.getElementById('diffStats')!;
+
+    function escapeHtml(unsafe: string) {
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function runCompare() {
+      const orig = originalText.value;
+      const mod = modifiedText.value;
+      
+      if (!orig && !mod) return;
+
+      compareBtn.innerHTML = `
+        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-void" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        Comparing...
+      `;
+      compareBtn.setAttribute('disabled', 'true');
+
+      // Small timeout to allow UI to update to loading state
+      setTimeout(() => {
+        try {
+          const diffResult = computeDiff(orig, mod, {
+            mode: diffMode.value as 'line' | 'word' | 'char',
+            ignoreWhitespace: cbIgnoreWhitespace.checked,
+            ignoreCase: cbIgnoreCase.checked
+          });
+
+          renderDiff(diffResult.lines);
+          
+          diffStats.innerHTML = `
+            <span class="text-success font-bold">+${diffResult.stats.additions}</span> additions | 
+            <span class="text-error font-bold">-${diffResult.stats.deletions}</span> deletions | 
+            <span>${diffResult.stats.unchanged}</span> unchanged
+          `;
+          
+          diffPlaceholder.classList.add('hidden');
+          diffOutput.classList.remove('hidden');
+
+        } catch (e) {
+          alert('Comparison failed or took too long for this document size.');
+        } finally {
+          compareBtn.innerHTML = `
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+            Compare
+          `;
+          compareBtn.removeAttribute('disabled');
+        }
+      }, 50);
+    }
+
+    function renderDiff(lines: import('../../tools/text-diff').DiffLine[]) {
+      let html = '';
+      
+      const isLineMode = diffMode.value === 'line';
+      
+      if (!isLineMode) {
+        // Render word/char diffs as inline blocks rather than strictly lines
+        let inlineHtml = '<div class="p-4 whitespace-pre-wrap break-words leading-relaxed text-text-primary">';
+        for (const item of lines) {
+          const val = escapeHtml(item.value);
+          if (item.type === 'add') inlineHtml += `<span class="bg-success/20 text-success rounded-sm">${val}</span>`;
+          else if (item.type === 'remove') inlineHtml += `<span class="bg-error/20 text-error line-through rounded-sm opacity-80">${val}</span>`;
+          else inlineHtml += `<span>${val}</span>`;
+        }
+        inlineHtml += '</div>';
+        diffOutput.innerHTML = inlineHtml;
+        return;
+      }
+
+      // Line mode rendering
+      for (const item of lines) {
+        const val = escapeHtml(item.value);
+        let rowClass = 'diff-same';
+        let origIdx = item.originalIndex !== undefined ? item.originalIndex : '';
+        let modIdx = item.modifiedIndex !== undefined ? item.modifiedIndex : '';
+        let sign = ' ';
+
+        if (item.type === 'add') {
+          rowClass = 'diff-add';
+          sign = '+';
+          origIdx = ''; // No original index for additions
+        } else if (item.type === 'remove') {
+          rowClass = 'diff-remove';
+          sign = '-';
+          modIdx = ''; // No modified index for deletions
+        }
+
+        // Handle multi-line strings from compaction
+        const sublines = val.split('\n');
+        for (let i = 0; i < sublines.length; i++) {
+          let currentOrigIdx = origIdx !== '' ? (origIdx as number) + i : '';
+          let currentModIdx = modIdx !== '' ? (modIdx as number) + i : '';
+          
+          html += `
+            <div class="diff-line ${rowClass}">
+              <div class="diff-line-number" title="Original Line">${currentOrigIdx}</div>
+              <div class="diff-line-number" title="Modified Line">${currentModIdx}</div>
+              <div class="diff-line-content"><span class="select-none font-bold opacity-50 mr-2">${sign}</span>${sublines[i]}</div>
+            </div>
+          `;
+        }
+      }
+      
+      diffOutput.innerHTML = html;
+    }
+
+    compareBtn.addEventListener('click', runCompare);
+    
+    clearOrigBtn.addEventListener('click', () => {
+      originalText.value = '';
+    });
+    
+    clearModBtn.addEventListener('click', () => {
+      modifiedText.value = '';
+    });
+  </script>
+</ToolLayout>

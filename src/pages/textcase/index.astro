@@ -1,0 +1,186 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import HowToSection from '../../components/seo/HowToSection.astro';
+import FaqSection from '../../components/seo/FaqSection.astro';
+import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
+import { tools } from '../../lib/tool-registry';
+
+const tool = tools.find(t => t.id === 'text-case')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="space-y-6">
+    
+    <!-- Input Section -->
+    <div class="flex flex-col">
+      <div class="flex justify-between items-center mb-2 px-1">
+        <label for="inputArea" class="text-sm font-semibold text-text-primary">Type or Paste Text</label>
+        <div class="flex items-center gap-3">
+          <span id="charCount" class="text-xs font-mono text-text-muted">0 characters</span>
+          <button id="clearBtn" class="text-xs text-text-muted hover:text-error transition-colors font-medium">Clear</button>
+        </div>
+      </div>
+      <textarea 
+        id="inputArea" 
+        class="w-full h-32 bg-surface/50 border border-border-subtle rounded-xl p-4 text-lg text-text-primary resize-none focus-glow transition-colors"
+        placeholder="hello world"
+      ></textarea>
+    </div>
+
+    <!-- Output Grid -->
+    <div>
+      <div class="flex justify-between items-center mb-3 px-1 mt-2">
+        <label class="text-sm font-semibold text-text-primary">Click to Copy</label>
+      </div>
+      
+      <div id="casesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Buttons injected by JS -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Hidden Notification Toast -->
+  <div id="copyToast" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 transition-all duration-300 bg-accent text-void font-bold px-4 py-3 rounded-lg shadow-xl flex items-center gap-2 z-50">
+    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+    Copied to clipboard!
+  </div>
+
+  <Fragment slot="content">
+    <HowToSection 
+      title="How to Convert Text Case"
+      steps={[
+        {
+          name: "Enter Your Text",
+          text: "Type or paste the text you want to convert into the large input box. It can be a single word, a variable name, or a whole sentence.",
+          description: "Type or paste the text you want to convert into the large input box. It can be a single word, a variable name, or a whole sentence."
+        },
+        {
+          name: "View Live Previews",
+          text: "As you type, all the buttons below will instantly update to show a preview of what your text looks like in that specific case.",
+          description: "As you type, all the buttons below will instantly update to show a preview of what your text looks like in that specific case."
+        },
+        {
+          name: "Click to Copy",
+          text: "Find the format you need (like camelCase or SCREAMING_SNAKE_CASE) and simply click the button. The converted text is instantly copied to your clipboard.",
+          description: "Find the format you need (like camelCase or SCREAMING_SNAKE_CASE) and simply click the button. The converted text is instantly copied to your clipboard."
+        }
+      ]}
+    />
+    <TechnicalExplainer 
+      title="Common Programming Cases"
+      sections={[
+        {
+          title: "camelCase",
+          content: "Widely used in JavaScript, Java, and C# for variable and function names. The first word is lowercase, and every subsequent word is capitalized without spaces. Example: <code>myVariableName</code>."
+        },
+        {
+          title: "snake_case & SCREAMING_SNAKE",
+          content: "Standard in Python, Ruby, and Rust. Words are separated by underscores. The uppercase variant is universally used for defining global constants across almost all programming languages. Example: <code>MAX_RETRY_COUNT</code>."
+        },
+        {
+          title: "kebab-case",
+          content: "Also known as dash-case. Used extensively in URLs (slugs), CSS class names, and HTML attributes. Example: <code>btn-primary-hover</code>."
+        },
+        {
+          title: "PascalCase",
+          content: "Similar to camelCase, but the very first letter is also capitalized. Used for Class names and Types/Interfaces in most object-oriented languages. Example: <code>UserModel</code>."
+        }
+      ]}
+    />
+    <FaqSection 
+      faqs={[
+        {
+          question: "Can it convert from camelCase to snake_case?",
+          text: "Yes! The tool automatically tokenizes the input text. It can intelligently read an existing camelCase or snake_case string, split it into separate words, and format it into any other case.",
+          answer: "Yes! The tool automatically tokenizes the input text. It can intelligently read an existing camelCase or snake_case string, split it into separate words, and format it into any other case."
+        },
+        {
+          question: "Is there a limit to the length of the text?",
+          text: "No hard limit, but this tool is optimized for variable names, titles, and short sentences. If you paste an entire 500-page book, the live previews might slow down your browser.",
+          answer: "No hard limit, but this tool is optimized for variable names, titles, and short sentences. If you paste an entire 500-page book, the live previews might slow down your browser."
+        }
+      ]}
+    />
+  </Fragment>
+
+  <script>
+    import { caseConversions } from '../../tools/text-case';
+
+    const inputArea = document.getElementById('inputArea') as HTMLTextAreaElement;
+    const charCount = document.getElementById('charCount')!;
+    const clearBtn = document.getElementById('clearBtn')!;
+    const casesGrid = document.getElementById('casesGrid')!;
+    const copyToast = document.getElementById('copyToast')!;
+    
+    let toastTimeout: any;
+
+    function initGrid() {
+      casesGrid.innerHTML = caseConversions.map(conv => `
+        <button 
+          id="btn-${conv.id}"
+          class="flex flex-col items-start p-4 bg-surface border border-border-default rounded-xl hover:border-accent hover:bg-surface-hover transition-all group text-left relative overflow-hidden"
+          title="${conv.description}"
+        >
+          <span class="text-xs font-bold uppercase tracking-wider text-text-muted group-hover:text-accent transition-colors mb-1">${conv.name}</span>
+          <span id="preview-${conv.id}" class="text-sm font-mono text-text-primary break-all line-clamp-2"></span>
+          
+          <div class="absolute inset-0 bg-accent/10 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+        </button>
+      `).join('');
+
+      // Attach click events
+      caseConversions.forEach(conv => {
+        const btn = document.getElementById(`btn-${conv.id}`)!;
+        btn.addEventListener('click', () => {
+          const val = inputArea.value;
+          if (!val) return;
+          const converted = conv.convert(val);
+          
+          navigator.clipboard.writeText(converted).then(() => {
+            showToast();
+            
+            // Visual feedback on button
+            const originalBorder = btn.style.borderColor;
+            btn.style.borderColor = 'var(--color-success)';
+            setTimeout(() => {
+              btn.style.borderColor = originalBorder;
+            }, 500);
+          });
+        });
+      });
+    }
+
+    function showToast() {
+      clearTimeout(toastTimeout);
+      copyToast.classList.remove('translate-y-20', 'opacity-0');
+      
+      toastTimeout = setTimeout(() => {
+        copyToast.classList.add('translate-y-20', 'opacity-0');
+      }, 2000);
+    }
+
+    function updatePreviews() {
+      const val = inputArea.value || 'hello world';
+      charCount.textContent = `${inputArea.value.length} characters`;
+      
+      caseConversions.forEach(conv => {
+        const previewEl = document.getElementById(`preview-${conv.id}`)!;
+        previewEl.textContent = conv.convert(val);
+      });
+    }
+
+    inputArea.addEventListener('input', updatePreviews);
+    
+    clearBtn.addEventListener('click', () => {
+      inputArea.value = '';
+      updatePreviews();
+      inputArea.focus();
+    });
+
+    // Initialize
+    initGrid();
+    updatePreviews();
+
+  </script>
+</ToolLayout>

@@ -1,0 +1,311 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import HowToSection from '../../components/seo/HowToSection.astro';
+import FaqSection from '../../components/seo/FaqSection.astro';
+import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
+import { tools } from '../../lib/tool-registry';
+
+const tool = tools.find(t => t.id === 'code-minifier')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="space-y-6">
+    
+    <!-- Controls Bar -->
+    <div class="glass p-6 rounded-2xl flex flex-wrap gap-6 items-center justify-between">
+      
+      <div class="flex flex-wrap items-center gap-6">
+        
+        <!-- Language Select -->
+        <div class="flex flex-col gap-2">
+          <label for="langSelect" class="text-sm font-medium text-text-secondary">Language</label>
+          <select id="langSelect" class="bg-surface border border-border-default rounded-md px-4 py-2 text-sm text-text-primary focus-glow outline-none">
+            <option value="css">CSS</option>
+            <option value="js">JavaScript</option>
+            <option value="json">JSON</option>
+          </select>
+        </div>
+
+        <!-- Options -->
+        <div class="flex flex-col gap-2">
+          <span class="text-sm font-medium text-text-secondary">Minification Options</span>
+          <div class="flex flex-wrap gap-4">
+            <label class="flex items-center gap-2 cursor-pointer group">
+              <input type="checkbox" id="cbComments" checked class="w-4 h-4 rounded border-border-default bg-surface text-accent focus-glow" />
+              <span class="text-sm text-text-primary group-hover:text-accent transition-colors">Remove Comments</span>
+            </label>
+            <label id="lblColors" class="flex items-center gap-2 cursor-pointer group">
+              <input type="checkbox" id="cbColors" checked class="w-4 h-4 rounded border-border-default bg-surface text-accent focus-glow" />
+              <span class="text-sm text-text-primary group-hover:text-accent transition-colors">Shorten Hex Colors</span>
+            </label>
+          </div>
+        </div>
+
+      </div>
+
+      <button id="minifyBtn" class="px-8 py-3 bg-accent text-void font-bold text-sm rounded-lg hover:bg-accent-hover transition-colors focus-glow flex items-center gap-2 shadow-lg shadow-accent/20 h-fit">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+        Minify Code
+      </button>
+
+    </div>
+
+    <!-- Stats Bar -->
+    <div id="statsBar" class="hidden grid grid-cols-3 gap-4 animate-fade-in-down">
+      <div class="bg-surface/50 border border-border-subtle rounded-xl p-4 flex flex-col items-center justify-center">
+        <span class="text-xs text-text-muted uppercase font-bold tracking-wider mb-1">Original Size</span>
+        <span id="statOrig" class="text-lg font-mono text-text-primary">0 KB</span>
+      </div>
+      <div class="bg-surface/50 border border-border-subtle rounded-xl p-4 flex flex-col items-center justify-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-success/10 z-0"></div>
+        <span class="text-xs text-success uppercase font-bold tracking-wider mb-1 z-10">Saved Space</span>
+        <span id="statSaved" class="text-2xl font-black text-success z-10">0%</span>
+      </div>
+      <div class="bg-surface/50 border border-border-subtle rounded-xl p-4 flex flex-col items-center justify-center">
+        <span class="text-xs text-text-muted uppercase font-bold tracking-wider mb-1">Minified Size</span>
+        <span id="statMin" class="text-lg font-mono text-accent font-bold">0 KB</span>
+      </div>
+    </div>
+
+    <!-- Panels -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      
+      <!-- Input Panel -->
+      <div class="flex flex-col h-[500px]">
+        <div class="flex justify-between items-center mb-2 px-1">
+          <label for="inputArea" class="text-sm font-semibold text-text-primary">Original Source Code</label>
+          <div class="flex items-center gap-2">
+            <label class="text-xs text-accent hover:text-accent-hover cursor-pointer transition-colors font-medium flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+              Upload File
+              <input type="file" id="fileUpload" accept=".css,.js,.json" class="hidden" />
+            </label>
+            <span class="text-border-subtle">|</span>
+            <button id="clearBtn" class="text-xs text-text-muted hover:text-error transition-colors font-medium">Clear</button>
+          </div>
+        </div>
+        <textarea 
+          id="inputArea" 
+          class="flex-1 w-full bg-surface/50 border border-border-subtle rounded-xl p-4 font-mono text-xs text-text-primary resize-none focus-glow transition-colors whitespace-pre overflow-auto"
+          placeholder="/* Paste your CSS, JS, or JSON here */&#10;.button {&#10;  color: #ffffff;&#10;  margin: 0px;&#10;}"
+        ></textarea>
+      </div>
+
+      <!-- Output Panel -->
+      <div class="flex flex-col h-[500px]">
+        <div class="flex justify-between items-center mb-2 px-1">
+          <label for="outputArea" class="text-sm font-semibold text-text-primary">Minified Output</label>
+          <div class="flex gap-3">
+            <button id="copyBtn" class="text-xs text-accent hover:text-accent-hover transition-colors flex items-center gap-1 font-medium">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+              Copy
+            </button>
+            <button id="downloadBtn" class="text-xs text-accent hover:text-accent-hover transition-colors flex items-center gap-1 font-medium">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+              Download
+            </button>
+          </div>
+        </div>
+        <textarea 
+          id="outputArea" 
+          class="flex-1 w-full bg-void border border-border-subtle rounded-xl p-4 font-mono text-xs text-text-secondary resize-none focus-glow whitespace-pre overflow-auto break-all"
+          readonly
+        ></textarea>
+      </div>
+      
+    </div>
+  </div>
+
+  <Fragment slot="content">
+    <HowToSection 
+      title="How to Minify Your Code"
+      steps={[
+        {
+          name: "Select the Language",
+          text: "Ensure the correct language (CSS, JavaScript, or JSON) is selected in the dropdown menu so the minifier applies the right rules.",
+          description: "Ensure the correct language (CSS, JavaScript, or JSON) is selected in the dropdown menu so the minifier applies the right rules."
+        },
+        {
+          name: "Upload or Paste",
+          text: "Click 'Upload File' to load a file directly from your computer, or paste your raw source code into the left editor.",
+          description: "Click 'Upload File' to load a file directly from your computer, or paste your raw source code into the left editor."
+        },
+        {
+          name: "Review Options",
+          text: "For CSS, you can opt to shorten hex colors (like converting #ffffff to #fff). Generally, it is safe to leave all default checkboxes checked.",
+          description: "For CSS, you can opt to shorten hex colors (like converting <code>#ffffff</code> to <code>#fff</code>). Generally, it is safe to leave all default checkboxes checked."
+        },
+        {
+          name: "Minify and Download",
+          text: "Click 'Minify Code'. Review the stats bar to see how much file size you saved, then click Download to save the new .min version of your file.",
+          description: "Click 'Minify Code'. Review the stats bar to see how much file size you saved, then click Download to save the new <code>.min</code> version of your file."
+        }
+      ]}
+    />
+    <TechnicalExplainer 
+      title="How Minification Works"
+      sections={[
+        {
+          title: "Stripping Whitespace",
+          content: "The majority of code size comes from spaces, tabs, and newlines inserted solely for human readability. Compilers and browsers ignore this whitespace. Minification strips it out, putting your entire script onto a single line."
+        },
+        {
+          title: "Comment Removal",
+          content: "Comments (<code>/* ... */</code> or <code>// ...</code>) are essential for developers but useless for the browser rendering the page. Removing them can reduce file size by up to 20% in heavily documented codebases."
+        },
+        {
+          title: "CSS-Specific Optimizations",
+          content: "This tool applies CSS-specific tricks to save bytes: it removes units from zero values (<code>margin: 0px</code> becomes <code>margin: 0</code>), strips leading zeros from decimals (<code>0.5</code> becomes <code>.5</code>), and removes trailing semicolons from the last rule in a block."
+        }
+      ]}
+    />
+    <FaqSection 
+      faqs={[
+        {
+          question: "Is this minifier safe for production JavaScript?",
+          text: "This is a lightweight, regex-based minifier. While perfect for small scripts, JSON data, and CSS files, for massive production-scale JavaScript applications (like React bundles), we recommend using a dedicated build tool like Terser or ESBuild which perform AST-level mangling.",
+          answer: "This is a lightweight, regex-based minifier. While perfect for small scripts, JSON data, and CSS files, for massive production-scale JavaScript applications (like React bundles), we recommend using a dedicated build tool like <em>Terser</em> or <em>ESBuild</em> which perform AST-level mangling."
+        },
+        {
+          question: "Does it rename my variables?",
+          text: "No. This tool only performs whitespace, comment, and structural compression. It does not perform 'mangling' (renaming long variable names like 'userAccountList' to 'a'), ensuring your code behaves exactly as originally written.",
+          answer: "No. This tool only performs whitespace, comment, and structural compression. It does not perform 'mangling' (renaming long variable names like <code>userAccountList</code> to <code>a</code>), ensuring your code behaves exactly as originally written."
+        },
+        {
+          question: "Can it un-minify (beautify) code?",
+          text: "No. Minification is generally a one-way process. Because comments and semantic whitespace are deleted, they cannot be perfectly reconstructed. To format code, use a dedicated code formatter.",
+          answer: "No. Minification is generally a one-way process. Because comments and semantic whitespace are deleted, they cannot be perfectly reconstructed. To format code, use a dedicated code formatter."
+        }
+      ]}
+    />
+  </Fragment>
+
+  <script>
+    import { copyToClipboard } from '../../lib/clipboard';
+    import { downloadFile } from '../../lib/download';
+    import { minifyCode, type MinifyOptions } from '../../tools/code-minifier';
+
+    const inputArea = document.getElementById('inputArea') as HTMLTextAreaElement;
+    const outputArea = document.getElementById('outputArea') as HTMLTextAreaElement;
+    const fileUpload = document.getElementById('fileUpload') as HTMLInputElement;
+    const clearBtn = document.getElementById('clearBtn')!;
+    const copyBtn = document.getElementById('copyBtn')!;
+    const downloadBtn = document.getElementById('downloadBtn')!;
+    const minifyBtn = document.getElementById('minifyBtn')!;
+
+    const langSelect = document.getElementById('langSelect') as HTMLSelectElement;
+    const cbComments = document.getElementById('cbComments') as HTMLInputElement;
+    const cbColors = document.getElementById('cbColors') as HTMLInputElement;
+    const lblColors = document.getElementById('lblColors')!;
+
+    const statsBar = document.getElementById('statsBar')!;
+    const statOrig = document.getElementById('statOrig')!;
+    const statSaved = document.getElementById('statSaved')!;
+    const statMin = document.getElementById('statMin')!;
+
+    function formatBytes(bytes: number) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    langSelect.addEventListener('change', () => {
+      const isCss = langSelect.value === 'css';
+      if (isCss) {
+        lblColors.classList.remove('opacity-50', 'pointer-events-none');
+        cbColors.disabled = false;
+      } else {
+        lblColors.classList.add('opacity-50', 'pointer-events-none');
+        cbColors.disabled = true;
+      }
+    });
+
+    function runProcess() {
+      const val = inputArea.value;
+      if (!val) {
+        outputArea.value = '';
+        statsBar.classList.add('hidden');
+        return;
+      }
+
+      const options: MinifyOptions = {
+        type: langSelect.value as 'css' | 'js' | 'json',
+        removeComments: cbComments.checked,
+        shortenHexColors: cbColors.checked
+      };
+
+      const res = minifyCode(val, options);
+
+      if (res.error) {
+        alert(res.error);
+        return;
+      }
+
+      outputArea.value = res.output;
+
+      if (res.stats.originalSize > 0) {
+        statsBar.classList.remove('hidden');
+        statOrig.textContent = formatBytes(res.stats.originalSize);
+        statMin.textContent = formatBytes(res.stats.minifiedSize);
+        statSaved.textContent = res.stats.savedPercentage + '%';
+      } else {
+        statsBar.classList.add('hidden');
+      }
+    }
+
+    minifyBtn.addEventListener('click', runProcess);
+
+    fileUpload.addEventListener('change', (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      // Auto-detect language
+      const ext = file.name.split('.').pop()?.toLowerCase();
+      if (ext === 'css') langSelect.value = 'css';
+      else if (ext === 'js') langSelect.value = 'js';
+      else if (ext === 'json') langSelect.value = 'json';
+      
+      langSelect.dispatchEvent(new Event('change'));
+
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const text = ev.target?.result as string;
+        inputArea.value = text;
+        runProcess();
+      };
+      reader.readAsText(file);
+    });
+
+    clearBtn.addEventListener('click', () => {
+      inputArea.value = '';
+      outputArea.value = '';
+      statsBar.classList.add('hidden');
+      fileUpload.value = '';
+      inputArea.focus();
+    });
+
+    copyBtn.addEventListener('click', () => {
+      if (outputArea.value) {
+        copyToClipboard(outputArea.value, copyBtn, `
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+          Copied
+        `);
+      }
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      if (!outputArea.value) return;
+      const lang = langSelect.value;
+      const mimeMap: Record<string, string> = {
+        'css': 'text/css',
+        'js': 'text/javascript',
+        'json': 'application/json'
+      };
+      
+      downloadFile(outputArea.value, `minified.${lang}`, `${mimeMap[lang]};charset=utf-8;`);
+    });
+
+  </script>
+</ToolLayout>

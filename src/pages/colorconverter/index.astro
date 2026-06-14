@@ -1,0 +1,216 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import HowToSection from '../../components/seo/HowToSection.astro';
+import FaqSection from '../../components/seo/FaqSection.astro';
+import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
+import { tools } from '../../lib/tool-registry';
+
+const tool = tools.find(t => t.id === 'color-converter')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="space-y-8 max-w-4xl mx-auto">
+    
+    <!-- Color Preview Hero -->
+    <div class="glass p-8 rounded-2xl flex flex-col items-center relative overflow-hidden transition-colors duration-500" id="previewBox">
+      <div class="absolute inset-0 bg-void/50 backdrop-blur-[2px]"></div>
+      <div class="relative z-10 flex flex-col items-center">
+        <h2 class="text-sm font-semibold text-text-secondary uppercase tracking-wider mb-4 drop-shadow-md">Color Preview</h2>
+        <div class="w-32 h-32 rounded-full shadow-2xl border-4 border-void transition-colors duration-500 bg-accent" id="colorCircle"></div>
+      </div>
+    </div>
+
+    <!-- Input Form -->
+    <div class="glass p-8 rounded-2xl">
+      <div class="flex flex-col md:flex-row gap-4 items-end mb-8">
+        <div class="flex-1 w-full">
+          <label for="colorInput" class="block text-sm font-medium text-text-secondary mb-2">
+            Enter HEX, RGB, or HSL Value
+          </label>
+          <div class="relative">
+            <input 
+              type="text" 
+              id="colorInput" 
+              class="w-full bg-surface/50 border border-border-subtle rounded-xl px-4 py-3 pl-12 font-mono text-text-primary focus-glow transition-colors text-lg"
+              placeholder="#5c24ff or rgb(92, 36, 255)"
+            />
+            <div class="absolute left-4 top-1/2 -translate-y-1/2">
+              <input type="color" id="nativePicker" class="w-6 h-6 p-0 border-0 rounded cursor-pointer bg-transparent" value="#5c24ff" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error Banner -->
+      <div id="errorBanner" class="hidden mb-6 bg-error/10 border border-error/30 text-error px-4 py-3 rounded-lg text-sm flex items-start gap-3 animate-fade-in-down">
+        <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        <div>
+          <strong class="block font-semibold mb-1">Invalid Color Format</strong>
+          <span>Could not parse the provided color string. Ensure it is valid HEX, RGB, or HSL.</span>
+        </div>
+      </div>
+
+      <!-- Results Grid -->
+      <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        
+        <div class="bg-surface/50 border border-border-subtle rounded-xl p-4 flex flex-col relative group">
+          <span class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">HEX</span>
+          <span id="resHex" class="font-mono text-text-primary text-lg">#5c24ff</span>
+          <button class="copy-res absolute top-4 right-4 opacity-0 group-hover:opacity-100 text-accent transition-opacity" data-target="resHex">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+          </button>
+        </div>
+
+        <div class="bg-surface/50 border border-border-subtle rounded-xl p-4 flex flex-col relative group">
+          <span class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">RGB</span>
+          <span id="resRgb" class="font-mono text-text-primary text-lg">rgb(92, 36, 255)</span>
+          <button class="copy-res absolute top-4 right-4 opacity-0 group-hover:opacity-100 text-accent transition-opacity" data-target="resRgb">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+          </button>
+        </div>
+
+        <div class="bg-surface/50 border border-border-subtle rounded-xl p-4 flex flex-col relative group">
+          <span class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">HSL</span>
+          <span id="resHsl" class="font-mono text-text-primary text-lg">hsl(255, 100%, 57%)</span>
+          <button class="copy-res absolute top-4 right-4 opacity-0 group-hover:opacity-100 text-accent transition-opacity" data-target="resHsl">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <Fragment slot="content">
+    <HowToSection 
+      title="How to Convert Colors Online"
+      steps={[
+        {
+          name: "Enter a Color Value",
+          text: "Type or paste a color code into the input field. The tool automatically detects whether you've entered HEX (e.g., #FF0000), RGB (e.g., rgb(255, 0, 0)), or HSL.",
+          description: "Type or paste a color code into the input field. The tool automatically detects whether you've entered HEX (e.g., <code>#FF0000</code>), RGB (e.g., <code>rgb(255, 0, 0)</code>), or HSL."
+        },
+        {
+          name: "Use the Color Picker",
+          text: "Alternatively, click the color swatch icon inside the input box to open your system's native color picker and select a color visually.",
+          description: "Alternatively, click the color swatch icon inside the input box to open your system's native color picker and select a color visually."
+        },
+        {
+          name: "Live Preview",
+          text: "As you type, the preview area instantly updates to show the parsed color, helping you verify you've got the exact shade you want.",
+          description: "As you type, the preview area instantly updates to show the parsed color, helping you verify you've got the exact shade you want."
+        },
+        {
+          name: "Copy the Code",
+          text: "Hover over the HEX, RGB, or HSL result boxes and click the copy icon to instantly copy the formatted code to your clipboard.",
+          description: "Hover over the HEX, RGB, or HSL result boxes and click the copy icon to instantly copy the formatted code to your clipboard."
+        }
+      ]}
+    />
+    <TechnicalExplainer 
+      title="Understanding Color Formats on the Web"
+      sections={[
+        {
+          title: "HEX (Hexadecimal)",
+          content: "The most common color format on the web. It uses a base-16 number system to represent the mix of Red, Green, and Blue. For example, <code>#FF0000</code> is pure red because the Red channel is at its maximum (FF, or 255), while Green and Blue are at 00. You can also use 3-digit shorthand like <code>#F00</code>."
+        },
+        {
+          title: "RGB (Red, Green, Blue)",
+          content: "RGB is additive color mapping used by electronic displays. It explicitly lists the values for the Red, Green, and Blue channels on a scale from 0 to 255. Example: <code>rgb(255, 0, 0)</code>."
+        },
+        {
+          title: "HSL (Hue, Saturation, Lightness)",
+          content: "Often preferred by designers because it feels more intuitive than RGB. <strong>Hue</strong> is the degree on the color wheel from 0 to 360 (e.g., 0 is red, 120 is green, 240 is blue). <strong>Saturation</strong> is a percentage from 0% (grayscale) to 100% (full color). <strong>Lightness</strong> is a percentage from 0% (black) to 100% (white). Example: <code>hsl(0, 100%, 50%)</code> is pure red."
+        }
+      ]}
+    />
+    <FaqSection 
+      faqs={[
+        {
+          question: "Does this tool support Alpha/Transparency (RGBA or HEX8)?",
+          text: "Currently, this tool focuses on solid colors (RGB/HEX6). If you paste an RGBA or HEX8 value, the alpha channel will be ignored and it will convert the solid base color.",
+          answer: "Currently, this tool focuses on solid colors (RGB/HEX6). If you paste an RGBA or HEX8 value, the alpha channel will be ignored and it will convert the solid base color."
+        },
+        {
+          question: "Which format is best for web development?",
+          text: "All three are fully supported by modern browsers. HEX is the most compact and widely used. RGB is useful when you need to animate individual color channels in JavaScript. HSL is increasingly popular for creating design systems, as you can easily create lighter/darker shades by tweaking the Lightness percentage.",
+          answer: "All three are fully supported by modern browsers. HEX is the most compact and widely used. RGB is useful when you need to animate individual color channels in JavaScript. HSL is increasingly popular for creating design systems, as you can easily create lighter/darker shades by tweaking the Lightness percentage."
+        }
+      ]}
+    />
+  </Fragment>
+
+  <script>
+    import { copyToClipboard } from '../../lib/clipboard';
+    import { parseColor } from '../../tools/color-converter';
+
+    const colorInput = document.getElementById('colorInput') as HTMLInputElement;
+    const nativePicker = document.getElementById('nativePicker') as HTMLInputElement;
+    const errorBanner = document.getElementById('errorBanner')!;
+    
+    const previewBox = document.getElementById('previewBox')!;
+    const colorCircle = document.getElementById('colorCircle')!;
+
+    const resHex = document.getElementById('resHex')!;
+    const resRgb = document.getElementById('resRgb')!;
+    const resHsl = document.getElementById('resHsl')!;
+
+    function processColor(val: string, fromPicker: boolean = false) {
+      if (!val.trim()) {
+        errorBanner.classList.add('hidden');
+        return;
+      }
+
+      const res = parseColor(val);
+      
+      if (!res.isValid) {
+        errorBanner.classList.remove('hidden');
+        resHex.textContent = '---';
+        resRgb.textContent = '---';
+        resHsl.textContent = '---';
+        return;
+      }
+
+      errorBanner.classList.add('hidden');
+      
+      resHex.textContent = res.hex;
+      resRgb.textContent = res.rgb;
+      resHsl.textContent = res.hsl;
+
+      colorCircle.style.backgroundColor = res.hex;
+      
+      // Update background tint
+      previewBox.style.backgroundColor = `rgba(${res.r}, ${res.g}, ${res.b}, 0.1)`;
+
+      if (!fromPicker) {
+        nativePicker.value = res.hex;
+      } else {
+        colorInput.value = res.hex;
+      }
+    }
+
+    colorInput.addEventListener('input', (e) => {
+      processColor((e.target as HTMLInputElement).value, false);
+    });
+
+    nativePicker.addEventListener('input', (e) => {
+      processColor((e.target as HTMLInputElement).value, true);
+    });
+
+    // Copy buttons
+    document.querySelectorAll('.copy-res').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const targetId = (e.currentTarget as HTMLElement).getAttribute('data-target');
+        if (targetId) {
+          const text = document.getElementById(targetId)?.textContent;
+          if (text && text !== '---') {
+            copyToClipboard(text, e.currentTarget as HTMLElement, `
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+            `);
+          }
+        }
+      });
+    });
+
+  </script>
+</ToolLayout>

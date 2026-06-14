@@ -1,33 +1,22 @@
 ---
+interface Props {
+  title: string;
+  sections: {
+    title: string;
+    content: string; // HTML content
+  }[];
+}
+const { title, sections } = Astro.props;
 ---
 <section class="mb-12">
-  <h2 class="text-2xl font-bold mb-6 text-text-primary">Understanding JSON and CSV: Formats, Use Cases, and Trade-offs</h2>
+  <h2 class="text-2xl font-bold mb-6 text-text-primary">{title}</h2>
   
   <div class="prose prose-invert prose-accent max-w-none text-text-secondary text-sm md:text-base">
-    <h3 class="text-text-primary font-semibold text-lg mt-8 mb-4">What is JSON?</h3>
-    <p class="mb-4">
-      JSON (JavaScript Object Notation) is a lightweight data interchange format that is easy for humans to read and write, and easy for machines to parse and generate. It is built on two structures: a collection of name/value pairs (often realized as an object, record, struct, dictionary, hash table, keyed list, or associative array), and an ordered list of values (an array, vector, list, or sequence). Because it supports nested structures, it's the dominant format for web APIs.
-    </p>
-
-    <h3 class="text-text-primary font-semibold text-lg mt-8 mb-4">What is CSV?</h3>
-    <p class="mb-4">
-      CSV (Comma-Separated Values) is a plain-text tabular format. It stores tabular data (numbers and text) in plain text, where each line of the file is a data record, and each record consists of one or more fields, separated by commas. It is widely supported by consumer, business, and scientific applications (like Microsoft Excel, Google Sheets, and databases).
-    </p>
-
-    <h3 class="text-text-primary font-semibold text-lg mt-8 mb-4">When Should You Convert JSON to CSV?</h3>
-    <ul class="space-y-2 list-disc pl-5 mb-4 marker:text-accent">
-      <li><strong class="text-text-primary">Spreadsheet analysis:</strong> Import API data into Excel or Google Sheets for financial modeling, charting, or pivot tables.</li>
-      <li><strong class="text-text-primary">Database imports:</strong> Bulk-load data into SQL databases via CSV, which is often much faster and natively supported by tools like PostgreSQL's <code>COPY</code> command.</li>
-      <li><strong class="text-text-primary">Reporting:</strong> Generate human-readable tabular reports from complex, nested API responses.</li>
-      <li><strong class="text-text-primary">Legacy system integration:</strong> Interface with older business systems that only accept flat CSV files.</li>
-    </ul>
-
-    <h3 class="text-text-primary font-semibold text-lg mt-8 mb-4">How This Converter Handles Edge Cases</h3>
-    <ul class="space-y-2 list-disc pl-5 mb-4 marker:text-accent">
-      <li><strong class="text-text-primary">Nested Objects:</strong> Flattened using dot-notation (`user.address.city`), making them perfectly suited for column-based databases.</li>
-      <li><strong class="text-text-primary">Arrays:</strong> Serialized as quoted strings to preserve their content without breaking the CSV structure.</li>
-      <li><strong class="text-text-primary">Null/Undefined:</strong> Rendered as empty fields to maintain column alignment.</li>
-      <li><strong class="text-text-primary">Mixed Types:</strong> Coerced to strings with type preservation where possible.</li>
-    </ul>
+    {sections.map(section => (
+      <>
+        <h3 class="text-text-primary font-semibold text-lg mt-8 mb-4">{section.title}</h3>
+        <div class="mb-4" set:html={section.content}></div>
+      </>
+    ))}
   </div>
 </section>

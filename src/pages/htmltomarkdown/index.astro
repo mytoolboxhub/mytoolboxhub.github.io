@@ -1,0 +1,158 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import HowToSection from '../../components/seo/HowToSection.astro';
+import FaqSection from '../../components/seo/FaqSection.astro';
+import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
+import { tools } from '../../lib/tool-registry';
+
+const tool = tools.find(t => t.id === 'html-to-markdown')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="space-y-6">
+    <!-- Layout Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      
+      <!-- Input Panel -->
+      <div class="flex flex-col h-[600px]">
+        <div class="flex justify-between items-center mb-2 px-1">
+          <label for="htmlInput" class="text-sm font-semibold text-text-primary">Raw HTML</label>
+          <button id="clearBtn" class="text-xs text-text-muted hover:text-error transition-colors font-medium">Clear</button>
+        </div>
+        <textarea 
+          id="htmlInput" 
+          class="flex-1 bg-surface/50 border border-border-subtle rounded-xl p-4 font-mono text-sm text-text-primary resize-none focus-glow transition-colors"
+          placeholder="Paste your <h1>HTML</h1> here..."
+          spellcheck="false"
+        ></textarea>
+      </div>
+
+      <!-- Output Panel -->
+      <div class="flex flex-col h-[600px]">
+        <div class="flex justify-between items-center mb-2 px-1">
+          <label for="mdOutput" class="text-sm font-semibold text-text-primary">Markdown Output</label>
+          <div class="flex gap-3">
+            <button id="copyBtn" class="text-xs text-accent hover:text-accent-hover transition-colors flex items-center gap-1 font-medium">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+              Copy
+            </button>
+            <button id="downloadBtn" class="text-xs text-accent hover:text-accent-hover transition-colors flex items-center gap-1 font-medium">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+              Download
+            </button>
+          </div>
+        </div>
+        <textarea 
+          id="mdOutput" 
+          class="flex-1 bg-void border border-border-subtle rounded-xl p-4 font-mono text-sm text-text-secondary resize-none focus-glow"
+          placeholder="# Markdown Output"
+          readonly
+        ></textarea>
+      </div>
+    </div>
+  </div>
+
+  <Fragment slot="content">
+    <HowToSection 
+      title="How to Convert HTML to Markdown"
+      steps={[
+        {
+          name: "Paste Your HTML",
+          text: "Copy raw HTML from your editor or the source code of a webpage, and paste it into the left panel.",
+          description: "Copy raw HTML from your editor or the source code of a webpage, and paste it into the left panel."
+        },
+        {
+          name: "Live Conversion",
+          text: "The tool uses your browser's internal parser to instantly convert the HTML tags into their Markdown equivalents.",
+          description: "The tool uses your browser's internal parser to instantly convert the HTML tags into their Markdown equivalents."
+        },
+        {
+          name: "Copy or Download",
+          text: "Use the Copy button to copy the resulting Markdown, or download it directly as a .md file.",
+          description: "Use the Copy button to copy the resulting Markdown, or download it directly as a <code>.md</code> file."
+        }
+      ]}
+    />
+    <TechnicalExplainer 
+      title="Why Convert HTML to Markdown?"
+      sections={[
+        {
+          title: "Simplicity and Readability",
+          content: "Markdown was created by John Gruber in 2004 to be a plain-text formatting syntax that is easy to read and write. Unlike HTML, which is cluttered with opening and closing tags, Markdown uses minimal punctuation characters (like <code>#</code> for headers and <code>*</code> for emphasis) to format text."
+        },
+        {
+          title: "Platform Compatibility",
+          content: "Markdown has become the standard for developer documentation. It is the default format for GitHub READMEs, Notion pages, Discord messages, and Static Site Generators (like Astro, Hugo, or Next.js)."
+        },
+        {
+          title: "How the Parser Works",
+          content: "This tool leverages the <code>DOMParser</code> API built directly into your web browser. Instead of using complex regular expressions (which often fail on malformed HTML), it builds an actual Document Object Model tree, traverses it recursively, and maps supported HTML elements (h1-h6, p, ul, ol, a, img, etc.) to standard Markdown syntax."
+        }
+      ]}
+    />
+    <FaqSection 
+      faqs={[
+        {
+          question: "Are inline styles and classes preserved?",
+          text: "No. Markdown is strictly a structural format. It does not support custom CSS classes or inline styles. Elements like <span style='color: red'> will be converted to plain text.",
+          answer: "No. Markdown is strictly a structural format. It does not support custom CSS classes or inline styles. Elements like <code>&lt;span style='color: red'&gt;</code> will be converted to plain text."
+        },
+        {
+          question: "What happens to complex layouts like tables or grids?",
+          text: "Standard Markdown has very limited support for complex layouts. While basic tables are supported by GitHub Flavored Markdown (GFM), nested grids or complex divs will generally be stripped of their structure and output as block text.",
+          answer: "Standard Markdown has very limited support for complex layouts. While basic tables are supported by GitHub Flavored Markdown (GFM), nested grids or complex divs will generally be stripped of their structure and output as block text."
+        },
+        {
+          question: "Does it support script and style tags?",
+          text: "No. The converter automatically ignores all <script>, <style>, and <noscript> tags so their raw code doesn't pollute your markdown document.",
+          answer: "No. The converter automatically ignores all <code>&lt;script&gt;</code>, <code>&lt;style&gt;</code>, and <code>&lt;noscript&gt;</code> tags so their raw code doesn't pollute your markdown document."
+        }
+      ]}
+    />
+  </Fragment>
+
+  <script>
+    import { copyToClipboard } from '../../lib/clipboard';
+    import { downloadFile } from '../../lib/download';
+    import { htmlToMarkdown } from '../../tools/html-to-markdown';
+
+    const input = document.getElementById('htmlInput') as HTMLTextAreaElement;
+    const output = document.getElementById('mdOutput') as HTMLTextAreaElement;
+    const clearBtn = document.getElementById('clearBtn')!;
+    const copyBtn = document.getElementById('copyBtn')!;
+    const downloadBtn = document.getElementById('downloadBtn')!;
+
+    function processConversion() {
+      const val = input.value;
+      if (!val) {
+        output.value = '';
+        return;
+      }
+      output.value = htmlToMarkdown(val);
+    }
+
+    input.addEventListener('input', processConversion);
+
+    clearBtn.addEventListener('click', () => {
+      input.value = '';
+      output.value = '';
+      input.focus();
+    });
+
+    copyBtn.addEventListener('click', () => {
+      if (output.value) {
+        copyToClipboard(output.value, copyBtn, `
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+          Copied!
+        `);
+      }
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      if (output.value) {
+        downloadFile(output.value, 'document.md', 'text/markdown;charset=utf-8;');
+      }
+    });
+
+  </script>
+</ToolLayout>

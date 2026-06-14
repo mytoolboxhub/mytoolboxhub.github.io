@@ -1,0 +1,271 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import HowToSection from '../../components/seo/HowToSection.astro';
+import FaqSection from '../../components/seo/FaqSection.astro';
+import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
+import { tools } from '../../lib/tool-registry';
+
+const tool = tools.find(t => t.id === 'password-generator')!;
+---
+
+<ToolLayout tool={tool}>
+  <div class="max-w-3xl mx-auto space-y-8">
+    
+    <!-- Password Display -->
+    <div class="glass p-8 rounded-2xl relative group">
+      <div class="flex justify-between items-center mb-4">
+        <label class="text-sm font-medium text-text-secondary">Generated Password</label>
+        <div id="strengthLabel" class="text-xs font-bold px-2 py-1 rounded text-void bg-surface">None</div>
+      </div>
+      
+      <div class="relative">
+        <input 
+          type="text" 
+          id="passwordOutput" 
+          class="w-full bg-void border border-border-subtle rounded-xl px-6 py-5 font-mono text-xl sm:text-2xl text-text-primary focus-glow pr-24 tracking-wider"
+          readonly
+        />
+        <div class="absolute right-3 top-1/2 -translate-y-1/2 flex gap-2">
+          <button id="regenerateBtn" class="p-2 text-text-muted hover:text-accent transition-colors" title="Generate New">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+          </button>
+          <button id="copyBtn" class="p-2 bg-accent text-void rounded-lg hover:bg-accent-hover transition-colors shadow-lg shadow-accent/20" title="Copy to Clipboard">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Strength Meter -->
+      <div class="w-full h-1.5 bg-surface rounded-full mt-6 overflow-hidden flex gap-1">
+        <div id="meter1" class="h-full flex-1 rounded-l-full bg-surface transition-colors duration-300"></div>
+        <div id="meter2" class="h-full flex-1 bg-surface transition-colors duration-300"></div>
+        <div id="meter3" class="h-full flex-1 bg-surface transition-colors duration-300"></div>
+        <div id="meter4" class="h-full flex-1 rounded-r-full bg-surface transition-colors duration-300"></div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="glass p-8 rounded-2xl">
+      <div class="mb-8">
+        <div class="flex justify-between items-center mb-4">
+          <label for="lengthSlider" class="text-sm font-medium text-text-secondary">Password Length</label>
+          <span id="lengthDisplay" class="text-lg font-bold text-accent font-mono">16</span>
+        </div>
+        <input 
+          type="range" 
+          id="lengthSlider" 
+          min="4" 
+          max="128" 
+          value="16" 
+          class="w-full h-2 bg-surface rounded-lg appearance-none cursor-pointer accent-accent"
+        />
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Checkbox Options -->
+        <label class="flex items-center gap-3 p-3 rounded-lg border border-border-subtle bg-surface/30 cursor-pointer hover:bg-surface/60 transition-colors">
+          <input type="checkbox" id="cbUppercase" checked class="w-5 h-5 rounded border-border-default bg-void text-accent focus-glow" />
+          <div class="flex flex-col">
+            <span class="text-sm font-medium text-text-primary">Uppercase</span>
+            <span class="text-xs text-text-muted font-mono">ABC...</span>
+          </div>
+        </label>
+        
+        <label class="flex items-center gap-3 p-3 rounded-lg border border-border-subtle bg-surface/30 cursor-pointer hover:bg-surface/60 transition-colors">
+          <input type="checkbox" id="cbLowercase" checked class="w-5 h-5 rounded border-border-default bg-void text-accent focus-glow" />
+          <div class="flex flex-col">
+            <span class="text-sm font-medium text-text-primary">Lowercase</span>
+            <span class="text-xs text-text-muted font-mono">abc...</span>
+          </div>
+        </label>
+
+        <label class="flex items-center gap-3 p-3 rounded-lg border border-border-subtle bg-surface/30 cursor-pointer hover:bg-surface/60 transition-colors">
+          <input type="checkbox" id="cbNumbers" checked class="w-5 h-5 rounded border-border-default bg-void text-accent focus-glow" />
+          <div class="flex flex-col">
+            <span class="text-sm font-medium text-text-primary">Numbers</span>
+            <span class="text-xs text-text-muted font-mono">123...</span>
+          </div>
+        </label>
+
+        <label class="flex items-center gap-3 p-3 rounded-lg border border-border-subtle bg-surface/30 cursor-pointer hover:bg-surface/60 transition-colors">
+          <input type="checkbox" id="cbSymbols" checked class="w-5 h-5 rounded border-border-default bg-void text-accent focus-glow" />
+          <div class="flex flex-col">
+            <span class="text-sm font-medium text-text-primary">Symbols</span>
+            <span class="text-xs text-text-muted font-mono">!@#...</span>
+          </div>
+        </label>
+
+        <label class="flex items-center gap-3 p-3 rounded-lg border border-border-subtle bg-surface/30 cursor-pointer hover:bg-surface/60 transition-colors sm:col-span-2">
+          <input type="checkbox" id="cbExcludeSimilar" class="w-5 h-5 rounded border-border-default bg-void text-accent focus-glow" />
+          <div class="flex flex-col">
+            <span class="text-sm font-medium text-text-primary">Exclude Similar Characters</span>
+            <span class="text-xs text-text-muted">Don't use characters that look alike (e.g. i, l, 1, L, o, 0, O)</span>
+          </div>
+        </label>
+
+        <label class="flex items-center gap-3 p-3 rounded-lg border border-border-subtle bg-surface/30 cursor-pointer hover:bg-surface/60 transition-colors sm:col-span-2">
+          <input type="checkbox" id="cbExcludeAmbiguous" class="w-5 h-5 rounded border-border-default bg-void text-accent focus-glow" />
+          <div class="flex flex-col">
+            <span class="text-sm font-medium text-text-primary">Exclude Ambiguous Characters</span>
+            <span class="text-xs text-text-muted font-mono">{"{}[]()/\\'\"`~,;:.<>"}</span>
+          </div>
+        </label>
+
+      </div>
+    </div>
+  </div>
+
+  <Fragment slot="content">
+    <HowToSection 
+      title="How to Generate Secure Passwords"
+      steps={[
+        {
+          name: "Adjust the Length",
+          text: "Use the slider to choose your password length. We recommend at least 16 characters for strong security against brute-force attacks.",
+          description: "Use the slider to choose your password length. We recommend at least 16 characters for strong security against brute-force attacks."
+        },
+        {
+          name: "Select Character Types",
+          text: "Toggle Uppercase, Lowercase, Numbers, and Symbols to determine what character sets will be used. The more variety, the stronger the password.",
+          description: "Toggle Uppercase, Lowercase, Numbers, and Symbols to determine what character sets will be used. The more variety, the stronger the password."
+        },
+        {
+          name: "Tweak Exclusions (Optional)",
+          text: "If you need to type the password manually, consider excluding similar characters (like l and 1) or ambiguous symbols.",
+          description: "If you need to type the password manually, consider excluding similar characters (like <code>l</code> and <code>1</code>) or ambiguous symbols."
+        },
+        {
+          name: "Copy and Save",
+          text: "Click the Copy button and paste the generated password directly into your password manager.",
+          description: "Click the Copy button and paste the generated password directly into your password manager."
+        }
+      ]}
+    />
+    <TechnicalExplainer 
+      title="The Math Behind Secure Passwords"
+      sections={[
+        {
+          title: "Cryptographically Secure Randomness",
+          content: "This tool uses the <code>crypto.getRandomValues()</code> API built into your browser. Unlike <code>Math.random()</code>, which is predictable and not suitable for security, the Web Crypto API uses the operating system's secure entropy source (like <code>/dev/urandom</code>) to generate truly unpredictable values."
+        },
+        {
+          title: "Entropy (Password Strength)",
+          content: "Password strength is measured in 'entropy'. It calculates how many guesses a computer would need to crack the password. Entropy increases exponentially with length, and logarithmically with the size of the character pool. <strong>A 16-character password with letters and numbers is exponentially stronger than an 8-character password with every possible symbol.</strong> Length is the most critical factor."
+        },
+        {
+          title: "Why Client-Side Matters",
+          content: "Generating passwords on the server means they have to be transmitted over the internet, creating a vulnerability. Because this tool is 100% client-side (runs entirely in your browser using JavaScript), the passwords generated never exist anywhere except in your computer's RAM until you save them."
+        }
+      ]}
+    />
+    <FaqSection 
+      faqs={[
+        {
+          question: "Does this tool save my generated passwords?",
+          text: "Absolutely not. This tool is fully static and runs locally in your browser. There is no database, no backend server, and no analytics tracking the passwords you generate.",
+          answer: "Absolutely not. This tool is fully static and runs locally in your browser. There is no database, no backend server, and no analytics tracking the passwords you generate."
+        },
+        {
+          question: "What is a 'Good' password length?",
+          text: "Modern security standards recommend a minimum of 16 characters for passwords. At 16 characters with a mix of letters and numbers, it would take current supercomputers trillions of years to brute-force.",
+          answer: "Modern security standards recommend a minimum of <strong>16 characters</strong> for passwords. At 16 characters with a mix of letters and numbers, it would take current supercomputers trillions of years to brute-force."
+        },
+        {
+          question: "Why should I exclude similar characters?",
+          text: "In many fonts, the lowercase letter 'l' (el), the uppercase letter 'I' (eye), and the number '1' (one) look identical. If you are writing down a password or reading it to type on another device, these ambiguities cause errors.",
+          answer: "In many fonts, the lowercase letter 'l' (el), the uppercase letter 'I' (eye), and the number '1' (one) look identical. If you are writing down a password or reading it to type on another device, these ambiguities cause errors."
+        }
+      ]}
+    />
+  </Fragment>
+
+  <script>
+    import { copyToClipboard } from '../../lib/clipboard';
+    import { generatePassword, calculatePasswordStrength } from '../../tools/password-generator';
+
+    const output = document.getElementById('passwordOutput') as HTMLInputElement;
+    const lengthSlider = document.getElementById('lengthSlider') as HTMLInputElement;
+    const lengthDisplay = document.getElementById('lengthDisplay')!;
+    const copyBtn = document.getElementById('copyBtn')!;
+    const regenerateBtn = document.getElementById('regenerateBtn')!;
+
+    const cbUppercase = document.getElementById('cbUppercase') as HTMLInputElement;
+    const cbLowercase = document.getElementById('cbLowercase') as HTMLInputElement;
+    const cbNumbers = document.getElementById('cbNumbers') as HTMLInputElement;
+    const cbSymbols = document.getElementById('cbSymbols') as HTMLInputElement;
+    const cbExcludeSimilar = document.getElementById('cbExcludeSimilar') as HTMLInputElement;
+    const cbExcludeAmbiguous = document.getElementById('cbExcludeAmbiguous') as HTMLInputElement;
+
+    const strengthLabel = document.getElementById('strengthLabel')!;
+    const meter1 = document.getElementById('meter1')!;
+    const meter2 = document.getElementById('meter2')!;
+    const meter3 = document.getElementById('meter3')!;
+    const meter4 = document.getElementById('meter4')!;
+
+    function updateStrengthMeter(password: string) {
+      const strength = calculatePasswordStrength(password);
+      
+      strengthLabel.textContent = strength.label;
+      strengthLabel.className = `text-xs font-bold px-2 py-1 rounded text-void ${strength.color}`;
+
+      // Reset meters
+      const bgColors = ['bg-red-500', 'bg-orange-500', 'bg-yellow-500', 'bg-green-500'];
+      
+      let meterColor = 'bg-surface';
+      if (strength.score <= 2) meterColor = bgColors[0];
+      else if (strength.score <= 4) meterColor = bgColors[1];
+      else if (strength.score <= 6) meterColor = bgColors[2];
+      else meterColor = bgColors[3];
+
+      meter1.className = `h-full flex-1 rounded-l-full transition-colors duration-300 ${strength.score >= 1 ? meterColor : 'bg-surface'}`;
+      meter2.className = `h-full flex-1 transition-colors duration-300 ${strength.score >= 3 ? meterColor : 'bg-surface'}`;
+      meter3.className = `h-full flex-1 transition-colors duration-300 ${strength.score >= 5 ? meterColor : 'bg-surface'}`;
+      meter4.className = `h-full flex-1 rounded-r-full transition-colors duration-300 ${strength.score >= 7 ? meterColor : 'bg-surface'}`;
+    }
+
+    function doGenerate() {
+      const options = {
+        length: parseInt(lengthSlider.value, 10),
+        lowercase: cbLowercase.checked,
+        uppercase: cbUppercase.checked,
+        numbers: cbNumbers.checked,
+        symbols: cbSymbols.checked,
+        excludeSimilar: cbExcludeSimilar.checked,
+        excludeAmbiguous: cbExcludeAmbiguous.checked,
+      };
+
+      const pwd = generatePassword(options);
+      output.value = pwd;
+      updateStrengthMeter(pwd);
+    }
+
+    lengthSlider.addEventListener('input', () => {
+      lengthDisplay.textContent = lengthSlider.value;
+      doGenerate();
+    });
+
+    const inputs = [cbUppercase, cbLowercase, cbNumbers, cbSymbols, cbExcludeSimilar, cbExcludeAmbiguous];
+    inputs.forEach(input => {
+      input.addEventListener('change', () => {
+        // Prevent unchecking all base character sets
+        if (!cbUppercase.checked && !cbLowercase.checked && !cbNumbers.checked && !cbSymbols.checked) {
+          cbLowercase.checked = true;
+        }
+        doGenerate();
+      });
+    });
+
+    regenerateBtn.addEventListener('click', doGenerate);
+
+    copyBtn.addEventListener('click', () => {
+      if (output.value) {
+        copyToClipboard(output.value, copyBtn, `
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+        `);
+      }
+    });
+
+    // Initial run
+    doGenerate();
+  </script>
+</ToolLayout>

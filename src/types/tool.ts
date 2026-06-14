@@ -7,6 +7,7 @@ export type CategoryId =
   | 'encoders'
   | 'dev-tools'
   | 'text-tools'
+  | 'cleaners'
   | 'image-tools'
   | 'network-tools'
   | 'crypto-tools'

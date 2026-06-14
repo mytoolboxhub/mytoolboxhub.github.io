@@ -1,0 +1,154 @@
+@import "tailwindcss";
+
+@theme {
+  /* === Colors === */
+  --color-void:           hsl(225, 15%, 3%);
+  --color-base:           hsl(225, 14%, 6%);
+  --color-surface:        hsl(225, 13%, 9%);
+  --color-elevated:       hsl(225, 12%, 13%);
+  --color-overlay:        hsl(225, 12%, 17%);
+  
+  --color-accent:         hsl(200, 100%, 55%);
+  --color-accent-hover:   hsl(200, 100%, 65%);
+  --color-accent-glow:    hsla(200, 100%, 55%, 0.15);
+  --color-accent-muted:   hsl(200, 60%, 25%);
+  
+  --color-border-subtle:  rgba(255, 255, 255, 0.06);
+  --color-border-default: rgba(255, 255, 255, 0.10);
+  --color-border-strong:  rgba(255, 255, 255, 0.18);
+  
+  --color-text-primary:   hsl(220, 10%, 93%);
+  --color-text-secondary: hsl(220, 8%, 60%);
+  --color-text-muted:     hsl(220, 6%, 40%);
+
+  /* === Typography === */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  
+  --text-display: 3.5rem;
+  --text-display--line-height: 1.1;
+  --text-display--letter-spacing: -0.03em;
+  --text-display--font-weight: 700;
+  
+  --text-heading: 2rem;
+  --text-heading--line-height: 1.2;
+  --text-heading--letter-spacing: -0.02em;
+  --text-heading--font-weight: 600;
+  
+  --text-subhead: 1.25rem;
+  --text-subhead--line-height: 1.4;
+  --text-subhead--letter-spacing: -0.01em;
+  --text-subhead--font-weight: 500;
+  
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.65;
+  
+  --text-small: 0.8125rem;
+  --text-small--line-height: 1.5;
+  --text-small--letter-spacing: 0.01em;
+  
+  --text-micro: 0.6875rem;
+  --text-micro--line-height: 1.4;
+  --text-micro--letter-spacing: 0.04em;
+  --text-micro--font-weight: 500;
+
+  /* === Shadows & Glows === */
+  --shadow-glow-sm:  0 0 12px -3px var(--color-accent-glow);
+  --shadow-glow-md:  0 0 24px -5px var(--color-accent-glow);
+  --shadow-glow-lg:  0 0 48px -8px var(--color-accent-glow);
+  --shadow-inner-glow: inset 0 1px 0 0 rgba(255,255,255,0.05);
+  
+  --shadow-elevation-1: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-elevation-2: 0 4px 12px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3);
+  --shadow-elevation-3: 0 12px 40px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.3);
+
+  /* === Animations === */
+  --animate-fade-in:       fadeIn 0.4s ease-out;
+  --animate-fade-in-up:    fadeInUp 0.5s ease-out;
+  --animate-fade-in-down:  fadeInDown 0.4s ease-out;
+  --animate-slide-in-left: slideInLeft 0.3s ease-out;
+  --animate-scale-in:      scaleIn 0.3s ease-out;
+  --animate-glow-pulse:    glowPulse 3s ease-in-out infinite;
+  --animate-grid-fade:     gridFade 1.5s ease-out;
+
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  @keyframes fadeInUp {
+    0% { opacity: 0; transform: translateY(12px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeInDown {
+    0% { opacity: 0; transform: translateY(-8px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slideInLeft {
+    0% { opacity: 0; transform: translateX(-16px); }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes scaleIn {
+    0% { opacity: 0; transform: scale(0.95); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  @keyframes glowPulse {
+    0%, 100% { box-shadow: 0 0 12px -3px var(--color-accent-glow); }
+    50% { box-shadow: 0 0 24px -5px var(--color-accent-glow); }
+  }
+  @keyframes gridFade {
+    0% { opacity: 0; border-color: transparent; }
+    100% { opacity: 1; border-color: var(--color-border-subtle); }
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark; /* Force dark mode */
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  body {
+    background-color: var(--color-void);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: 'liga' 1, 'calt' 1;
+  }
+
+  ::selection {
+    background-color: var(--color-accent);
+    color: white;
+  }
+}
+
+@layer components {
+  .glass {
+    background-color: color-mix(in srgb, var(--color-surface) 60%, transparent);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--color-border-subtle);
+    border-radius: var(--radius-xl, 0.875rem);
+  }
+
+  .focus-glow:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-accent) 40%, transparent), var(--shadow-glow-sm);
+  }
+
+  .grid-lines {
+    background-image:
+      linear-gradient(var(--color-border-subtle) 1px, transparent 1px),
+      linear-gradient(90deg, var(--color-border-subtle) 1px, transparent 1px);
+    background-size: 64px 64px;
+  }
+}

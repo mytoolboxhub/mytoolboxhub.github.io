@@ -1,0 +1,46 @@
+---
+import '../styles/global.css';
+import '@fontsource-variable/inter';
+import '@fontsource-variable/jetbrains-mono';
+
+interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+  image?: string;
+}
+
+const { 
+  title, 
+  description, 
+  canonical = new URL(Astro.url.pathname, Astro.site || 'https://mytoolboxhub.github.io').href,
+  image = new URL('/og-default.png', Astro.site || 'https://mytoolboxhub.github.io').href
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={image} />
+    
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Privacy-friendly Analytics (Plausible) - Replace data-domain when launching -->
+    <script defer data-domain="mytoolboxhub.github.io" src="https://plausible.io/js/script.js" is:inline></script>
+  </head>
+  <body class="bg-void text-text-primary antialiased min-h-screen flex flex-col">
+    <slot />
+  </body>
+</html>

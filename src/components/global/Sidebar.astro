@@ -1,0 +1,61 @@
+---
+import { tools } from '../../lib/tool-registry';
+
+interface Props {
+  currentToolId?: string;
+}
+
+const { currentToolId } = Astro.props;
+
+// Group tools by category
+const categories = tools.reduce((acc, tool) => {
+  if (!acc[tool.category]) {
+    acc[tool.category] = [];
+  }
+  acc[tool.category].push(tool);
+  return acc;
+}, {} as Record<string, typeof tools>);
+
+const categoryOrder = ['converters', 'formatters', 'dev-tools', 'generators', 'encoders', 'text-tools'];
+const sortedCategories = Object.keys(categories).sort((a, b) => {
+  return categoryOrder.indexOf(a) - categoryOrder.indexOf(b);
+});
+---
+
+<aside class="w-64 flex-shrink-0 hidden md:block border-r border-border-subtle py-8 pr-6">
+  <div class="sticky top-24 space-y-8">
+    {sortedCategories.map((category) => (
+      <div>
+        <h3 class="text-xs font-semibold text-text-primary tracking-wider uppercase mb-3 px-3">
+          {category.replace('-', ' ')}
+        </h3>
+        <ul class="space-y-1">
+          {categories[category].map((tool) => {
+            const isActive = currentToolId === tool.id;
+            return (
+              <li>
+                <a 
+                  href={`/${tool.slug}`} 
+                  class:list={[
+                    'group flex items-center gap-3 px-3 py-2 rounded-lg transition-all focus-glow',
+                    isActive 
+                      ? 'bg-accent/10 text-accent font-medium' 
+                      : 'text-text-secondary hover:text-text-primary hover:bg-surface'
+                  ]}
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  <span class="truncate">{tool.shortName || tool.name}</span>
+                  {tool.status === 'coming-soon' && (
+                    <span class="ml-auto text-[10px] uppercase tracking-wider bg-surface border border-border-subtle px-1.5 py-0.5 rounded text-text-muted">
+                      Soon
+                    </span>
+                  )}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    ))}
+  </div>
+</aside>

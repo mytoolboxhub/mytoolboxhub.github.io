@@ -1,0 +1,76 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Header from '../components/global/Header.astro';
+import Footer from '../components/global/Footer.astro';
+import Sidebar from '../components/global/Sidebar.astro';
+import AdSlot from '../components/global/AdSlot.astro';
+import type { ToolDefinition } from '../types/tool';
+
+interface Props {
+  tool: ToolDefinition;
+}
+
+const { tool } = Astro.props;
+const title = `${tool.name} — Free Online Tool | MyToolboxHub`;
+---
+
+<BaseLayout title={title} description={tool.description}>
+  <Header />
+  
+  <div class="flex flex-1 max-w-screen-2xl mx-auto w-full">
+    <!-- Left Sidebar: Navigation -->
+    <Sidebar currentToolId={tool.id} />
+    
+    <!-- Main Content Area -->
+    <main class="flex-1 px-4 sm:px-6 lg:px-8 py-8 min-w-0 max-w-4xl">
+      <!-- Breadcrumbs -->
+      <nav class="flex text-text-muted text-sm mb-6" aria-label="Breadcrumb">
+        <ol class="inline-flex items-center space-x-2">
+          <li><a href="/" class="hover:text-accent transition-colors">Home</a></li>
+          <li><span class="mx-2">/</span></li>
+          <li class="capitalize">{tool.category.replace('-', ' ')}</li>
+          <li><span class="mx-2">/</span></li>
+          <li class="text-text-primary" aria-current="page">{tool.name}</li>
+        </ol>
+      </nav>
+
+      <!-- Tool Header -->
+      <div class="mb-8">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="bg-surface border border-border-subtle p-2 rounded-lg">
+            <!-- Icon placeholder -->
+            <svg class="w-6 h-6 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </span>
+          <h1 class="text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">{tool.name}</h1>
+        </div>
+        <p class="mt-2 text-lg text-text-secondary">{tool.longDescription}</p>
+      </div>
+
+      <!-- Interactive Tool Area -->
+      <div class="mb-16">
+        <slot />
+      </div>
+
+      <!-- SEO Content Sections -->
+      <div class="prose prose-invert prose-accent max-w-none mt-16 pt-16 border-t border-border-subtle">
+        <slot name="content" />
+      </div>
+      
+      <!-- Bottom Ad Placement -->
+      <div class="mt-12">
+        <AdSlot slot="in-content" />
+      </div>
+    </main>
+    
+    <!-- Right Sidebar: Ads & Promos -->
+    <aside class="hidden xl:block w-80 pl-8 pr-4 py-8 border-l border-border-subtle">
+      <div class="sticky top-24 space-y-8">
+        <AdSlot slot="sidebar" />
+      </div>
+    </aside>
+  </div>
+  
+  <Footer />
+</BaseLayout>

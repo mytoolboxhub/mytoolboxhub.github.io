@@ -72,7 +72,7 @@ export const tools: ToolDefinition[] = [
     featured: true,
     publishedAt: '2026-06-15',
   },
-  
+
   // 2. The Content & Data Cleaners
   {
     id: 'html-to-markdown',
@@ -234,7 +234,7 @@ export const tools: ToolDefinition[] = [
     id: 'string-manipulator',
     slug: 'stringmanipulator',
     name: 'String Manipulator',
-    shortName: 'String Tools',
+    shortName: 'String Manipulator',
     description: 'Chain powerful string operations: join lines, prefix/suffix, find & replace, filter, wrap, and more.',
     longDescription: 'A pipeline-based string manipulation tool. Stack multiple operations in order — join lines with a custom separator, add prefixes and suffixes, find & replace with regex, trim, wrap, number, filter, reverse, and repeat lines — all without writing a single line of code.',
     category: 'text-tools',

@@ -1,0 +1,435 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import HowToSection from '../../components/seo/HowToSection.astro';
+import FaqSection from '../../components/seo/FaqSection.astro';
+import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
+import { tools } from '../../lib/tool-registry';
+
+const tool = tools.find(t => t.id === 'string-manipulator')!;
+---
+
+<ToolLayout tool={tool}>
+
+  <!-- ── Main Layout ─────────────────────────────────────────────────────── -->
+  <div class="space-y-5">
+
+    <!-- Stats row -->
+    <div class="flex items-center justify-between px-1 text-sm text-text-muted">
+      <span>
+        Input: <span id="statInputLines" class="font-mono font-bold text-text-primary">0</span> lines /
+        <span id="statInputChars" class="font-mono font-bold text-text-primary">0</span> chars
+      </span>
+      <span id="statPipeline" class="text-xs font-bold uppercase tracking-wider text-accent hidden">
+        Pipeline active
+      </span>
+      <span>
+        Output: <span id="statOutputLines" class="font-mono font-bold text-accent">0</span> lines
+      </span>
+    </div>
+
+    <!-- Three-panel grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_340px_1fr] gap-4">
+
+      <!-- ── INPUT PANEL ───────────────────────────────────────────────── -->
+      <div class="flex flex-col">
+        <div class="flex justify-between items-center mb-2 px-1">
+          <label for="inputArea" class="text-sm font-semibold text-text-primary">Input Text</label>
+          <button id="clearBtn" class="text-xs text-text-muted hover:text-error transition-colors font-medium">Clear</button>
+        </div>
+        <textarea
+          id="inputArea"
+          class="flex-1 min-h-[420px] w-full bg-surface/50 border border-border-subtle rounded-xl p-4 font-mono text-sm text-text-primary resize-none focus-glow transition-colors"
+          placeholder="apple&#10;banana&#10;cherry&#10;&#10;Paste your text here..."
+        ></textarea>
+      </div>
+
+      <!-- ── OPERATIONS PANEL ──────────────────────────────────────────── -->
+      <div class="flex flex-col">
+        <div class="flex justify-between items-center mb-2 px-1">
+          <span class="text-sm font-semibold text-text-primary">Operations</span>
+          <button id="resetPipelineBtn" class="text-xs text-text-muted hover:text-error transition-colors font-medium">Reset all</button>
+        </div>
+
+        <!-- Scrollable ops list -->
+        <div id="opsList" class="flex-1 overflow-y-auto space-y-2 pr-1 max-h-[420px]">
+          <!-- Injected by JS -->
+        </div>
+      </div>
+
+      <!-- ── OUTPUT PANEL ──────────────────────────────────────────────── -->
+      <div class="flex flex-col">
+        <div class="flex justify-between items-center mb-2 px-1">
+          <label for="outputArea" class="text-sm font-semibold text-text-primary">Output</label>
+          <div class="flex gap-3">
+            <button id="copyBtn" class="text-xs text-accent hover:text-accent-hover transition-colors flex items-center gap-1 font-medium">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+              Copy
+            </button>
+            <button id="downloadBtn" class="text-xs text-accent hover:text-accent-hover transition-colors flex items-center gap-1 font-medium">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+              Download
+            </button>
+          </div>
+        </div>
+        <textarea
+          id="outputArea"
+          class="flex-1 min-h-[420px] w-full bg-void border border-border-subtle rounded-xl p-4 font-mono text-sm text-text-secondary resize-none focus-glow"
+          readonly
+          placeholder="Result will appear here..."
+        ></textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="copyToast" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 transition-all duration-300 bg-accent text-void font-bold px-4 py-3 rounded-lg shadow-xl flex items-center gap-2 z-50">
+    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+    Copied to clipboard!
+  </div>
+
+  <!-- ── SEO Content ──────────────────────────────────────────────────────── -->
+  <Fragment slot="content">
+    <HowToSection
+      title="How to Use the String Manipulator"
+      steps={[
+        {
+          name: "Paste Your Text",
+          text: "Type or paste any block of text into the left Input panel. It can be a column of values, a list of items, or any multi-line string.",
+          description: "Type or paste any block of text into the left Input panel. It can be a column of values, a list of items, or any multi-line string."
+        },
+        {
+          name: "Enable Operations",
+          text: "In the center Operations panel, toggle one or more transformations. Each operation has its own parameter controls that appear when enabled.",
+          description: "In the center Operations panel, toggle one or more transformations. Each operation has its own parameter controls that appear when enabled."
+        },
+        {
+          name: "Chain Transformations (Pipeline)",
+          text: "Operations are applied in order from top to bottom, forming a pipeline. For example: enable 'Trim Lines' first, then 'Remove Empty Lines', then 'Join Lines' with a comma separator.",
+          description: "Operations are applied in order from top to bottom, forming a pipeline. For example: enable 'Trim Lines' first, then 'Remove Empty Lines', then 'Join Lines' with a comma separator."
+        },
+        {
+          name: "Copy or Download the Result",
+          text: "The output updates live. Click Copy to grab the result to your clipboard, or Download to save it as a .txt file.",
+          description: "The output updates live. Click Copy to grab the result to your clipboard, or Download to save it as a .txt file."
+        }
+      ]}
+    />
+    <TechnicalExplainer
+      title="What Each Operation Does"
+      sections={[
+        {
+          title: "Join Lines",
+          content: "Collapses all lines into a single line, joined by a separator you choose. Ideal for converting a spreadsheet column into a comma-separated list for use in SQL <code>IN (...)</code> clauses or similar."
+        },
+        {
+          title: "Prefix / Suffix",
+          content: "Adds arbitrary text before and/or after every line. A common use case: wrap each line in double quotes and add a trailing comma to create a JSON-ready string array."
+        },
+        {
+          title: "Find & Replace",
+          content: "Performs a global search-and-replace across all lines. Supports both plain text and full JavaScript regular expressions with flags, making it more powerful than a simple text editor's find & replace."
+        },
+        {
+          title: "Wrap Each Line",
+          content: "A specialized version of prefix/suffix that lets you choose from quick presets (single quotes, double quotes, brackets, parentheses, etc.) for wrapping each line."
+        },
+        {
+          title: "Filter Lines",
+          content: "Keeps only lines that match (or don't match) a keyword or regex pattern. The invert toggle turns it into an exclusion filter, equivalent to <code>grep -v</code> in Unix."
+        }
+      ]}
+    />
+    <FaqSection
+      faqs={[
+        {
+          question: "Are operations applied in order?",
+          text: "Yes. Operations run as a pipeline from top to bottom. The output of one operation feeds directly into the next. Enable them in the order that makes sense for your task.",
+          answer: "Yes. Operations run as a pipeline from top to bottom. The output of one operation feeds directly into the next. Enable them in the order that makes sense for your task."
+        },
+        {
+          question: "Can I use regex in Find & Replace and Filter Lines?",
+          text: "Yes. Toggle 'Use regex' on each of those operations to enable full JavaScript regular expression support, including named groups, lookaheads, and flags.",
+          answer: "Yes. Toggle 'Use regex' on each of those operations to enable full JavaScript regular expression support, including named groups, lookaheads, and flags."
+        },
+        {
+          question: "Does any data leave my browser?",
+          text: "No. All processing happens entirely in your browser using JavaScript. No text is ever sent to a server.",
+          answer: "No. All processing happens entirely in your browser using JavaScript. No text is ever sent to a server."
+        }
+      ]}
+    />
+  </Fragment>
+
+  <script>
+    import { allOps, applyPipeline } from '../../tools/string-manipulator';
+    import { copyToClipboard } from '../../lib/clipboard';
+    import { downloadFile } from '../../lib/download';
+
+    // ── State ──────────────────────────────────────────────────────────────
+    // Map: opId -> { enabled: boolean, params: Record<string, any> }
+    const state: Map<string, { enabled: boolean; params: Record<string, string | number | boolean> }> = new Map();
+
+    for (const op of allOps) {
+      const defaultParams: Record<string, string | number | boolean> = {};
+      for (const p of op.params) defaultParams[p.key] = p.default;
+      state.set(op.id, { enabled: false, params: defaultParams });
+    }
+
+    // ── DOM refs ───────────────────────────────────────────────────────────
+    const inputArea    = document.getElementById('inputArea') as HTMLTextAreaElement;
+    const outputArea   = document.getElementById('outputArea') as HTMLTextAreaElement;
+    const clearBtn     = document.getElementById('clearBtn')!;
+    const copyBtn      = document.getElementById('copyBtn')!;
+    const downloadBtn  = document.getElementById('downloadBtn')!;
+    const resetBtn     = document.getElementById('resetPipelineBtn')!;
+    const opsList      = document.getElementById('opsList')!;
+    const statInputLines  = document.getElementById('statInputLines')!;
+    const statInputChars  = document.getElementById('statInputChars')!;
+    const statOutputLines = document.getElementById('statOutputLines')!;
+    const statPipeline    = document.getElementById('statPipeline')!;
+    const copyToast    = document.getElementById('copyToast')!;
+    let toastTimeout: ReturnType<typeof setTimeout>;
+
+    // ── Build ops list UI ──────────────────────────────────────────────────
+    function buildOpCard(op: typeof allOps[number]): HTMLElement {
+      const s = state.get(op.id)!;
+
+      const card = document.createElement('div');
+      card.className = 'op-card bg-surface border border-border-subtle rounded-xl overflow-hidden transition-all';
+      card.dataset.opId = op.id;
+
+      // Header (toggle row)
+      const header = document.createElement('div');
+      header.className = 'flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-surface-hover transition-colors';
+      header.innerHTML = `
+        <button
+          id="toggle-${op.id}"
+          role="switch"
+          aria-checked="false"
+          class="relative inline-flex h-5 w-9 flex-shrink-0 rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-border-default"
+        >
+          <span class="toggle-thumb pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow transform transition duration-200 ease-in-out translate-x-0"></span>
+        </button>
+        <svg class="w-4 h-4 text-text-muted flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${op.icon}" />
+        </svg>
+        <span class="text-sm font-medium text-text-primary flex-1">${op.name}</span>
+        ${op.params.length > 0 ? `<svg class="expand-icon w-4 h-4 text-text-muted transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>` : ''}
+      `;
+
+      card.appendChild(header);
+
+      // Params body (hidden by default)
+      if (op.params.length > 0) {
+        const body = document.createElement('div');
+        body.className = 'params-body hidden border-t border-border-subtle px-3 py-3 space-y-2.5 bg-void/30';
+        body.id = `params-${op.id}`;
+
+        for (const param of op.params) {
+          const row = document.createElement('div');
+          row.className = 'flex items-center justify-between gap-2';
+
+          const lbl = document.createElement('label');
+          lbl.className = 'text-xs text-text-muted flex-shrink-0';
+          lbl.setAttribute('for', `param-${op.id}-${param.key}`);
+          lbl.textContent = param.label;
+          row.appendChild(lbl);
+
+          if (param.type === 'toggle') {
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.id = `param-${op.id}-${param.key}`;
+            cb.checked = param.default as boolean;
+            cb.className = 'w-4 h-4 rounded border-border-default bg-surface text-accent focus-glow cursor-pointer';
+            cb.addEventListener('change', () => {
+              state.get(op.id)!.params[param.key] = cb.checked;
+              run();
+            });
+            row.appendChild(cb);
+
+          } else if (param.type === 'select') {
+            const sel = document.createElement('select');
+            sel.id = `param-${op.id}-${param.key}`;
+            sel.className = 'bg-surface border border-border-default rounded px-2 py-1 text-xs text-text-primary focus-glow outline-none max-w-[140px]';
+            for (const opt of param.options ?? []) {
+              const o = document.createElement('option');
+              o.value = opt;
+              o.textContent = opt;
+              if (opt === param.default) o.selected = true;
+              sel.appendChild(o);
+            }
+            sel.addEventListener('change', () => {
+              state.get(op.id)!.params[param.key] = sel.value;
+              run();
+            });
+            row.appendChild(sel);
+
+          } else if (param.type === 'number') {
+            const inp = document.createElement('input');
+            inp.type = 'number';
+            inp.id = `param-${op.id}-${param.key}`;
+            inp.value = String(param.default);
+            if (param.min !== undefined) inp.min = String(param.min);
+            if (param.max !== undefined) inp.max = String(param.max);
+            inp.className = 'bg-surface border border-border-default rounded px-2 py-1 text-xs text-text-primary focus-glow outline-none w-20 text-right font-mono';
+            inp.addEventListener('input', () => {
+              state.get(op.id)!.params[param.key] = Number(inp.value);
+              run();
+            });
+            row.appendChild(inp);
+
+          } else {
+            // text
+            const inp = document.createElement('input');
+            inp.type = 'text';
+            inp.id = `param-${op.id}-${param.key}`;
+            inp.value = param.default as string;
+            inp.placeholder = param.placeholder ?? '';
+            inp.className = 'bg-surface border border-border-default rounded px-2 py-1 text-xs text-text-primary focus-glow outline-none flex-1 font-mono min-w-0';
+            inp.addEventListener('input', () => {
+              state.get(op.id)!.params[param.key] = inp.value;
+              run();
+            });
+            row.appendChild(inp);
+          }
+
+          body.appendChild(row);
+        }
+        card.appendChild(body);
+      }
+
+      // Toggle logic
+      const toggleBtn = header.querySelector(`#toggle-${op.id}`) as HTMLButtonElement;
+      const thumb = toggleBtn.querySelector('.toggle-thumb') as HTMLElement;
+      const expandIcon = header.querySelector('.expand-icon') as HTMLElement | null;
+      const paramsBody = card.querySelector('.params-body') as HTMLElement | null;
+
+      function setEnabled(val: boolean) {
+        s.enabled = val;
+        toggleBtn.setAttribute('aria-checked', String(val));
+        if (val) {
+          toggleBtn.classList.remove('bg-border-default');
+          toggleBtn.classList.add('bg-accent');
+          thumb.classList.add('translate-x-4');
+          thumb.classList.remove('translate-x-0');
+          card.classList.add('border-accent/40');
+          // expand params if any
+          if (paramsBody) {
+            paramsBody.classList.remove('hidden');
+            if (expandIcon) expandIcon.classList.add('rotate-180');
+          }
+        } else {
+          toggleBtn.classList.add('bg-border-default');
+          toggleBtn.classList.remove('bg-accent');
+          thumb.classList.remove('translate-x-4');
+          thumb.classList.add('translate-x-0');
+          card.classList.remove('border-accent/40');
+        }
+        updatePipelineBadge();
+        run();
+      }
+
+      toggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setEnabled(!s.enabled);
+      });
+
+      // Click header to expand/collapse params (when enabled)
+      header.addEventListener('click', () => {
+        if (!s.enabled || !paramsBody) return;
+        const isHidden = paramsBody.classList.toggle('hidden');
+        if (expandIcon) {
+          expandIcon.classList.toggle('rotate-180', !isHidden);
+        }
+      });
+
+      return card;
+    }
+
+    function buildOpsList() {
+      opsList.innerHTML = '';
+      for (const op of allOps) {
+        opsList.appendChild(buildOpCard(op));
+      }
+    }
+
+    // ── Pipeline badge ─────────────────────────────────────────────────────
+    function updatePipelineBadge() {
+      const activeCount = [...state.values()].filter(s => s.enabled).length;
+      if (activeCount > 0) {
+        statPipeline.textContent = `${activeCount} operation${activeCount > 1 ? 's' : ''} active`;
+        statPipeline.classList.remove('hidden');
+      } else {
+        statPipeline.classList.add('hidden');
+      }
+    }
+
+    // ── Run pipeline ───────────────────────────────────────────────────────
+    function run() {
+      const text = inputArea.value;
+      const lines = text.split('\n');
+
+      statInputLines.textContent = lines.length.toLocaleString();
+      statInputChars.textContent = text.length.toLocaleString();
+
+      const steps = allOps
+        .filter(op => state.get(op.id)!.enabled)
+        .map(op => ({ opId: op.id, params: { ...state.get(op.id)!.params } }));
+
+      const result = applyPipeline(text, steps);
+      outputArea.value = result;
+
+      const outLines = result ? result.split('\n').length : 0;
+      statOutputLines.textContent = outLines.toLocaleString();
+    }
+
+    // ── Toast ──────────────────────────────────────────────────────────────
+    function showToast() {
+      clearTimeout(toastTimeout);
+      copyToast.classList.remove('translate-y-20', 'opacity-0');
+      toastTimeout = setTimeout(() => {
+        copyToast.classList.add('translate-y-20', 'opacity-0');
+      }, 2000);
+    }
+
+    // ── Event listeners ────────────────────────────────────────────────────
+    inputArea.addEventListener('input', run);
+
+    clearBtn.addEventListener('click', () => {
+      inputArea.value = '';
+      outputArea.value = '';
+      statInputLines.textContent = '0';
+      statInputChars.textContent = '0';
+      statOutputLines.textContent = '0';
+      inputArea.focus();
+    });
+
+    copyBtn.addEventListener('click', () => {
+      if (outputArea.value) {
+        navigator.clipboard.writeText(outputArea.value).then(() => showToast());
+      }
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      if (outputArea.value) {
+        downloadFile(outputArea.value, 'string_output.txt', 'text/plain;charset=utf-8;');
+      }
+    });
+
+    resetBtn.addEventListener('click', () => {
+      for (const op of allOps) {
+        const s = state.get(op.id)!;
+        s.enabled = false;
+      }
+      buildOpsList();
+      updatePipelineBadge();
+      run();
+    });
+
+    // ── Init ───────────────────────────────────────────────────────────────
+    buildOpsList();
+    run();
+  </script>
+
+</ToolLayout>

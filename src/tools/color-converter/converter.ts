@@ -2,52 +2,88 @@ export interface ColorResult {
   hex: string;
   rgb: string;
   hsl: string;
+  argb: string;
+  rgba: string;
   isValid: boolean;
   r: number;
   g: number;
   b: number;
+  a: number;
 }
 
 export function parseColor(input: string): ColorResult {
   const clean = input.trim().toLowerCase();
   
-  if (!clean) return { hex: '', rgb: '', hsl: '', isValid: false, r: 0, g: 0, b: 0 };
+  if (!clean) return { hex: '', rgb: '', hsl: '', argb: '', rgba: '', isValid: false, r: 0, g: 0, b: 0, a: 1 };
 
-  let r = 0, g = 0, b = 0;
+  let r = 0, g = 0, b = 0, a = 1.0;
   let isValid = false;
 
   // Try HEX
-  if (/^#?[0-9a-f]{3,6}$/.test(clean)) {
+  if (/^#?([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/.test(clean)) {
     const hex = clean.replace('#', '');
     if (hex.length === 3) {
       r = parseInt(hex[0] + hex[0], 16);
       g = parseInt(hex[1] + hex[1], 16);
       b = parseInt(hex[2] + hex[2], 16);
+      a = 1.0;
+      isValid = true;
+    } else if (hex.length === 4) {
+      r = parseInt(hex[0] + hex[0], 16);
+      g = parseInt(hex[1] + hex[1], 16);
+      b = parseInt(hex[2] + hex[2], 16);
+      a = parseInt(hex[3] + hex[3], 16) / 255;
       isValid = true;
     } else if (hex.length === 6) {
       r = parseInt(hex.substring(0, 2), 16);
       g = parseInt(hex.substring(2, 4), 16);
       b = parseInt(hex.substring(4, 6), 16);
+      a = 1.0;
+      isValid = true;
+    } else if (hex.length === 8) {
+      r = parseInt(hex.substring(0, 2), 16);
+      g = parseInt(hex.substring(2, 4), 16);
+      b = parseInt(hex.substring(4, 6), 16);
+      a = parseInt(hex.substring(6, 8), 16) / 255;
       isValid = true;
     }
   }
-  // Try RGB
-  else if (/^rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)$/.test(clean) || /^\d+\s*,\s*\d+\s*,\s*\d+$/.test(clean)) {
-    const parts = clean.match(/\d+/g);
-    if (parts && parts.length === 3) {
+  // Try 0x (ARGB or RGB)
+  else if (/^0x([0-9a-f]{6}|[0-9a-f]{8})$/.test(clean)) {
+    const hex = clean.substring(2);
+    if (hex.length === 6) {
+      r = parseInt(hex.substring(0, 2), 16);
+      g = parseInt(hex.substring(2, 4), 16);
+      b = parseInt(hex.substring(4, 6), 16);
+      a = 1.0;
+      isValid = true;
+    } else if (hex.length === 8) {
+      a = parseInt(hex.substring(0, 2), 16) / 255;
+      r = parseInt(hex.substring(2, 4), 16);
+      g = parseInt(hex.substring(4, 6), 16);
+      b = parseInt(hex.substring(6, 8), 16);
+      isValid = true;
+    }
+  }
+  // Try RGB or RGBA
+  else if (/^rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*(?:,\s*[\d.]+\s*)?\)$/.test(clean) || /^\d+\s*,\s*\d+\s*,\s*\d+$/.test(clean)) {
+    const parts = clean.match(/[\d.]+/g);
+    if (parts && (parts.length === 3 || parts.length === 4)) {
       r = Math.min(255, Math.max(0, parseInt(parts[0], 10)));
       g = Math.min(255, Math.max(0, parseInt(parts[1], 10)));
       b = Math.min(255, Math.max(0, parseInt(parts[2], 10)));
+      a = parts.length === 4 ? Math.min(1.0, Math.max(0.0, parseFloat(parts[3]))) : 1.0;
       isValid = true;
     }
   }
-  // Try HSL
-  else if (/^hsl\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*\)$/.test(clean)) {
-    const parts = clean.match(/\d+/g);
-    if (parts && parts.length === 3) {
+  // Try HSL or HSLA
+  else if (/^hsla?\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*(?:,\s*[\d.]+\s*)?\)$/.test(clean)) {
+    const parts = clean.match(/[\d.]+/g);
+    if (parts && (parts.length === 3 || parts.length === 4)) {
       const h = parseInt(parts[0], 10) % 360;
       const s = Math.min(100, Math.max(0, parseInt(parts[1], 10))) / 100;
       const l = Math.min(100, Math.max(0, parseInt(parts[2], 10))) / 100;
+      a = parts.length === 4 ? Math.min(1.0, Math.max(0.0, parseFloat(parts[3]))) : 1.0;
       
       const c = (1 - Math.abs(2 * l - 1)) * s;
       const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
@@ -69,15 +105,17 @@ export function parseColor(input: string): ColorResult {
   }
 
   if (!isValid) {
-    return { hex: '', rgb: '', hsl: '', isValid: false, r: 0, g: 0, b: 0 };
+    return { hex: '', rgb: '', hsl: '', argb: '', rgba: '', isValid: false, r: 0, g: 0, b: 0, a: 1 };
   }
 
   return {
     hex: rgbToHex(r, g, b),
     rgb: `rgb(${r}, ${g}, ${b})`,
     hsl: rgbToHslString(r, g, b),
+    argb: rgbToArgbString(r, g, b, a),
+    rgba: `rgba(${r}, ${g}, ${b}, ${formatAlpha(a)})`,
     isValid: true,
-    r, g, b
+    r, g, b, a
   };
 }
 
@@ -87,6 +125,23 @@ function rgbToHex(r: number, g: number, b: number): string {
     return hex.length === 1 ? '0' + hex : hex;
   };
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
+function rgbToArgbString(r: number, g: number, b: number, a: number): string {
+  const toHex = (c: number) => {
+    const hex = c.toString(16);
+    return hex.length === 1 ? '0' + hex : hex;
+  };
+  const alphaHex = toHex(Math.round(a * 255));
+  return `0x${alphaHex}${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
+function formatAlpha(a: number): string {
+  if (Number.isInteger(a)) {
+    return a.toFixed(1);
+  }
+  const rounded = Math.round(a * 100) / 100;
+  return rounded.toString();
 }
 
 function rgbToHslString(r: number, g: number, b: number): string {

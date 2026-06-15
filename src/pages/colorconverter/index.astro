@@ -25,14 +25,14 @@ const tool = tools.find(t => t.id === 'color-converter')!;
       <div class="flex flex-col md:flex-row gap-4 items-end mb-8">
         <div class="flex-1 w-full">
           <label for="colorInput" class="block text-sm font-medium text-text-secondary mb-2">
-            Enter HEX, RGB, or HSL Value
+            Enter HEX, RGB, HSL, ARGB, or RGBA Value
           </label>
           <div class="relative">
             <input 
               type="text" 
               id="colorInput" 
               class="w-full bg-surface/50 border border-border-subtle rounded-xl px-4 py-3 pl-12 font-mono text-text-primary focus-glow transition-colors text-lg"
-              placeholder="#5c24ff or rgb(92, 36, 255)"
+              placeholder="#5c24ff, rgb(92, 36, 255), 0xff5c24ff, or rgba(92, 36, 255, 1.0)"
             />
             <div class="absolute left-4 top-1/2 -translate-y-1/2">
               <input type="color" id="nativePicker" class="w-6 h-6 p-0 border-0 rounded cursor-pointer bg-transparent" value="#5c24ff" />
@@ -51,7 +51,7 @@ const tool = tools.find(t => t.id === 'color-converter')!;
       </div>
 
       <!-- Results Grid -->
-      <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div id="resultsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         
         <div class="bg-surface/50 border border-border-subtle rounded-xl p-4 flex flex-col relative group">
           <span class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">HEX</span>
@@ -73,6 +73,22 @@ const tool = tools.find(t => t.id === 'color-converter')!;
           <span class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">HSL</span>
           <span id="resHsl" class="font-mono text-text-primary text-lg">hsl(255, 100%, 57%)</span>
           <button class="copy-res absolute top-4 right-4 opacity-0 group-hover:opacity-100 text-accent transition-opacity" data-target="resHsl">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+          </button>
+        </div>
+
+        <div class="bg-surface/50 border border-border-subtle rounded-xl p-4 flex flex-col relative group">
+          <span class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">ARGB</span>
+          <span id="resArgb" class="font-mono text-text-primary text-lg">0xff5c24ff</span>
+          <button class="copy-res absolute top-4 right-4 opacity-0 group-hover:opacity-100 text-accent transition-opacity" data-target="resArgb">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+          </button>
+        </div>
+
+        <div class="bg-surface/50 border border-border-subtle rounded-xl p-4 flex flex-col relative group">
+          <span class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">RGBA</span>
+          <span id="resRgba" class="font-mono text-text-primary text-lg">rgba(92, 36, 255, 1.0)</span>
+          <button class="copy-res absolute top-4 right-4 opacity-0 group-hover:opacity-100 text-accent transition-opacity" data-target="resRgba">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
           </button>
         </div>
@@ -127,9 +143,9 @@ const tool = tools.find(t => t.id === 'color-converter')!;
     <FaqSection 
       faqs={[
         {
-          question: "Does this tool support Alpha/Transparency (RGBA or HEX8)?",
-          text: "Currently, this tool focuses on solid colors (RGB/HEX6). If you paste an RGBA or HEX8 value, the alpha channel will be ignored and it will convert the solid base color.",
-          answer: "Currently, this tool focuses on solid colors (RGB/HEX6). If you paste an RGBA or HEX8 value, the alpha channel will be ignored and it will convert the solid base color."
+          question: "Does this tool support Alpha/Transparency (RGBA, HSLA, ARGB, or HEX8)?",
+          text: "Yes, this tool fully supports transparency/alpha channels. You can input or convert colors using RGBA, HSLA, ARGB (e.g., 0xffffffff), and HEX with alpha formats.",
+          answer: "Yes, this tool fully supports transparency/alpha channels. You can input or convert colors using RGBA, HSLA, ARGB (e.g., 0xffffffff), and HEX with alpha formats."
         },
         {
           question: "Which format is best for web development?",
@@ -154,6 +170,8 @@ const tool = tools.find(t => t.id === 'color-converter')!;
     const resHex = document.getElementById('resHex')!;
     const resRgb = document.getElementById('resRgb')!;
     const resHsl = document.getElementById('resHsl')!;
+    const resArgb = document.getElementById('resArgb')!;
+    const resRgba = document.getElementById('resRgba')!;
 
     function processColor(val: string, fromPicker: boolean = false) {
       if (!val.trim()) {
@@ -168,6 +186,8 @@ const tool = tools.find(t => t.id === 'color-converter')!;
         resHex.textContent = '---';
         resRgb.textContent = '---';
         resHsl.textContent = '---';
+        resArgb.textContent = '---';
+        resRgba.textContent = '---';
         return;
       }
 
@@ -176,8 +196,10 @@ const tool = tools.find(t => t.id === 'color-converter')!;
       resHex.textContent = res.hex;
       resRgb.textContent = res.rgb;
       resHsl.textContent = res.hsl;
+      resArgb.textContent = res.argb;
+      resRgba.textContent = res.rgba;
 
-      colorCircle.style.backgroundColor = res.hex;
+      colorCircle.style.backgroundColor = res.rgba;
       
       // Update background tint
       previewBox.style.backgroundColor = `rgba(${res.r}, ${res.g}, ${res.b}, 0.1)`;

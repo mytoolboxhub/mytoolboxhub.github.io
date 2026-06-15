@@ -1,0 +1,80 @@
+---
+import HubLayout from '../layouts/HubLayout.astro';
+---
+
+<HubLayout title="About Us — MyToolboxHub" description="Learn about the design, speed, and privacy philosophy behind MyToolboxHub.">
+  <div class="relative pt-8 pb-16 sm:pt-12 sm:pb-24 overflow-hidden mt-6 sm:mt-10 mb-12 sm:mb-16">
+    <!-- Glowing backgrounds -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden">
+      <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-accent/8 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      
+      <!-- Heading -->
+      <div class="text-center mb-16">
+        <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-text-primary mb-4">
+          About <span class="text-accent">MyToolboxHub</span>
+        </h1>
+        <p class="text-lg text-text-secondary max-w-xl mx-auto leading-relaxed">
+          A premium, privacy-first developer utility suite designed for speed, visual excellence, and ease of use.
+        </p>
+      </div>
+
+      <!-- Glass Card Content -->
+      <div class="glass p-8 sm:p-12 rounded-2xl space-y-12">
+        
+        <section class="space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold text-text-primary flex items-center gap-3">
+            <span class="w-1.5 h-6 bg-accent rounded-full"></span>
+            Our Philosophy
+          </h2>
+          <p class="text-text-secondary leading-relaxed">
+            Every day, developers need to format JSON, decode JWTs, convert colors, clean subtitles, or generate password hashes. Most search results lead to heavy, ad-ridden websites that transmit your data to remote servers. We built MyToolboxHub to change that.
+          </p>
+        </section>
+
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-surface/40 border border-border-subtle p-6 rounded-xl space-y-3">
+            <div class="text-accent font-bold text-lg flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+              100% Secure
+            </div>
+            <p class="text-xs text-text-muted leading-relaxed">
+              All tools run purely client-side inside your browser. Your sensitive code, passwords, and tokens never leave your machine.
+            </p>
+          </div>
+          <div class="bg-surface/40 border border-border-subtle p-6 rounded-xl space-y-3">
+            <div class="text-accent font-bold text-lg flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+              Blazing Fast
+            </div>
+            <p class="text-xs text-text-muted leading-relaxed">
+              Built using Astro 6 and modern CSS for zero unused JavaScript, instant loading, and microsecond computations.
+            </p>
+          </div>
+          <div class="bg-surface/40 border border-border-subtle p-6 rounded-xl space-y-3">
+            <div class="text-accent font-bold text-lg flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              Premium Design
+            </div>
+            <p class="text-xs text-text-muted leading-relaxed">
+              Beautiful glassmorphic elements, smooth gradients, dark mode by default, and tailored colors to keep you in the flow.
+            </p>
+          </div>
+        </section>
+
+        <section class="space-y-4">
+          <h2 class="text-xl sm:text-2xl font-bold text-text-primary flex items-center gap-3">
+            <span class="w-1.5 h-6 bg-accent rounded-full"></span>
+            Open Source & Free
+          </h2>
+          <p class="text-text-secondary leading-relaxed">
+            MyToolboxHub is completely free to use. There are no tracking scripts, cookie consent popups, or server payloads. We leverage browser APIs to handle calculations locally, ensuring you have access to a clean workspace.
+          </p>
+        </section>
+
+      </div>
+    </div>
+  </div>
+</HubLayout>

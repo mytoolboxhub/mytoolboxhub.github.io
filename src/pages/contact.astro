@@ -1,0 +1,180 @@
+---
+import HubLayout from '../layouts/HubLayout.astro';
+---
+
+<HubLayout title="Contact Us — MyToolboxHub" description="Get in touch with the team at MyToolboxHub. Provide feedback, report issues, or suggest new developer tools.">
+  <div class="relative pt-8 pb-16 sm:pt-12 sm:pb-24 overflow-hidden mt-6 sm:mt-10 mb-12 sm:mb-16">
+    <!-- Glowing backgrounds -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden">
+      <div class="absolute top-1/3 right-1/4 w-[450px] h-[450px] bg-accent/6 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      
+      <!-- Heading -->
+      <div class="text-center mb-16">
+        <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-text-primary mb-4">
+          Get in <span class="text-accent">Touch</span>
+        </h1>
+        <p class="text-lg text-text-secondary max-w-xl mx-auto leading-relaxed">
+          Have an idea for a new developer utility? Spotted a bug? Send us a message and we'll get right back to you.
+        </p>
+      </div>
+
+      <!-- Main Layout Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+        
+        <!-- Contact Info Sidecard -->
+        <div class="md:col-span-1 space-y-6">
+          <div class="glass p-6 rounded-2xl space-y-4">
+            <h2 class="text-lg font-bold text-text-primary">Contact Channels</h2>
+            
+            <div class="space-y-4 text-sm">
+              <div class="flex items-start gap-3">
+                <div class="bg-accent/10 p-2 rounded-lg text-accent mt-0.5 border border-accent/20">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                </div>
+                <div>
+                  <h3 class="font-medium text-text-primary">Support Email</h3>
+                  <a href="mailto:hello@mytoolboxhub.com" class="text-text-secondary hover:text-accent transition-colors">hello@mytoolboxhub.com</a>
+                </div>
+              </div>
+
+              <div class="flex items-start gap-3">
+                <div class="bg-accent/10 p-2 rounded-lg text-accent mt-0.5 border border-accent/20">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+                </div>
+                <div>
+                  <h3 class="font-medium text-text-primary">GitHub issues</h3>
+                  <a href="https://github.com/mytoolboxhub" target="_blank" rel="noopener noreferrer" class="text-text-secondary hover:text-accent transition-colors">github.com/mytoolboxhub</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass p-6 rounded-2xl">
+            <p class="text-xs text-text-muted leading-relaxed">
+              We aim to respond to all inquiries within 24-48 business hours. For feature requests, opening a GitHub issue is the quickest way to track implementation progress.
+            </p>
+          </div>
+        </div>
+
+        <!-- Form Glass Container -->
+        <div class="md:col-span-2 glass p-8 rounded-2xl relative overflow-hidden">
+          
+          <form id="contactForm" class="space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div>
+                <label for="contactName" class="block text-sm font-medium text-text-secondary mb-2">Name</label>
+                <input 
+                  type="text" 
+                  id="contactName" 
+                  required
+                  class="w-full bg-surface/50 border border-border-subtle rounded-xl px-4 py-2.5 text-text-primary focus-glow transition-colors"
+                  placeholder="Ada Lovelace"
+                />
+              </div>
+              <div>
+                <label for="contactEmail" class="block text-sm font-medium text-text-secondary mb-2">Email Address</label>
+                <input 
+                  type="email" 
+                  id="contactEmail" 
+                  required
+                  class="w-full bg-surface/50 border border-border-subtle rounded-xl px-4 py-2.5 text-text-primary focus-glow transition-colors"
+                  placeholder="ada@example.com"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label for="contactSubject" class="block text-sm font-medium text-text-secondary mb-2">Subject</label>
+              <input 
+                type="text" 
+                id="contactSubject" 
+                required
+                class="w-full bg-surface/50 border border-border-subtle rounded-xl px-4 py-2.5 text-text-primary focus-glow transition-colors"
+                placeholder="Feature Suggestion: Base64 File Uplink"
+              />
+            </div>
+
+            <div>
+              <label for="contactMessage" class="block text-sm font-medium text-text-secondary mb-2">Message</label>
+              <textarea 
+                id="contactMessage" 
+                rows="5"
+                required
+                class="w-full bg-surface/50 border border-border-subtle rounded-xl px-4 py-2.5 text-text-primary focus-glow transition-colors resize-none"
+                placeholder="Describe your request or suggest improvements..."
+              ></textarea>
+            </div>
+
+            <button 
+              type="submit" 
+              class="w-full py-3.5 bg-accent text-void font-bold rounded-xl hover:bg-accent-hover transition-all shadow-lg shadow-accent/20 hover:shadow-accent/40 hover:-translate-y-0.5 focus-glow cursor-pointer"
+            >
+              Send Message
+            </button>
+          </form>
+
+          <!-- Success Alert overlay -->
+          <div id="successOverlay" class="hidden absolute inset-0 bg-void/90 backdrop-blur-md flex flex-col items-center justify-center text-center p-8 animate-fade-in">
+            <div class="bg-accent/15 p-4 rounded-full border border-accent/20 text-accent mb-6 animate-scale-in">
+              <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+            </div>
+            <h3 class="text-2xl font-bold text-text-primary mb-2">Message Sent Successfully!</h3>
+            <p class="text-sm text-text-secondary max-w-sm mb-8 leading-relaxed">
+              Thank you for reaching out. We have received your inquiry and our team will get in touch with you shortly.
+            </p>
+            <button 
+              id="resetBtn"
+              class="px-6 py-2.5 bg-surface hover:bg-elevated border border-border-subtle rounded-xl text-text-primary text-sm font-medium transition-colors focus-glow cursor-pointer"
+            >
+              Send Another Message
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const contactForm = document.getElementById('contactForm') as HTMLFormElement;
+    const successOverlay = document.getElementById('successOverlay')!;
+    const resetBtn = document.getElementById('resetBtn')!;
+
+    if (contactForm) {
+      contactForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        // Form simulation
+        successOverlay.classList.remove('hidden');
+        contactForm.reset();
+      });
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        successOverlay.classList.add('hidden');
+      });
+    }
+  </script>
+
+  <style>
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes scale-in {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .animate-fade-in {
+      animation: fade-in 0.3s ease-out forwards;
+    }
+    .animate-scale-in {
+      animation: scale-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+  </style>
+</HubLayout>

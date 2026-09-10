@@ -38,7 +38,9 @@ export function decodeJwt(token: string): JwtResult {
       while (b64.length % 4) {
         b64 += '=';
       }
-      return decodeBase64(b64);
+      const decoded = decodeBase64(b64);
+      if (!decoded.isValid) throw new Error('Invalid Base64URL segment.');
+      return decoded.text;
     };
 
     const headerRaw = decodeB64Url(headerB64);
@@ -57,12 +59,14 @@ export function decodeJwt(token: string): JwtResult {
       throw new Error('Failed to parse JWT Payload as JSON.');
     }
 
+    if (!header || typeof header !== 'object' || Array.isArray(header) || !payload || typeof payload !== 'object' || Array.isArray(payload)) throw new Error('Header and payload must be JSON objects.');
+    if ('exp' in payload && (typeof payload.exp !== 'number' || !Number.isFinite(payload.exp))) throw new Error('exp must be a numeric timestamp.');
     let isExpired = false;
     let expiresIn = '';
 
-    if (payload.exp && typeof payload.exp === 'number') {
+    if (typeof payload.exp === 'number') {
       const now = Math.floor(Date.now() / 1000);
-      isExpired = now > payload.exp;
+      isExpired = now >= payload.exp;
       
       const diff = Math.abs(payload.exp - now);
       if (diff < 60) expiresIn = `${diff} seconds`;

@@ -38,6 +38,10 @@ function escapeCsv(value: any, delimiter: string): string {
 }
 
 export function convertJsonToCsv(data: unknown, options: ConverterOptions): string {
+  const records = Array.isArray(data) ? data : [data];
+  if (records.some(item => item === null || typeof item !== 'object' || Array.isArray(item))) {
+    throw new Error('Use a JSON object or an array of objects. Wrap primitive values in named fields before converting.');
+  }
   const schema = detectSchema(data, options.flattenObjects);
   
   if (schema.length === 0) return '';

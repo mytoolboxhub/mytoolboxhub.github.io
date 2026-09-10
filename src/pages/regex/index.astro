@@ -1,8 +1,5 @@
 ---
 import ToolLayout from '../../layouts/ToolLayout.astro';
-import HowToSection from '../../components/seo/HowToSection.astro';
-import FaqSection from '../../components/seo/FaqSection.astro';
-import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
 import { tools } from '../../lib/tool-registry';
 
 const tool = tools.find(t => t.id === 'regex-tester')!;
@@ -18,7 +15,8 @@ const tool = tools.find(t => t.id === 'regex-tester')!;
         <input 
           type="text" 
           id="patternInput" 
-          class="flex-1 bg-transparent border-none text-xl md:text-2xl font-mono text-text-primary focus:ring-0 px-0 focus-glow-none"
+          aria-label="Regular expression pattern"
+          class="min-w-0 flex-1 bg-transparent border-none text-xl md:text-2xl font-mono text-text-primary focus:ring-0 px-0 focus-glow-none"
           placeholder="^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$"
           spellcheck="false"
         />
@@ -26,6 +24,7 @@ const tool = tools.find(t => t.id === 'regex-tester')!;
         <input 
           type="text" 
           id="flagsInput" 
+          aria-label="Regular expression flags"
           class="w-16 md:w-24 bg-transparent border-none text-xl md:text-2xl font-mono text-accent focus:ring-0 px-0 focus-glow-none"
           placeholder="gmi"
           value="gmi"
@@ -35,7 +34,7 @@ const tool = tools.find(t => t.id === 'regex-tester')!;
     </div>
 
     <!-- Error Banner -->
-    <div id="errorBanner" class="hidden bg-error/10 border border-error/30 text-error px-4 py-3 rounded-lg text-sm flex items-start gap-3 animate-fade-in-down">
+    <div id="errorBanner" role="alert" class="hidden bg-error/10 border border-error/30 text-error px-4 py-3 rounded-lg text-sm flex items-start gap-3 animate-fade-in-down">
       <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
       <div>
         <strong class="block font-semibold mb-1">Invalid Regular Expression</strong>
@@ -85,72 +84,12 @@ jane_smith123@company.co.uk</textarea>
     </div>
   </div>
 
-  <Fragment slot="content">
-    <HowToSection 
-      title="How to Test Regular Expressions"
-      steps={[
-        {
-          name: "Enter Your Pattern",
-          text: "Type your regular expression into the large input bar at the top. Do not include the surrounding slashes (/).",
-          description: "Type your regular expression into the large input bar at the top. Do not include the surrounding slashes (<code>/</code>)."
-        },
-        {
-          name: "Adjust Flags",
-          text: "Add or remove flags in the small input box on the right. 'g' (global) finds all matches, 'm' (multiline) makes ^ and $ match line breaks, and 'i' (ignore case) makes it case-insensitive.",
-          description: "Add or remove flags in the small input box on the right. <code>g</code> (global) finds all matches, <code>m</code> (multiline) makes <code>^</code> and <code>$</code> match line breaks, and <code>i</code> (ignore case) makes it case-insensitive."
-        },
-        {
-          name: "Type Test Data",
-          text: "Paste your sample text into the main editor. The tool will instantly highlight matching text in blue.",
-          description: "Paste your sample text into the main editor. The tool will instantly highlight matching text in blue."
-        },
-        {
-          name: "Review Capture Groups",
-          text: "Check the sidebar on the right to see a detailed breakdown of every match, including the exact extracted values for all your capture groups.",
-          description: "Check the sidebar on the right to see a detailed breakdown of every match, including the exact extracted values for all your capture groups."
-        }
-      ]}
-    />
-    <TechnicalExplainer 
-      title="Common Regex Patterns & Cheatsheet"
-      sections={[
-        {
-          title: "Character Classes",
-          content: "<ul class=\"list-disc pl-5 space-y-1 mt-2\"><li><code>.</code> : Any character except newline</li><li><code>\\w</code> : Word character (alphanumeric & underscore)</li><li><code>\\d</code> : Digit (0-9)</li><li><code>\\s</code> : Whitespace (space, tab, newline)</li><li><code>[A-Z]</code> : Character set (any uppercase letter)</li></ul>"
-        },
-        {
-          title: "Quantifiers",
-          content: "<ul class=\"list-disc pl-5 space-y-1 mt-2\"><li><code>*</code> : Zero or more times</li><li><code>+</code> : One or more times</li><li><code>?</code> : Zero or one time</li><li><code>{3}</code> : Exactly 3 times</li><li><code>{2,5}</code> : Between 2 and 5 times</li></ul>"
-        },
-        {
-          title: "Anchors & Groups",
-          content: "<ul class=\"list-disc pl-5 space-y-1 mt-2\"><li><code>^</code> : Start of string (or line with 'm' flag)</li><li><code>$</code> : End of string</li><li><code>(abc)</code> : Capture group (extracts 'abc')</li><li><code>(?:abc)</code> : Non-capturing group (groups without extracting)</li></ul>"
-        }
-      ]}
-    />
-    <FaqSection 
-      faqs={[
-        {
-          question: "Which Regex flavor does this tool use?",
-          text: "This tool uses the JavaScript (ECMAScript) Regular Expression engine, as it runs directly in your browser. While heavily compatible with PCRE, some advanced features like 'lookbehinds' may vary depending on your browser version.",
-          answer: "This tool uses the <strong>JavaScript (ECMAScript)</strong> Regular Expression engine, as it runs directly in your browser. While heavily compatible with PCRE, some advanced features like 'lookbehinds' may vary depending on your browser version."
-        },
-        {
-          question: "Why is it freezing my browser?",
-          text: "You likely encountered 'Catastrophic Backtracking'. Certain complex regex patterns with nested quantifiers (like (a+)+$) can take exponentially long to fail on non-matching strings. We cap matches at 5,000 to prevent some crashes, but complex patterns can still lock up the JS thread.",
-          answer: "You likely encountered 'Catastrophic Backtracking'. Certain complex regex patterns with nested quantifiers (like <code>(a+)+$</code>) can take exponentially long to fail on non-matching strings. We cap matches at 5,000 to prevent some crashes, but complex patterns can still lock up the JS thread."
-        },
-        {
-          question: "What is the 'g' flag?",
-          text: "The 'g' (global) flag tells the regex engine to find ALL matches in the string. Without it, the engine stops and returns only the very first match it finds.",
-          answer: "The 'g' (global) flag tells the regex engine to find ALL matches in the string. Without it, the engine stops and returns only the very first match it finds."
-        }
-      ]}
-    />
-  </Fragment>
+
 
   <script>
-    import { testRegex } from '../../tools/regex';
+    import { createTaskRunner } from '../../lib/worker-task';
+    const runTask = createTaskRunner();
+    let requestId = 0;
 
     const patternInput = document.getElementById('patternInput') as HTMLInputElement;
     const flagsInput = document.getElementById('flagsInput') as HTMLInputElement;
@@ -177,7 +116,8 @@ jane_smith123@company.co.uk</textarea>
         .replace(/'/g, '&#039;');
     }
 
-    function processRegex() {
+    async function processRegex() {
+      const id = ++requestId;
       const pattern = patternInput.value;
       const flags = flagsInput.value;
       const text = testStringInput.value;
@@ -190,7 +130,10 @@ jane_smith123@company.co.uk</textarea>
         return;
       }
 
-      const res = testRegex(pattern, flags, text);
+      let res: import('../../tools/regex').RegexResult;
+      try { res = await runTask('regex', [pattern, flags, text]); }
+      catch (e) { res = {isValid:false, error:String(e), matches:[], executionTimeMs:0}; }
+      if (id !== requestId) return;
 
       if (!res.isValid) {
         errorBanner.classList.remove('hidden');

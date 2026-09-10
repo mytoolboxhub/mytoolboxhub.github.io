@@ -1,8 +1,5 @@
 ---
 import ToolLayout from '../../layouts/ToolLayout.astro';
-import HowToSection from '../../components/seo/HowToSection.astro';
-import FaqSection from '../../components/seo/FaqSection.astro';
-import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
 import { tools } from '../../lib/tool-registry';
 
 const tool = tools.find(t => t.id === 'html-escaper')!;
@@ -73,69 +70,7 @@ const tool = tools.find(t => t.id === 'html-escaper')!;
     </div>
   </div>
 
-  <Fragment slot="content">
-    <HowToSection 
-      title="How to Escape HTML Entities"
-      steps={[
-        {
-          name: "Select Your Mode",
-          text: "Use the toggle at the top to choose between Escaping (converting characters into code) or Unescaping (converting code back into readable characters).",
-          description: "Use the toggle at the top to choose between Escaping (converting characters into code) or Unescaping (converting code back into readable characters)."
-        },
-        {
-          name: "Paste Your Text",
-          text: "Paste your raw text or HTML code into the left text area. The tool will process it instantly as you type.",
-          description: "Paste your raw text or HTML code into the left text area. The tool will process it instantly as you type."
-        },
-        {
-          name: "Extended Entities",
-          text: "If you want to encode special symbols like the copyright sign (©) or currency symbols (€), check the 'Extended Entities' box.",
-          description: "If you want to encode special symbols like the copyright sign (©) or currency symbols (€), check the 'Extended Entities' box."
-        },
-        {
-          name: "Copy Output",
-          text: "Click the Copy button to copy the safely escaped string to your clipboard for use in your application.",
-          description: "Click the Copy button to copy the safely escaped string to your clipboard for use in your application."
-        }
-      ]}
-    />
-    <TechnicalExplainer 
-      title="Why do we escape HTML?"
-      sections={[
-        {
-          title: "Preventing XSS Attacks",
-          content: "Cross-Site Scripting (XSS) is a major security vulnerability where users can inject malicious JavaScript into a website via input forms. By escaping characters like <code>&lt;</code> and <code>&gt;</code> into <code>&amp;lt;</code> and <code>&amp;gt;</code>, the browser treats the input as plain text rather than executable code."
-        },
-        {
-          title: "Displaying Code Snippets",
-          content: "If you are building a blog or documentation site and want to show HTML code on the screen (like a tutorial), you must escape it first. Otherwise, the browser will literally render the HTML instead of displaying the raw code."
-        },
-        {
-          title: "XML Compatibility",
-          content: "In XML and older XHTML specifications, five characters are strictly reserved and must always be escaped: Ampersand (<code>&amp;</code>), Less Than (<code>&lt;</code>), Greater Than (<code>&gt;</code>), Double Quote (<code>&quot;</code>), and Apostrophe (<code>&apos;</code> or <code>&#039;</code>)."
-        }
-      ]}
-    />
-    <FaqSection 
-      faqs={[
-        {
-          question: "What is an HTML Entity?",
-          text: "An HTML entity is a piece of text (string) that begins with an ampersand (&) and ends with a semicolon (;). Entities are frequently used to display reserved characters (which would otherwise be interpreted as HTML code) or invisible characters (like non-breaking spaces).",
-          answer: "An HTML entity is a piece of text (string) that begins with an ampersand (<code>&amp;</code>) and ends with a semicolon (<code>;</code>). Entities are frequently used to display reserved characters (which would otherwise be interpreted as HTML code) or invisible characters (like non-breaking spaces)."
-        },
-        {
-          question: "Can this unescape numeric entities like &#169;?",
-          text: "Yes. When set to 'Unescape (Decode)' mode, the tool acts like a standard browser and will accurately decode both named entities (like &copy;) and numeric/hex entities (like &#169; or &#xA9;) back into their original characters.",
-          answer: "Yes. When set to 'Unescape (Decode)' mode, the tool acts like a standard browser and will accurately decode both named entities (like <code>&copy;</code>) and numeric/hex entities (like <code>&#169;</code> or <code>&#xA9;</code>) back into their original characters."
-        },
-        {
-          question: "Is it safe to paste sensitive data here?",
-          text: "Yes. All processing is done locally in your browser via JavaScript. The data never leaves your computer.",
-          answer: "Yes. All processing is done locally in your browser via JavaScript. The data never leaves your computer."
-        }
-      ]}
-    />
-  </Fragment>
+
 
   <script>
     import { copyToClipboard } from '../../lib/clipboard';
@@ -175,7 +110,7 @@ const tool = tools.find(t => t.id === 'html-escaper')!;
       }
       
       // Swap contents
-      const temp = inputArea.value;
+
       inputArea.value = outputArea.value;
       
       runProcess();

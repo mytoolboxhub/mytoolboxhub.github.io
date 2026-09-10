@@ -10,7 +10,7 @@ export interface UrlParts {
 export function parseUrlParts(input: string): UrlParts | null {
   try {
     const url = new URL(input);
-    const queryParams: Record<string, string> = {};
+    const queryParams: Record<string, string> = Object.create(null);
     
     url.searchParams.forEach((value, key) => {
       queryParams[key] = value;

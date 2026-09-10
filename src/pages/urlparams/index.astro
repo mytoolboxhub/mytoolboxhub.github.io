@@ -1,8 +1,5 @@
 ---
 import ToolLayout from '../../layouts/ToolLayout.astro';
-import HowToSection from '../../components/seo/HowToSection.astro';
-import FaqSection from '../../components/seo/FaqSection.astro';
-import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
 import { tools } from '../../lib/tool-registry';
 
 const tool = tools.find(t => t.id === 'url-params')!;
@@ -24,7 +21,7 @@ const tool = tools.find(t => t.id === 'url-params')!;
       ></textarea>
     </div>
 
-    <div id="errorBanner" class="hidden text-error text-sm font-medium px-2"></div>
+    <div id="errorBanner" role="alert" class="hidden text-error text-sm font-medium px-2"></div>
 
     <!-- Results Section (Hidden until valid URL) -->
     <div id="resultsPanel" class="hidden space-y-6">
@@ -75,69 +72,7 @@ const tool = tools.find(t => t.id === 'url-params')!;
     </div>
   </div>
 
-  <Fragment slot="content">
-    <HowToSection 
-      title="How to Extract and Clean URL Parameters"
-      steps={[
-        {
-          name: "Paste Your URL",
-          text: "Copy any long URL and paste it into the input box. The tool works instantly as you type or paste.",
-          description: "Copy any long URL and paste it into the input box. The tool works instantly as you type or paste."
-        },
-        {
-          name: "View the Data Table",
-          text: "The tool parses the query string (everything after the '?') and organizes each parameter into a neat, easily readable table.",
-          description: "The tool parses the query string (everything after the <code>?</code>) and organizes each parameter into a neat, easily readable table."
-        },
-        {
-          name: "Identify Tracking Tags",
-          text: "If the URL contains marketing tracking parameters like 'utm_source' or 'fbclid', they will be highlighted in red.",
-          description: "If the URL contains marketing tracking parameters like <code>utm_source</code> or <code>fbclid</code>, they will be highlighted in red."
-        },
-        {
-          name: "Copy the Clean URL",
-          text: "At the top of the results, you'll find a 'Clean URL'. This is the exact same URL but with all known privacy-invasive tracking parameters automatically removed.",
-          description: "At the top of the results, you'll find a 'Clean URL'. This is the exact same URL but with all known privacy-invasive tracking parameters automatically removed."
-        }
-      ]}
-    />
-    <TechnicalExplainer 
-      title="Understanding URL Queries"
-      sections={[
-        {
-          title: "The Query String",
-          content: "In a URL like <code>https://example.com/page?id=123&sort=asc</code>, the query string is everything after the question mark. It consists of key-value pairs separated by an ampersand (<code>&</code>). These parameters are used by the web server or frontend application to load specific data."
-        },
-        {
-          title: "URL Encoding",
-          content: "Because URLs cannot contain spaces or special characters, they are 'URL Encoded'. A space becomes <code>%20</code> or <code>+</code>. This extractor automatically decodes these values so you can read them normally."
-        },
-        {
-          title: "UTM Parameters",
-          content: "Urchin Tracking Module (UTM) parameters are five variants of URL parameters used by marketers to track the effectiveness of online marketing campaigns across traffic sources and publishing media. They do not affect the functionality of the website."
-        }
-      ]}
-    />
-    <FaqSection 
-      faqs={[
-        {
-          question: "What tracking tags does this tool remove?",
-          text: "The tool removes over 20 known tracking tags, including Google Analytics (utm_*), Facebook (fbclid), Instagram (igshid), Twitter (twclid), TikTok (ttclid), and Mailchimp (mc_cid).",
-          answer: "The tool removes over 20 known tracking tags, including Google Analytics (<code>utm_*</code>), Facebook (<code>fbclid</code>), Instagram (<code>igshid</code>), Twitter (<code>twclid</code>), TikTok (<code>ttclid</code>), and Mailchimp (<code>mc_cid</code>)."
-        },
-        {
-          question: "Will stripping these parameters break the link?",
-          text: "No. Marketing parameters are designed specifically to be ignored by the actual application logic. Stripping them will simply prevent the destination site from knowing exactly which ad or newsletter you clicked to get there.",
-          answer: "No. Marketing parameters are designed specifically to be ignored by the actual application logic. Stripping them will simply prevent the destination site from knowing exactly which ad or newsletter you clicked to get there."
-        },
-        {
-          question: "Is my URL sent to a server?",
-          text: "No. The parsing and cleaning happens entirely in your browser using the native URLSearchParams API. Your links are completely private.",
-          answer: "No. The parsing and cleaning happens entirely in your browser using the native <code>URLSearchParams</code> API. Your links are completely private."
-        }
-      ]}
-    />
-  </Fragment>
+
 
   <script>
     import { copyToClipboard } from '../../lib/clipboard';

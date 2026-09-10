@@ -30,7 +30,7 @@ export const DATA_TYPES = [
 // Simple hardcoded lists to keep it zero-dep
 const firstNames = ['James', 'Mary', 'Robert', 'Patricia', 'John', 'Jennifer', 'Michael', 'Linda', 'David', 'Elizabeth', 'William', 'Barbara', 'Richard', 'Susan', 'Joseph', 'Jessica', 'Thomas', 'Sarah', 'Charles', 'Karen', 'Christopher', 'Lisa', 'Daniel', 'Nancy', 'Matthew', 'Betty', 'Anthony', 'Margaret', 'Mark', 'Sandra', 'Donald', 'Ashley', 'Steven', 'Kimberly', 'Paul', 'Emily', 'Andrew', 'Donna', 'Joshua', 'Michelle', 'Kenneth', 'Carol', 'Kevin', 'Amanda', 'Brian', 'Melissa', 'George', 'Deborah', 'Timothy', 'Stephanie', 'Ronald', 'Rebecca'];
 const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin', 'Lee', 'Perez', 'Thompson', 'White', 'Harris', 'Sanchez', 'Clark', 'Ramirez', 'Lewis', 'Robinson', 'Walker', 'Young', 'Allen', 'King', 'Wright', 'Scott', 'Torres', 'Nguyen', 'Hill', 'Flores', 'Green', 'Adams', 'Nelson', 'Baker', 'Hall', 'Rivera', 'Campbell', 'Mitchell', 'Carter', 'Roberts'];
-const domains = ['example.com', 'test.com', 'demo.org', 'sample.net', 'mock.io'];
+const domains = ['example.com', 'example.org', 'example.net'];
 const companies = ['Acme Corp', 'Globex', 'Soylent', 'Initech', 'Umbrella Corp', 'Stark Industries', 'Wayne Enterprises', 'Cyberdyne', 'Massive Dynamic', 'Hooli', 'Pied Piper'];
 const streets = ['Main St', 'Oak St', 'Pine St', 'Maple Ave', 'Cedar Ln', 'Elm St', 'Washington Blvd', 'Lakeview Dr', 'Sunset Blvd', 'Park Ave'];
 
@@ -92,11 +92,19 @@ export function generateFieldData(field: SchemaField): any {
 }
 
 export function generateMockData(schema: SchemaField[], count: number, format: ExportFormat, tableName: string = 'mock_data'): string {
+  if (!Number.isInteger(count) || count > 1000) throw new Error('Use an integer row count up to 1000.');
+  const names = schema.map(f => f.name.trim()).filter(Boolean);
+  if (new Set(names).size !== names.length) throw new Error('Field names must be unique.');
+  if (format === 'sql' && ![tableName, ...names].every(n => /^[A-Za-z_][A-Za-z0-9_]*$/.test(n))) throw new Error('SQL identifiers must start with a letter or underscore and contain only letters, numbers, and underscores.');
+  for (const field of schema) if (field.type === 'integer' || field.type === 'float') {
+    const min = field.min ?? (field.type === 'integer' ? 1 : 0), max = field.max ?? 100;
+    if (!Number.isFinite(min) || !Number.isFinite(max) || min > max || (field.type === 'integer' && (!Number.isSafeInteger(min) || !Number.isSafeInteger(max)))) throw new Error('Use valid numeric ranges with minimum no greater than maximum.');
+  }
   if (!schema || schema.length === 0 || count < 1) return '';
 
   const rows: any[] = [];
   for (let i = 0; i < count; i++) {
-    const row: Record<string, any> = {};
+    const row: Record<string, any> = Object.create(null);
     for (const field of schema) {
       if (!field.name.trim()) continue;
       row[field.name.trim()] = generateFieldData(field);
@@ -112,7 +120,7 @@ export function generateMockData(schema: SchemaField[], count: number, format: E
   
   if (format === 'csv') {
     const keys = Object.keys(rows[0]);
-    let csv = keys.join(',') + '\n';
+    let csv = keys.map(k => '"' + k.replace(/"/g, '""') + '"').join(',') + '\n';
     
     for (const row of rows) {
       const values = keys.map(k => {

@@ -8,26 +8,26 @@ export interface TimestampResult {
 }
 
 export function parseTimestamp(input: string | number): Date | null {
-  if (!input) return null;
+  if (input === '' || input === null || input === undefined) return null;
 
   // If number, it's either seconds or millis
   if (typeof input === 'number') {
     // Heuristic: If it's larger than 10^11, it's probably millis
-    if (input > 20000000000) {
-      return new Date(input);
+    if (Math.abs(input) > 20000000000) {
+      const date = new Date(input); return Number.isNaN(date.getTime()) ? null : date;
     }
-    return new Date(input * 1000);
+    const date = new Date(input * 1000); return Number.isNaN(date.getTime()) ? null : date;
   }
 
   const str = input.trim();
   
   // Try parsing as number first
-  if (/^\d+$/.test(str)) {
-    const num = parseInt(str, 10);
-    if (num > 20000000000) {
-      return new Date(num);
+  if (/^-?\d+(?:\.\d+)?$/.test(str)) {
+    const num = Number(str);
+    if (Math.abs(num) > 20000000000) {
+      const date = new Date(num); return Number.isNaN(date.getTime()) ? null : date;
     }
-    return new Date(num * 1000);
+    const date = new Date(num * 1000); return Number.isNaN(date.getTime()) ? null : date;
   }
 
   // Try parsing as date string

@@ -1,8 +1,5 @@
 ---
 import ToolLayout from '../../layouts/ToolLayout.astro';
-import HowToSection from '../../components/seo/HowToSection.astro';
-import FaqSection from '../../components/seo/FaqSection.astro';
-import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
 import { tools } from '../../lib/tool-registry';
 
 const tool = tools.find(t => t.id === 'password-generator')!;
@@ -115,69 +112,7 @@ const tool = tools.find(t => t.id === 'password-generator')!;
     </div>
   </div>
 
-  <Fragment slot="content">
-    <HowToSection 
-      title="How to Generate Secure Passwords"
-      steps={[
-        {
-          name: "Adjust the Length",
-          text: "Use the slider to choose your password length. We recommend at least 16 characters for strong security against brute-force attacks.",
-          description: "Use the slider to choose your password length. We recommend at least 16 characters for strong security against brute-force attacks."
-        },
-        {
-          name: "Select Character Types",
-          text: "Toggle Uppercase, Lowercase, Numbers, and Symbols to determine what character sets will be used. The more variety, the stronger the password.",
-          description: "Toggle Uppercase, Lowercase, Numbers, and Symbols to determine what character sets will be used. The more variety, the stronger the password."
-        },
-        {
-          name: "Tweak Exclusions (Optional)",
-          text: "If you need to type the password manually, consider excluding similar characters (like l and 1) or ambiguous symbols.",
-          description: "If you need to type the password manually, consider excluding similar characters (like <code>l</code> and <code>1</code>) or ambiguous symbols."
-        },
-        {
-          name: "Copy and Save",
-          text: "Click the Copy button and paste the generated password directly into your password manager.",
-          description: "Click the Copy button and paste the generated password directly into your password manager."
-        }
-      ]}
-    />
-    <TechnicalExplainer 
-      title="The Math Behind Secure Passwords"
-      sections={[
-        {
-          title: "Cryptographically Secure Randomness",
-          content: "This tool uses the <code>crypto.getRandomValues()</code> API built into your browser. Unlike <code>Math.random()</code>, which is predictable and not suitable for security, the Web Crypto API uses the operating system's secure entropy source (like <code>/dev/urandom</code>) to generate truly unpredictable values."
-        },
-        {
-          title: "Entropy (Password Strength)",
-          content: "Password strength is measured in 'entropy'. It calculates how many guesses a computer would need to crack the password. Entropy increases exponentially with length, and logarithmically with the size of the character pool. <strong>A 16-character password with letters and numbers is exponentially stronger than an 8-character password with every possible symbol.</strong> Length is the most critical factor."
-        },
-        {
-          title: "Why Client-Side Matters",
-          content: "Generating passwords on the server means they have to be transmitted over the internet, creating a vulnerability. Because this tool is 100% client-side (runs entirely in your browser using JavaScript), the passwords generated never exist anywhere except in your computer's RAM until you save them."
-        }
-      ]}
-    />
-    <FaqSection 
-      faqs={[
-        {
-          question: "Does this tool save my generated passwords?",
-          text: "Absolutely not. This tool is fully static and runs locally in your browser. There is no database, no backend server, and no analytics tracking the passwords you generate.",
-          answer: "Absolutely not. This tool is fully static and runs locally in your browser. There is no database, no backend server, and no analytics tracking the passwords you generate."
-        },
-        {
-          question: "What is a 'Good' password length?",
-          text: "Modern security standards recommend a minimum of 16 characters for passwords. At 16 characters with a mix of letters and numbers, it would take current supercomputers trillions of years to brute-force.",
-          answer: "Modern security standards recommend a minimum of <strong>16 characters</strong> for passwords. At 16 characters with a mix of letters and numbers, it would take current supercomputers trillions of years to brute-force."
-        },
-        {
-          question: "Why should I exclude similar characters?",
-          text: "In many fonts, the lowercase letter 'l' (el), the uppercase letter 'I' (eye), and the number '1' (one) look identical. If you are writing down a password or reading it to type on another device, these ambiguities cause errors.",
-          answer: "In many fonts, the lowercase letter 'l' (el), the uppercase letter 'I' (eye), and the number '1' (one) look identical. If you are writing down a password or reading it to type on another device, these ambiguities cause errors."
-        }
-      ]}
-    />
-  </Fragment>
+
 
   <script>
     import { copyToClipboard } from '../../lib/clipboard';

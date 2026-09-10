@@ -42,7 +42,7 @@ export function testRegex(pattern: string, flags: string, testString: string): R
           regex.lastIndex++;
         }
         
-        if (matches.length > 5000) {
+        if (matches.length >= 5000) {
            break; // Prevent browser hang
         }
       }

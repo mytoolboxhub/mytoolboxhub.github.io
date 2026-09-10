@@ -1,0 +1,12 @@
+---
+import { guides } from '../lib/tool-guides';
+const { slug } = Astro.props;
+const guide = guides[slug];
+---
+{guide && <section class="space-y-8 text-text-secondary leading-relaxed" aria-label="Instructions and examples">
+  <section><h2 class="text-2xl font-bold text-text-primary mb-4">How to use this tool</h2><ol class="list-decimal pl-6 space-y-3">{guide.steps.map(step => <li>{step}</li>)}</ol></section>
+  <section><h2 class="text-2xl font-bold text-text-primary mb-4">Worked example</h2><h3 class="font-semibold mb-2">Input and options</h3><pre class="p-4 bg-surface rounded-lg overflow-x-auto whitespace-pre-wrap break-words text-sm">{guide.input}</pre><h3 class="font-semibold mt-4 mb-2">Expected result</h3><pre class="p-4 bg-surface rounded-lg overflow-x-auto whitespace-pre-wrap break-words text-sm">{guide.output}</pre><p class="mt-4">{guide.explanation}</p></section>
+  <section><h2 class="text-2xl font-bold text-text-primary mb-4">Limitations and troubleshooting</h2><ul class="list-disc pl-6 space-y-3">{guide.limits.map(limit => <li>{limit}</li>)}</ul></section>
+  {guide.related && <a href={`/guides/${guide.related}/`} class="text-accent underline block">Follow the complete workflow with examples →</a>}
+  <p class="text-sm">Found an incorrect result? <a class="text-accent underline" href="/contact/">Report it with a small fictional example</a>. Tool inputs are processed locally; <a href="/privacy/" class="text-accent underline">website visit information is described separately</a>.</p>
+</section>}

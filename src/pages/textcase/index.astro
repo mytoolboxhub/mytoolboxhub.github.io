@@ -1,8 +1,5 @@
 ---
 import ToolLayout from '../../layouts/ToolLayout.astro';
-import HowToSection from '../../components/seo/HowToSection.astro';
-import FaqSection from '../../components/seo/FaqSection.astro';
-import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
 import { tools } from '../../lib/tool-registry';
 
 const tool = tools.find(t => t.id === 'text-case')!;
@@ -46,63 +43,7 @@ const tool = tools.find(t => t.id === 'text-case')!;
     Copied to clipboard!
   </div>
 
-  <Fragment slot="content">
-    <HowToSection 
-      title="How to Convert Text Case"
-      steps={[
-        {
-          name: "Enter Your Text",
-          text: "Type or paste the text you want to convert into the large input box. It can be a single word, a variable name, or a whole sentence.",
-          description: "Type or paste the text you want to convert into the large input box. It can be a single word, a variable name, or a whole sentence."
-        },
-        {
-          name: "View Live Previews",
-          text: "As you type, all the buttons below will instantly update to show a preview of what your text looks like in that specific case.",
-          description: "As you type, all the buttons below will instantly update to show a preview of what your text looks like in that specific case."
-        },
-        {
-          name: "Click to Copy",
-          text: "Find the format you need (like camelCase or SCREAMING_SNAKE_CASE) and simply click the button. The converted text is instantly copied to your clipboard.",
-          description: "Find the format you need (like camelCase or SCREAMING_SNAKE_CASE) and simply click the button. The converted text is instantly copied to your clipboard."
-        }
-      ]}
-    />
-    <TechnicalExplainer 
-      title="Common Programming Cases"
-      sections={[
-        {
-          title: "camelCase",
-          content: "Widely used in JavaScript, Java, and C# for variable and function names. The first word is lowercase, and every subsequent word is capitalized without spaces. Example: <code>myVariableName</code>."
-        },
-        {
-          title: "snake_case & SCREAMING_SNAKE",
-          content: "Standard in Python, Ruby, and Rust. Words are separated by underscores. The uppercase variant is universally used for defining global constants across almost all programming languages. Example: <code>MAX_RETRY_COUNT</code>."
-        },
-        {
-          title: "kebab-case",
-          content: "Also known as dash-case. Used extensively in URLs (slugs), CSS class names, and HTML attributes. Example: <code>btn-primary-hover</code>."
-        },
-        {
-          title: "PascalCase",
-          content: "Similar to camelCase, but the very first letter is also capitalized. Used for Class names and Types/Interfaces in most object-oriented languages. Example: <code>UserModel</code>."
-        }
-      ]}
-    />
-    <FaqSection 
-      faqs={[
-        {
-          question: "Can it convert from camelCase to snake_case?",
-          text: "Yes! The tool automatically tokenizes the input text. It can intelligently read an existing camelCase or snake_case string, split it into separate words, and format it into any other case.",
-          answer: "Yes! The tool automatically tokenizes the input text. It can intelligently read an existing camelCase or snake_case string, split it into separate words, and format it into any other case."
-        },
-        {
-          question: "Is there a limit to the length of the text?",
-          text: "No hard limit, but this tool is optimized for variable names, titles, and short sentences. If you paste an entire 500-page book, the live previews might slow down your browser.",
-          answer: "No hard limit, but this tool is optimized for variable names, titles, and short sentences. If you paste an entire 500-page book, the live previews might slow down your browser."
-        }
-      ]}
-    />
-  </Fragment>
+
 
   <script>
     import { caseConversions } from '../../tools/text-case';

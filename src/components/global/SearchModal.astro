@@ -47,7 +47,7 @@ const toolsJson = JSON.stringify(tools.filter(t => t.status !== 'coming-soon').m
   </div>
 </div>
 
-<script define:vars={{ toolsJson }}>
+<script is:inline define:vars={{ toolsJson }}>
   const tools = JSON.parse(toolsJson);
   
   const searchBackdrop = document.getElementById('searchBackdrop');
@@ -124,7 +124,7 @@ const toolsJson = JSON.stringify(tools.filter(t => t.status !== 'coming-soon').m
     } else {
       noResults.classList.add('hidden');
       
-      matched.forEach((t, i) => {
+      matched.forEach((t) => {
         const a = document.createElement('a');
         a.href = `/${t.slug}`;
         a.className = 'flex flex-col p-3 rounded-lg hover:bg-elevated transition-colors mb-1 focus-glow focus:bg-elevated outline-none group';

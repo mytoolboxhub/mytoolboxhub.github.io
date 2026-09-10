@@ -1,8 +1,5 @@
 ---
 import ToolLayout from '../../layouts/ToolLayout.astro';
-import HowToSection from '../../components/seo/HowToSection.astro';
-import FaqSection from '../../components/seo/FaqSection.astro';
-import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
 import { tools } from '../../lib/tool-registry';
 
 const tool = tools.find(t => t.id === 'sql-formatter')!;
@@ -87,64 +84,7 @@ const tool = tools.find(t => t.id === 'sql-formatter')!;
     </div>
   </div>
 
-  <Fragment slot="content">
-    <HowToSection 
-      title="How to Format SQL Queries"
-      steps={[
-        {
-          name: "Paste Your Query",
-          text: "Paste your raw, messy, or single-line SQL query into the left text area.",
-          description: "Paste your raw, messy, or single-line SQL query into the left text area."
-        },
-        {
-          name: "Configure Options",
-          text: "Select your preferred indentation (Spaces vs Tabs). We highly recommend keeping 'Uppercase Keywords' enabled for standard SQL readability.",
-          description: "Select your preferred indentation (Spaces vs Tabs). We highly recommend keeping 'Uppercase Keywords' enabled for standard SQL readability."
-        },
-        {
-          name: "Format and Copy",
-          text: "Click the 'Format SQL' button. The beautifully indented and colorized query will appear on the right, ready to be copied into your IDE or database client.",
-          description: "Click the 'Format SQL' button. The beautifully indented and colorized query will appear on the right, ready to be copied into your IDE or database client."
-        }
-      ]}
-    />
-    <TechnicalExplainer 
-      title="SQL Formatting Best Practices"
-      sections={[
-        {
-          title: "Capitalization",
-          content: "Standard SQL convention dictates that all reserved keywords (e.g., <code>SELECT</code>, <code>FROM</code>, <code>WHERE</code>, <code>INNER JOIN</code>) should be fully capitalized. Table names and column names should remain lowercase or snake_case. This creates visual separation."
-        },
-        {
-          title: "Indentation Rules",
-          content: "Major clause keywords should align to the left. Sub-clauses (like <code>AND</code> or <code>OR</code> inside a <code>WHERE</code> statement) should be indented one level deeper. Selected columns should be indented below the <code>SELECT</code> keyword."
-        },
-        {
-          title: "Client-Side Processing",
-          content: "Database queries often contain highly sensitive information (like column names, table structures, or inline data values). This formatter runs entirely in your browser using JavaScript, ensuring your schema is never transmitted over the internet."
-        }
-      ]}
-    />
-    <FaqSection 
-      faqs={[
-        {
-          question: "Which SQL dialects are supported?",
-          text: "This formatter uses generic SQL syntax rules, making it compatible with almost all major dialects including PostgreSQL, MySQL, SQL Server (T-SQL), SQLite, and Oracle.",
-          answer: "This formatter uses generic SQL syntax rules, making it compatible with almost all major dialects including PostgreSQL, MySQL, SQL Server (T-SQL), SQLite, and Oracle."
-        },
-        {
-          question: "Does it format nested subqueries?",
-          text: "Yes. Parentheses () used for subqueries or function calls are automatically detected, and their contents are indented one level deeper than the surrounding query.",
-          answer: "Yes. Parentheses <code>()</code> used for subqueries or function calls are automatically detected, and their contents are indented one level deeper than the surrounding query."
-        },
-        {
-          question: "Why did it change my string capitalization?",
-          text: "The 'Uppercase Keywords' option relies on a dictionary of SQL reserved words. If you have a column named 'select', it might be incorrectly capitalized. However, text inside single quotes (string literals) is completely preserved.",
-          answer: "The 'Uppercase Keywords' option relies on a dictionary of SQL reserved words. If you have a column named 'select', it might be incorrectly capitalized. However, text inside single quotes (string literals) is completely preserved."
-        }
-      ]}
-    />
-  </Fragment>
+
 
   <script>
     import { copyToClipboard } from '../../lib/clipboard';
@@ -179,8 +119,9 @@ const tool = tools.find(t => t.id === 'sql-formatter')!;
         addTrailingSemicolon: cbSemi.checked
       };
 
-      const res = formatSql(val, options);
-      outputArea.value = res;
+      const status = document.getElementById('toolStatus')!;
+      try { outputArea.value = formatSql(val, options); status.textContent = ''; }
+      catch (e) { outputArea.value = ''; status.textContent = String(e); }
     }
 
     formatBtn.addEventListener('click', runProcess);

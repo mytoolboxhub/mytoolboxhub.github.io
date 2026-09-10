@@ -254,7 +254,7 @@ const repeatLines: ManipulatorOp = {
     { key: 'mode',  label: 'Mode', type: 'select', default: 'each-line', options: ['each-line', 'whole-block'] },
   ],
   apply(lines, params) {
-    const n = Math.max(1, params.times as number);
+    const n = Math.min(100, Math.max(1, Math.floor(Number(params.times) || 1)));
     const mode = params.mode as string;
     if (mode === 'whole-block') {
       const result: string[] = [];
@@ -289,13 +289,14 @@ export interface PipelineStep {
 }
 
 export function applyPipeline(text: string, steps: PipelineStep[]): string {
-  let lines = text.split('\n');
+  let lines = text.split(/\r?\n/);
   for (const step of steps) {
     const op = allOps.find(o => o.id === step.opId);
     if (!op) continue;
     // fill in any missing params with defaults
     const merged: Record<string, string | number | boolean> = { ...defaultParams(op), ...step.params };
     lines = op.apply(lines, merged);
+    if (lines.length > 100000 || lines.reduce((n, s) => n + s.length, 0) > 2000000) throw new Error('Pipeline output is too large. Reduce the input or repetition count.');
   }
   return lines.join('\n');
 }

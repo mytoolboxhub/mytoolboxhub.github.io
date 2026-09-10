@@ -1,46 +1,26 @@
-# Astro Starter Kit: Basics
+# MyToolboxHub
+
+24 browser-local tools at https://mytoolboxhub.github.io/ with tested examples and three practical walkthroughs.
+
+## Development and validation
+
+Use Node 24 (minimum 22.19), then run:
 
 ```sh
-npm create astro@latest -- --template basics
+npm ci
+npm run check
+npm test
+npm run build
+node scripts/check-site.mjs
+node scripts/test-converter.mjs
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+`npm run dev` starts development; `npm run preview` serves the production build. GitHub Pages publishes pushes to `main` only after source checks, tool tests, build, and generated-page checks pass.
 
-## 🚀 Project Structure
+Tool algorithms live in `src/tools`; page instructions in `src/lib/tool-guides.ts`; walkthroughs in `src/lib/walkthroughs.ts`. Preserve tool URLs when editing the registry.
 
-Inside of your Astro project, you'll see the following folders and files:
+## Advertising setup
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
-```
+`ads.txt` and the account-provided verification meta tag identify publisher `pub-1771884902241881`. The site currently uses verification metadata only, with no ad-serving script or ad placements. The Google European consent message is configured in AdSense. Before activating ad serving, update privacy disclosures, verify consent and withdrawal controls on the live site, and keep ads clear of tool controls.
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+AdSense approval is an external decision. Passing these checks or publishing the website does not establish approval.

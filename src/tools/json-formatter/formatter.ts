@@ -1,4 +1,4 @@
-export function formatJson(input: string, indent: number, sortKeys: boolean): string {
+export function formatJson(input: string, indent: number | string, sortKeys: boolean): string {
   if (!input.trim()) return '';
   const parsed = JSON.parse(input);
   
@@ -11,7 +11,7 @@ export function formatJson(input: string, indent: number, sortKeys: boolean): st
         return obj.map(sortObject);
       }
       const sortedKeys = Object.keys(obj).sort();
-      const result: any = {};
+      const result: any = Object.create(null);
       for (const key of sortedKeys) {
         result[key] = sortObject(obj[key]);
       }

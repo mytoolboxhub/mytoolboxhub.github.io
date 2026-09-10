@@ -1,8 +1,5 @@
 ---
 import ToolLayout from '../../layouts/ToolLayout.astro';
-import HowToSection from '../../components/seo/HowToSection.astro';
-import FaqSection from '../../components/seo/FaqSection.astro';
-import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
 import { tools } from '../../lib/tool-registry';
 
 const tool = tools.find(t => t.id === 'text-diff')!;
@@ -89,69 +86,7 @@ const tool = tools.find(t => t.id === 'text-diff')!;
     </div>
   </div>
 
-  <Fragment slot="content">
-    <HowToSection 
-      title="How to Compare Text Documents"
-      steps={[
-        {
-          name: "Paste Original Text",
-          text: "Copy and paste your original (older) document into the left text area.",
-          description: "Copy and paste your original (older) document into the left text area."
-        },
-        {
-          name: "Paste Modified Text",
-          text: "Copy and paste your modified (newer) document into the right text area.",
-          description: "Copy and paste your modified (newer) document into the right text area."
-        },
-        {
-          name: "Configure Options",
-          text: "Select your preferred comparison mode (Line, Word, or Character) and toggle 'Ignore Whitespace' or 'Ignore Case' if needed.",
-          description: "Select your preferred comparison mode (Line, Word, or Character) and toggle 'Ignore Whitespace' or 'Ignore Case' if needed."
-        },
-        {
-          name: "View Differences",
-          text: "Click 'Compare'. The tool will highlight additions in green, deletions in red, and show unchanged text in default color.",
-          description: "Click 'Compare'. The tool will highlight additions in green, deletions in red, and show unchanged text in default color."
-        }
-      ]}
-    />
-    <TechnicalExplainer 
-      title="Understanding Diff Algorithms"
-      sections={[
-        {
-          title: "Longest Common Subsequence (LCS)",
-          content: "This tool uses a dynamic programming approach based on the Longest Common Subsequence algorithm. It mathematically calculates the longest sequence of lines (or words/characters) that appear in the exact same order in both documents, establishing a baseline of 'unchanged' text."
-        },
-        {
-          title: "Additions vs Deletions",
-          content: "Once the LCS is found, anything in the original document that is NOT in the LCS is marked as a <strong>Deletion</strong> (highlighted red). Anything in the modified document that is NOT in the LCS is marked as an <strong>Addition</strong> (highlighted green)."
-        },
-        {
-          title: "Client-Side Processing",
-          content: "Like all tools on MyToolboxHub, the diff calculation happens entirely in your browser using JavaScript. This means your sensitive documents, source code, or private notes are never sent over the internet to a server."
-        }
-      ]}
-    />
-    <FaqSection 
-      faqs={[
-        {
-          question: "Why does Word or Character mode take longer?",
-          text: "The LCS algorithm's time complexity is O(N*M), where N and M are the number of items being compared. A document might have 1,000 lines, but 10,000 words or 50,000 characters. Comparing larger sets requires significantly more computation.",
-          answer: "The LCS algorithm's time complexity is O(N*M), where N and M are the number of items being compared. A document might have 1,000 lines, but 10,000 words or 50,000 characters. Comparing larger sets requires significantly more computation."
-        },
-        {
-          question: "Can I compare code files?",
-          text: "Yes! Paste your source code into the boxes. The 'Line by Line' mode is identical to how 'git diff' works, making it perfect for reviewing code changes before committing.",
-          answer: "Yes! Paste your source code into the boxes. The 'Line by Line' mode is identical to how <code>git diff</code> works, making it perfect for reviewing code changes before committing."
-        },
-        {
-          question: "What does 'Ignore Whitespace' do?",
-          text: "When checked, the algorithm will ignore changes involving spaces, tabs, or newlines. This is useful when code formatting has changed but the actual content remains identical.",
-          answer: "When checked, the algorithm will ignore changes involving spaces, tabs, or newlines. This is useful when code formatting has changed but the actual content remains identical."
-        }
-      ]}
-    />
-  </Fragment>
+
 
   <style>
     /* Diff specific styles */
@@ -262,7 +197,8 @@ const tool = tools.find(t => t.id === 'text-diff')!;
           diffOutput.classList.remove('hidden');
 
         } catch (e) {
-          alert('Comparison failed or took too long for this document size.');
+          diffOutput.innerHTML = '';
+          document.getElementById('toolStatus')!.textContent = String(e);
         } finally {
           compareBtn.innerHTML = `
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>

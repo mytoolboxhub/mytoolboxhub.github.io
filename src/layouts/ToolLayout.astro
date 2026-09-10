@@ -1,4 +1,6 @@
 ---
+import ToolGuide from '../components/ToolGuide.astro';
+import { guides } from '../lib/tool-guides';
 import BaseLayout from './BaseLayout.astro';
 import Header from '../components/global/Header.astro';
 import Footer from '../components/global/Footer.astro';
@@ -13,7 +15,7 @@ const { tool } = Astro.props;
 const title = `${tool.name} — Free Online Tool | MyToolboxHub`;
 ---
 
-<BaseLayout title={title} description={tool.description}>
+<BaseLayout title={title} description={guides[tool.slug].purpose}>
   <Header />
   
   <div class="flex flex-1 max-w-screen-2xl mx-auto w-full">
@@ -21,7 +23,7 @@ const title = `${tool.name} — Free Online Tool | MyToolboxHub`;
     <Sidebar currentToolId={tool.id} />
     
     <!-- Main Content Area -->
-    <main class="flex-1 px-4 sm:px-6 lg:px-8 py-8 min-w-0 max-w-4xl">
+    <main id="main-content" class="flex-1 px-4 sm:px-6 lg:px-8 py-8 min-w-0 max-w-4xl">
       <!-- Breadcrumbs -->
       <nav class="flex text-text-muted text-sm mb-6" aria-label="Breadcrumb">
         <ol class="inline-flex items-center space-x-2">
@@ -44,17 +46,18 @@ const title = `${tool.name} — Free Online Tool | MyToolboxHub`;
           </span>
           <h1 class="text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">{tool.name}</h1>
         </div>
-        <p class="mt-2 text-lg text-text-secondary">{tool.longDescription}</p>
+        <p class="mt-2 text-lg text-text-secondary">{guides[tool.slug].purpose}</p>
       </div>
 
       <!-- Interactive Tool Area -->
       <div class="mb-16">
+        <p id="toolStatus" role="status" aria-live="polite" class="text-error mb-4"></p>
         <slot />
       </div>
 
       <!-- SEO Content Sections -->
       <div class="prose prose-invert prose-accent max-w-none mt-16 pt-16 border-t border-border-subtle">
-        <slot name="content" />
+        <ToolGuide slug={tool.slug} />
       </div>
       
     </main>

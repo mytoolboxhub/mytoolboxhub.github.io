@@ -46,7 +46,7 @@ export function analyzeText(text: string): TextStats {
   // Keyword density (stop words simplified)
   const stopWords = new Set(['the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'i', 'it', 'for', 'not', 'on', 'with', 'he', 'as', 'you', 'do', 'at', 'this', 'but', 'his', 'by', 'from', 'they', 'we', 'say', 'her', 'she', 'or', 'an', 'will', 'my', 'one', 'all', 'would', 'there', 'their', 'what', 'so', 'up', 'out', 'if', 'about', 'who', 'get', 'which', 'go', 'me']);
   
-  const wordCounts: Record<string, number> = {};
+  const wordCounts: Record<string, number> = Object.create(null);
   for (const word of wordsArray) {
     const cleanWord = word.toLowerCase().replace(/[^a-z0-9]/g, '');
     if (cleanWord.length > 2 && !stopWords.has(cleanWord)) {

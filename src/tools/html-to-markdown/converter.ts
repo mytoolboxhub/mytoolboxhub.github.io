@@ -1,26 +1,31 @@
+import { parseFragment } from 'parse5';
 export function htmlToMarkdown(htmlString: string): string {
   if (!htmlString || !htmlString.trim()) return '';
 
-  // Use the browser's built-in DOM parser
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(htmlString, 'text/html');
-
-  // If there's a body, use that as root, otherwise the whole doc
-  const root = doc.body || doc;
-  
+  // Parse inert text: no images, iframes, scripts, or network requests are loaded.
+  const adapt = (node: any, parent: any = null): any => {
+    const el: any = { nodeType: node.nodeName === '#text' ? 3 : 1, tagName: node.tagName || 'div', parentElement: parent,
+      getAttribute: (key: string) => node.attrs?.find((a: any) => a.name === key)?.value || null };
+    el.className = el.getAttribute('class') || '';
+    el.childNodes = (node.childNodes || []).map((n: any) => adapt(n, el));
+    el.children = el.childNodes.filter((n: any) => n.nodeType === 1);
+    el.textContent = node.value || el.childNodes.map((n: any) => n.textContent).join('');
+    return el;
+  };
+  const root = adapt(parseFragment(htmlString));
   return walkNode(root).trim();
 }
 
 function walkNode(node: Node): string {
-  let md = '';
+
 
   // Text node
-  if (node.nodeType === Node.TEXT_NODE) {
+  if (node.nodeType === 3) {
     return (node.textContent || '').replace(/\s+/g, ' ');
   }
 
   // Element node
-  if (node.nodeType === Node.ELEMENT_NODE) {
+  if (node.nodeType === 1) {
     const el = node as HTMLElement;
     const tag = el.tagName.toLowerCase();
 

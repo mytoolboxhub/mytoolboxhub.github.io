@@ -1,3 +1,4 @@
+import { decodeHTML } from 'entities';
 export interface EscaperOptions {
   mode: 'escape' | 'unescape';
   useFullList: boolean;
@@ -42,17 +43,6 @@ const EXTENDED_ENTITIES: Record<string, string> = {
   ' ': '&nbsp;' // Note: this might be disruptive, usually we don't escape all spaces.
 };
 
-// We create reverse maps for decoding
-const BASIC_REVERSE = Object.entries(BASIC_ENTITIES).reduce((acc, [char, entity]) => {
-  acc[entity] = char;
-  return acc;
-}, {} as Record<string, string>);
-
-const EXTENDED_REVERSE = Object.entries(EXTENDED_ENTITIES).reduce((acc, [char, entity]) => {
-  acc[entity] = char;
-  return acc;
-}, {} as Record<string, string>);
-
 export function processHtmlEntities(input: string, options: EscaperOptions): string {
   if (!input) return '';
 
@@ -72,39 +62,6 @@ export function processHtmlEntities(input: string, options: EscaperOptions): str
     return input.replace(regex, (match) => safeMap[match]);
 
   } else {
-    // UNESCAPE
-    // For unescaping, we just use the browser's built-in DOMParser if available, 
-    // because it handles all 250+ named entities and numeric entities perfectly.
-    // Since this runs in the browser, DOMParser is ideal.
-    
-    // But we need to be careful about executing scripts if the user pastes `<script>alert()</script>`.
-    // DOMParser with 'text/html' does not execute scripts.
-    
-    try {
-      if (typeof DOMParser !== 'undefined') {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(input, 'text/html');
-        return doc.documentElement.textContent || '';
-      } else {
-        // Fallback for SSR/Node context
-        let decoded = input;
-        
-        // 1. Decode named
-        const map = options.useFullList ? EXTENDED_REVERSE : BASIC_REVERSE;
-        for (const [entity, char] of Object.entries(map)) {
-          decoded = decoded.replace(new RegExp(entity, 'g'), char);
-        }
-
-        // 2. Decode numeric (&#38;)
-        decoded = decoded.replace(/&#(\d+);/g, (match, dec) => String.fromCharCode(dec));
-        
-        // 3. Decode hex (&#x26;)
-        decoded = decoded.replace(/&#x([0-9a-f]+);/gi, (match, hex) => String.fromCharCode(parseInt(hex, 16)));
-
-        return decoded;
-      }
-    } catch (e) {
-      return input; // Fallback
-    }
+    return decodeHTML(input);
   }
 }

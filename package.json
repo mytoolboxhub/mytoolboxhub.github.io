@@ -3,20 +3,36 @@
   "type": "module",
   "version": "0.0.1",
   "engines": {
-    "node": ">=22.12.0"
+    "node": ">=22.19.0"
   },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "node scripts/test-tools.mjs",
+    "check": "astro check"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
     "@fontsource-variable/inter": "^5.2.8",
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
     "@tailwindcss/vite": "^4.3.1",
-    "astro": "^6.4.6",
-    "tailwindcss": "^4.3.1"
+    "astro": "^7.3.2",
+    "cron-parser": "^5.10.0",
+    "cronstrue": "^3.25.0",
+    "css-tree": "^3.2.1",
+    "entities": "^8.1.0",
+    "parse5": "^8.0.1",
+    "sql-formatter": "^15.8.2",
+    "tailwindcss": "^4.3.1",
+    "terser": "^5.51.2",
+    "yaml": "^2.9.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@types/css-tree": "^3.2.0",
+    "esbuild": "^0.28.2",
+    "typescript": "^6.0.3"
   }
 }

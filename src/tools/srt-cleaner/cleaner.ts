@@ -46,12 +46,12 @@ export function cleanSrt(input: string, options: SrtCleanOptions): SrtCleanResul
 
   for (const block of blocks) {
     const lines = block.trim().split('\n');
-    if (lines.length >= 3) {
+    if (lines.length >= 2) {
       // Basic validation: 1st line is number, 2nd line is timestamp
       const idxStr = lines[0].trim();
       const timestamp = lines[1].trim();
       
-      if (/^\d+$/.test(idxStr) && timestamp.includes('-->')) {
+      if (/^\d+$/.test(idxStr) && /^\d{2}:\d{2}:\d{2},\d{3}\s+-->\s+\d{2}:\d{2}:\d{2},\d{3}$/.test(timestamp)) {
         const text = lines.slice(2).join('\n');
         cues.push({
           index: parseInt(idxStr, 10),
@@ -128,7 +128,7 @@ export function cleanSrt(input: string, options: SrtCleanOptions): SrtCleanResul
     for (const c of cues) {
       const lines = c.text.split('\n').filter(l => l.length > 0);
       for (const line of lines) {
-        if (line !== lastText) {
+        if (!options.mergeDuplicateLines || line !== lastText) {
           plainText += line + ' ';
           lastText = line;
         }

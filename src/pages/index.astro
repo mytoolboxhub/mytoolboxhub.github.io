@@ -20,6 +20,11 @@ const sortedCategories = Object.keys(categories).sort((a, b) => {
 ---
 
 <HubLayout title="MyToolboxHub — Developer Utility Suite" description="Your premium, blazing-fast developer utility suite. Client-side, secure, and built for performance.">
+  <nav aria-label="Practical guides" class="max-w-screen-xl mx-auto px-4 py-5 flex flex-wrap gap-5 text-sm text-accent">
+    <a class="underline" href="/guides/json-to-spreadsheet/">JSON to spreadsheet workflow</a>
+    <a class="underline" href="/guides/clean-compare-lists/">Clean and compare lists</a>
+    <a class="underline" href="/guides/inspect-jwt/">Inspect JWT claims</a>
+  </nav>
   <!-- Hero Section -->
   <section class="relative min-h-[85vh] flex items-center justify-center overflow-hidden border-b border-border-subtle" id="heroSection">
     
@@ -55,7 +60,7 @@ const sortedCategories = Object.keys(categories).sort((a, b) => {
 
       <!-- Subtitle -->
       <p class="text-lg sm:text-xl text-text-secondary max-w-2xl mx-auto mb-12 animate-fade-in-up leading-relaxed" style="animation-delay: 0.5s;">
-        Blazing fast, privacy-first utilities designed for modern developers.<br class="hidden sm:inline" /> Zero friction. Zero dependencies. Zero data leaves your browser.
+        Blazing fast, privacy-first utilities designed for modern developers.<br class="hidden sm:inline" /> No account required. Tool inputs are processed in your browser.
       </p>
       
       <!-- CTA Row -->

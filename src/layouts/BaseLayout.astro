@@ -1,7 +1,7 @@
 ---
 import '../styles/global.css';
-import '@fontsource-variable/inter';
-import '@fontsource-variable/jetbrains-mono';
+import '@fontsource-variable/inter/index.css';
+import '@fontsource-variable/jetbrains-mono/index.css';
 
 interface Props {
   title: string;
@@ -14,7 +14,7 @@ const {
   title, 
   description, 
   canonical = new URL(Astro.url.pathname, Astro.site || 'https://mytoolboxhub.github.io').href,
-  image = new URL('/og-default.png', Astro.site || 'https://mytoolboxhub.github.io').href
+  image
 } = Astro.props;
 ---
 
@@ -25,6 +25,8 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="google-adsense-account" content="ca-pub-1771884902241881" />
+    <meta name="google-site-verification" content="Mc8if_s5cLX3a5833p-bYiLpNNALDtlIvbaoOxDzq7g" />
     <link rel="canonical" href={canonical} />
     
     <!-- Open Graph -->
@@ -32,7 +34,7 @@ const {
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={image} />
+    {image && <meta property="og:image" content={image} />}
     
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
@@ -41,6 +43,7 @@ const {
     <script defer data-domain="mytoolboxhub.github.io" src="https://plausible.io/js/script.js" is:inline></script>
   </head>
   <body class="bg-void text-text-primary antialiased min-h-screen flex flex-col">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:p-4 focus:bg-surface">Skip to content</a>
     <slot />
   </body>
 </html>

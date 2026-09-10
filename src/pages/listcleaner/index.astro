@@ -1,8 +1,5 @@
 ---
 import ToolLayout from '../../layouts/ToolLayout.astro';
-import HowToSection from '../../components/seo/HowToSection.astro';
-import FaqSection from '../../components/seo/FaqSection.astro';
-import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
 import { tools } from '../../lib/tool-registry';
 
 const tool = tools.find(t => t.id === 'list-cleaner')!;
@@ -130,69 +127,7 @@ const tool = tools.find(t => t.id === 'list-cleaner')!;
     </div>
   </div>
 
-  <Fragment slot="content">
-    <HowToSection 
-      title="How to Clean and Deduplicate Lists"
-      steps={[
-        {
-          name: "Paste Your List",
-          text: "Copy your messy data (like an email list, keyword list, or column from Excel) and paste it into the left text area.",
-          description: "Copy your messy data (like an email list, keyword list, or column from Excel) and paste it into the left text area."
-        },
-        {
-          name: "Select Cleaning Options",
-          text: "By default, the tool will remove duplicate lines, trim invisible whitespace from the edges, and remove blank lines. You can customize this in the top panel.",
-          description: "By default, the tool will remove duplicate lines, trim invisible whitespace from the edges, and remove blank lines. You can customize this in the top panel."
-        },
-        {
-          name: "Choose a Sort Order",
-          text: "Optionally, sort your list alphabetically, by string length, numerically, or even randomize it using the shuffle option.",
-          description: "Optionally, sort your list alphabetically, by string length, numerically, or even randomize it using the shuffle option."
-        },
-        {
-          name: "Process and Export",
-          text: "Click 'Clean List'. The results will instantly appear on the right. You can then copy it back to your clipboard or download it as a text file.",
-          description: "Click <strong>Clean List</strong>. The results will instantly appear on the right. You can then copy it back to your clipboard or download it as a text file."
-        }
-      ]}
-    />
-    <TechnicalExplainer 
-      title="Common List Cleaning Tasks"
-      sections={[
-        {
-          title: "Deduplication (Set Theory)",
-          content: "Removing duplicates manually from a 10,000-line list is impossible. This tool uses a JavaScript <code>Set</code> data structure to guarantee O(n) linear time complexity when finding unique lines, making it instantaneous even for massive lists."
-        },
-        {
-          title: "Whitespace Trimming",
-          content: "A common issue when copying data from PDFs or websites is the inclusion of invisible trailing spaces or tabs. Because <code>'apple '</code> and <code>'apple'</code> are technically different strings, trimming whitespace before deduplicating is critical for accuracy."
-        },
-        {
-          title: "Adding Prefixes / Suffixes",
-          content: "The formatting tools allow you to quickly wrap your list items. For example, if you have a list of filenames, you can easily add <code>https://example.com/</code> as a prefix and <code>.jpg</code> as a suffix to convert them into full URLs."
-        }
-      ]}
-    />
-    <FaqSection 
-      faqs={[
-        {
-          question: "Does 'Case Insensitive' deduplication alter the output?",
-          text: "No. If 'Apple' and 'apple' are in your list, and you choose Case Insensitive, the tool will keep the first one it finds (e.g., 'Apple') and remove the subsequent duplicates, preserving your original capitalization.",
-          answer: "No. If <code>Apple</code> and <code>apple</code> are in your list, and you choose Case Insensitive, the tool will keep the first one it finds (e.g., <code>Apple</code>) and remove the subsequent duplicates, preserving your original capitalization."
-        },
-        {
-          question: "How does Numerical Sorting work?",
-          text: "Numerical sorting attempts to extract the first number found in the line and sorts based on that mathematical value. For example, 'File 2' will be sorted before 'File 10' (whereas Alphabetical sorting would put 10 before 2).",
-          answer: "Numerical sorting attempts to extract the first number found in the line and sorts based on that mathematical value. For example, 'File 2' will be sorted before 'File 10' (whereas Alphabetical sorting would put 10 before 2)."
-        },
-        {
-          question: "Is there a limit to how many lines I can process?",
-          text: "There is no hard limit. The tool runs entirely in your browser's memory. Most modern browsers can easily handle lists of 100,000+ lines in milliseconds. If you paste millions of lines, the browser tab might freeze temporarily.",
-          answer: "There is no hard limit. The tool runs entirely in your browser's memory. Most modern browsers can easily handle lists of 100,000+ lines in milliseconds. If you paste millions of lines, the browser tab might freeze temporarily."
-        }
-      ]}
-    />
-  </Fragment>
+
 
   <script>
     import { copyToClipboard } from '../../lib/clipboard';

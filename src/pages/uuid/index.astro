@@ -1,8 +1,5 @@
 ---
 import ToolLayout from '../../layouts/ToolLayout.astro';
-import HowToSection from '../../components/seo/HowToSection.astro';
-import FaqSection from '../../components/seo/FaqSection.astro';
-import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
 import { tools } from '../../lib/tool-registry';
 
 const tool = tools.find(t => t.id === 'uuid-generator')!;
@@ -81,69 +78,7 @@ const tool = tools.find(t => t.id === 'uuid-generator')!;
     </div>
   </div>
 
-  <Fragment slot="content">
-    <HowToSection 
-      title="How to Generate UUIDs/GUIDs"
-      steps={[
-        {
-          name: "Choose the Quantity",
-          text: "Use the slider or input box to select how many UUIDs you want to generate (up to 1,000 at a time).",
-          description: "Use the slider or input box to select how many UUIDs you want to generate (up to 1,000 at a time)."
-        },
-        {
-          name: "Customize Formatting",
-          text: "Toggle 'Uppercase' if you need the letters capitalized. Toggle 'No Hyphens' if you need a contiguous 32-character hex string without dashes.",
-          description: "Toggle <strong>Uppercase</strong> if you need the letters capitalized. Toggle <strong>No Hyphens</strong> if you need a contiguous 32-character hex string without dashes."
-        },
-        {
-          name: "Generate",
-          text: "Click the Generate button. The UUIDs are created instantly using your browser's secure cryptography API.",
-          description: "Click the <strong>Generate</strong> button. The UUIDs are created instantly using your browser's secure cryptography API."
-        },
-        {
-          name: "Copy or Download",
-          text: "Use the Copy All button to copy the entire list to your clipboard, or Download to save them as a text file.",
-          description: "Use the <strong>Copy All</strong> button to copy the entire list to your clipboard, or <strong>Download</strong> to save them as a text file."
-        }
-      ]}
-    />
-    <TechnicalExplainer 
-      title="Understanding UUIDs (Universally Unique Identifiers)"
-      sections={[
-        {
-          title: "What is a UUID?",
-          content: "A UUID (Universally Unique Identifier), also known as a GUID (Globally Unique Identifier) in the Microsoft ecosystem, is a 128-bit label used for information in computer systems. When generated according to standard methods, UUIDs are for practical purposes unique, without depending on a central registration authority."
-        },
-        {
-          title: "What is a Version 4 UUID?",
-          content: "Version 4 UUIDs are generated using entirely random or pseudo-random numbers. Out of the 128 bits, 6 bits are reserved to indicate the version and variant, leaving 122 bits of randomness. This results in 2<sup>122</sup> (or 5.3 × 10<sup>36</sup>) possible UUIDs. The chances of a collision (generating the exact same UUID twice) are astronomically small."
-        },
-        {
-          title: "Anatomy of a UUID",
-          content: "A standard UUID string contains 32 hexadecimal digits displayed in five groups separated by hyphens, in the form <code>8-4-4-4-12</code> for a total of 36 characters (32 alphanumeric characters and 4 hyphens). Example: <code>123e4567-e89b-12d3-a456-426614174000</code>."
-        }
-      ]}
-    />
-    <FaqSection 
-      faqs={[
-        {
-          question: "Are these UUIDs really unique?",
-          text: "Yes. While theoretically possible to generate a duplicate, the probability is so close to zero that it is safely ignored. To put it in perspective, you would need to generate 1 billion UUIDs every second for 85 years to have a 50% chance of a single collision.",
-          answer: "Yes. While theoretically possible to generate a duplicate, the probability is so close to zero that it is safely ignored. To put it in perspective, you would need to generate 1 billion UUIDs every second for 85 years to have a 50% chance of a single collision."
-        },
-        {
-          question: "How are they generated?",
-          text: "This tool uses the Crypto.randomUUID() method available in modern browsers, which relies on a cryptographically secure pseudorandom number generator (CSPRNG) built into your operating system.",
-          answer: "This tool uses the <code>Crypto.randomUUID()</code> method available in modern browsers, which relies on a cryptographically secure pseudorandom number generator (CSPRNG) built into your operating system."
-        },
-        {
-          question: "Is it safe to use these for database primary keys?",
-          text: "Yes. v4 UUIDs are widely used as database primary keys, especially in distributed systems where auto-incrementing integers are impractical. However, be aware that their randomness can cause fragmentation in some index structures (like B-trees) compared to sequential IDs.",
-          answer: "Yes. v4 UUIDs are widely used as database primary keys, especially in distributed systems where auto-incrementing integers are impractical. However, be aware that their randomness can cause fragmentation in some index structures (like B-trees) compared to sequential IDs."
-        }
-      ]}
-    />
-  </Fragment>
+
 
   <script>
     import { copyToClipboard } from '../../lib/clipboard';

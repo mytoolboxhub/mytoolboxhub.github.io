@@ -1,0 +1,17 @@
+---
+import HubLayout from '../../layouts/HubLayout.astro';
+import { walkthroughs } from '../../lib/walkthroughs';
+export function getStaticPaths() { return walkthroughs.map(guide => ({params:{slug:guide.slug},props:{guide}})); }
+const { guide } = Astro.props;
+---
+<HubLayout title={`${guide.title} — MyToolboxHub`} description={guide.description}>
+  <article class="w-full max-w-3xl mx-auto px-4 sm:px-6 py-12 space-y-8 leading-relaxed text-text-secondary">
+    <a class="text-accent underline" href="/">← All tools</a>
+    <h1 class="text-3xl sm:text-4xl font-bold text-text-primary">{guide.title}</h1>
+    <p>{guide.description}</p>
+    <a class="inline-block rounded-lg bg-accent text-void font-semibold px-5 py-3" href={guide.tool}>Open the tool</a>
+    {guide.sections.map(section => <section class="space-y-4"><h2 class="text-2xl font-bold text-text-primary">{section.heading}</h2><p>{section.text}</p>{section.code && <pre class="bg-surface p-4 rounded-lg text-sm whitespace-pre-wrap break-words">{section.code}</pre>}{section.link && <a href={section.link} class="text-accent underline">Read the protocol specification</a>}</section>)}
+    <nav aria-label="Related tools" class="flex flex-wrap gap-4 text-accent underline"><a href="/jsonformatter/">JSON Formatter</a><a href="/jsontocsv/">JSON to CSV</a><a href="/listcleaner/">List Cleaner</a><a href="/textdiff/">Text Diff</a><a href="/stringmanipulator/">String Manipulator</a><a href="/jwt/">JWT Decoder</a></nav>
+    <p>Found a problem with an example? <a href="/contact/" class="text-accent underline">Send a correction</a>.</p>
+  </article>
+</HubLayout>

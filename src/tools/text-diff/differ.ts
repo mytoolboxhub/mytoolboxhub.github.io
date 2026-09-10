@@ -54,6 +54,7 @@ export function computeDiff(original: string, modified: string, options: DiffOpt
   const newMiddle = newTokens.slice(prefixCount, newTokens.length - suffixCount);
 
   // Compute LCS matrix for the middle part
+  if ((oldMiddle.length + 1) * (newMiddle.length + 1) > 2000000) throw new Error('Comparison is too large. Use line mode or compare smaller excerpts.');
   const matrix: number[][] = Array(oldMiddle.length + 1).fill(null).map(() => Array(newMiddle.length + 1).fill(0));
 
   for (let i = 1; i <= oldMiddle.length; i++) {
@@ -124,7 +125,7 @@ export function computeDiff(original: string, modified: string, options: DiffOpt
   const compacted: DiffLine[] = [];
   for (const item of fullDiff) {
     if (compacted.length > 0 && compacted[compacted.length - 1].type === item.type) {
-      compacted[compacted.length - 1].value += (options.mode === 'char' ? '' : options.mode === 'word' ? ' ' : '\n') + item.value;
+      compacted[compacted.length - 1].value += (options.mode === 'char' || options.mode === 'word' ? '' : '\n') + item.value;
       compacted[compacted.length - 1].count++;
     } else {
       compacted.push({ ...item });

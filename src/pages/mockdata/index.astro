@@ -1,8 +1,5 @@
 ---
 import ToolLayout from '../../layouts/ToolLayout.astro';
-import HowToSection from '../../components/seo/HowToSection.astro';
-import FaqSection from '../../components/seo/FaqSection.astro';
-import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
 import { tools } from '../../lib/tool-registry';
 
 const tool = tools.find(t => t.id === 'mock-data-generator')!;
@@ -97,69 +94,7 @@ const tool = tools.find(t => t.id === 'mock-data-generator')!;
     </div>
   </div>
 
-  <Fragment slot="content">
-    <HowToSection 
-      title="How to Generate Mock Data"
-      steps={[
-        {
-          name: "Define Your Schema",
-          text: "In the left panel, add rows to define the structure of your data. Give each field a name (like 'id' or 'email') and select its data type from the dropdown.",
-          description: "In the left panel, add rows to define the structure of your data. Give each field a name (like <code>id</code> or <code>email</code>) and select its data type from the dropdown."
-        },
-        {
-          name: "Customize Options",
-          text: "For specific types like Integers, Floats, or Custom Lists (oneOf), you can provide additional options like Min/Max ranges or comma-separated lists of values.",
-          description: "For specific types like Integers, Floats, or Custom Lists (oneOf), you can provide additional options like Min/Max ranges or comma-separated lists of values."
-        },
-        {
-          name: "Choose Output Format",
-          text: "Select how many rows you need (up to 1,000) and choose your preferred output format: JSON array, CSV table, or SQL INSERT statements.",
-          description: "Select how many rows you need (up to 1,000) and choose your preferred output format: JSON array, CSV table, or SQL INSERT statements."
-        },
-        {
-          name: "Generate and Export",
-          text: "Click the Generate button to instantly create the data. Use the Copy or Download buttons to export the results.",
-          description: "Click the Generate button to instantly create the data. Use the Copy or Download buttons to export the results."
-        }
-      ]}
-    />
-    <TechnicalExplainer 
-      title="Why Developers Need Mock Data"
-      sections={[
-        {
-          title: "Prototyping UIs",
-          content: "Before a backend API is finished, frontend developers need realistic data to build out UI components, test scrolling performance, and handle edge cases like very long names or missing fields."
-        },
-        {
-          title: "Database Seeding",
-          content: "When setting up a new development environment, an empty database is hard to work with. Generating thousands of rows of SQL INSERT statements allows developers to instantly populate a database to test queries and indexing performance."
-        },
-        {
-          title: "Privacy and Security",
-          content: "You should never use production customer data in a local development or staging environment. Generating fake, realistic data ensures you do not violate GDPR, HIPAA, or other data privacy regulations while testing."
-        }
-      ]}
-    />
-    <FaqSection 
-      faqs={[
-        {
-          question: "Is this data truly random?",
-          text: "The data is generated using your browser's pseudo-random number generator (Math.random()). While mathematically 'pseudo-random', it is perfectly sufficient for testing and prototyping purposes.",
-          answer: "The data is generated using your browser's pseudo-random number generator (<code>Math.random()</code>). While mathematically 'pseudo-random', it is perfectly sufficient for testing and prototyping purposes."
-        },
-        {
-          question: "Can I generate more than 1,000 rows?",
-          text: "Currently, we cap generation at 1,000 rows to ensure your browser remains responsive and doesn't freeze. If you need 10,000 rows, you can run the generator 10 times and append the files.",
-          answer: "Currently, we cap generation at 1,000 rows to ensure your browser remains responsive and doesn't freeze. If you need 10,000 rows, you can run the generator 10 times and append the files."
-        },
-        {
-          question: "What is the 'oneOf' data type?",
-          text: "The 'Custom List (oneOf)' type allows you to specify a comma-separated list of your own values. The generator will randomly pick one of those values for each row. For example, you could enter 'Pending, Active, Suspended' for an account status field.",
-          answer: "The 'Custom List (oneOf)' type allows you to specify a comma-separated list of your own values. The generator will randomly pick one of those values for each row. For example, you could enter <code>Pending, Active, Suspended</code> for an account status field."
-        }
-      ]}
-    />
-  </Fragment>
+
 
   <script>
     import { copyToClipboard } from '../../lib/clipboard';
@@ -174,7 +109,7 @@ const tool = tools.find(t => t.id === 'mock-data-generator')!;
     const outFormatSelect = document.getElementById('outFormat') as HTMLSelectElement;
     const tableNameWrapper = document.getElementById('tableNameWrapper')!;
     const tableNameInput = document.getElementById('tableName') as HTMLInputElement;
-    const generateBtn = document.getElementById('generateBtn')!;
+    const generateBtn = document.getElementById('generateBtn') as HTMLButtonElement;
     const outputArea = document.getElementById('outputArea') as HTMLTextAreaElement;
     
     const copyBtn = document.getElementById('copyBtn')!;
@@ -310,8 +245,9 @@ const tool = tools.find(t => t.id === 'mock-data-generator')!;
 
       // Small delay to allow UI refresh
       setTimeout(() => {
-        const result = generateMockData(schema, count, format, tableName);
-        outputArea.value = result;
+        const status = document.getElementById('toolStatus')!;
+        try { outputArea.value = generateMockData(schema, count, format, tableName); status.textContent = ''; }
+        catch (e) { outputArea.value = ''; status.textContent = String(e); }
         
         generateBtn.disabled = false;
         generateBtn.classList.remove('opacity-50');

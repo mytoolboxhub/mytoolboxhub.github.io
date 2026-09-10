@@ -19,7 +19,14 @@ export function detectSchema(data: unknown, flatten: boolean = true): string[] {
     }
 
     // Object
+    if (prefix && Object.keys(obj).length === 0) {
+      keys.add(prefix);
+      return;
+    }
     for (const [key, value] of Object.entries(obj)) {
+      if (flatten && (key.includes('.') || key === '')) {
+        throw new Error('Flattening requires non-empty keys without dots. Turn off Flatten Objects to preserve these keys.');
+      }
       const newPrefix = prefix ? `${prefix}.${key}` : key;
       if (flatten && value !== null && typeof value === 'object' && !Array.isArray(value)) {
         traverse(value, newPrefix);

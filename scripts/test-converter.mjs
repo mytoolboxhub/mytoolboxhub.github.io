@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict';
+import { build } from 'esbuild';
+import { readFileSync } from 'node:fs';
+
+const bundled = await build({entryPoints:['src/tools/json-to-csv/converter.ts'], bundle:true, write:false, platform:'node', format:'esm'});
+const { convertJsonToCsv: convert } = await import('data:text/javascript;base64,' + Buffer.from(bundled.outputFiles[0].text).toString('base64'));
+const options = {delimiter:',', includeHeaders:true, flattenObjects:true};
+assert.equal(convert([{name:'Alice', address:{city:'Madrid'}, tags:['a','b']},{name:'Bob',extra:2}], options), 'name,address.city,tags,extra\r\nAlice,Madrid,"[""a"",""b""]",\r\nBob,,,2');
+assert.equal(convert([{a:'x,y',b:'a"b',c:'line\nbreak'}], options), 'a,b,c\r\n"x,y","a""b","line\nbreak"');
+assert.equal(convert([{a:1,b:2}], {...options,delimiter:'\t'}), 'a\tb\r\n1\t2');
+assert.equal(convert([{a:1,b:null}], {...options,includeHeaders:false}), '1,');
+assert.equal(convert([{a:{}}], options), 'a\r\n{}');
+assert.equal(convert([], options), '');
+assert.throws(()=>convert([1,2], options), /array of objects/);
+assert.throws(()=>convert([{ 'a.b':1,a:{b:2}}], options), /Turn off Flatten Objects/);
+assert.equal(convert([{'a.b':1}], {...options,flattenObjects:false}), 'a.b\r\n1');
+const html = readFileSync('dist/jsontocsv/index.html','utf8');
+assert.match(html, /value="\t"/);
+assert.ok(!html.includes('interactive grid'));
+assert.ok(!readFileSync('dist/contact/index.html','utf8').includes('Message Sent Successfully'));
+assert.ok(readFileSync('dist/contact/index.html','utf8').includes('mailto:profitplannercraft@gmail.com'));
+console.log('Passed 9 conversion cases and 4 built-page checks.');

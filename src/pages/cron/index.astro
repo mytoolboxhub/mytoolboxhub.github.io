@@ -1,8 +1,5 @@
 ---
 import ToolLayout from '../../layouts/ToolLayout.astro';
-import HowToSection from '../../components/seo/HowToSection.astro';
-import FaqSection from '../../components/seo/FaqSection.astro';
-import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
 import { tools } from '../../lib/tool-registry';
 
 const tool = tools.find(t => t.id === 'cron-explainer')!;
@@ -29,7 +26,7 @@ const tool = tools.find(t => t.id === 'cron-explainer')!;
           spellcheck="false"
         />
         
-        <div id="errorBanner" class="absolute -bottom-8 left-0 w-full text-center text-error text-xs font-bold hidden animate-fade-in-down">
+        <div id="errorBanner" role="alert" class="absolute -bottom-8 left-0 w-full text-center text-error text-xs font-bold hidden animate-fade-in-down">
           Invalid Cron Expression
         </div>
       </div>
@@ -69,64 +66,7 @@ const tool = tools.find(t => t.id === 'cron-explainer')!;
     </div>
   </div>
 
-  <Fragment slot="content">
-    <HowToSection 
-      title="How to Understand Cron Expressions"
-      steps={[
-        {
-          name: "Enter an Expression",
-          text: "Type a standard 5-field cron expression into the large input box, or click one of the quick preset buttons below it.",
-          description: "Type a standard 5-field cron expression into the large input box, or click one of the quick preset buttons below it."
-        },
-        {
-          name: "Read the Translation",
-          text: "The tool will instantly translate the cryptic asterisks and numbers into a plain English sentence.",
-          description: "The tool will instantly translate the cryptic asterisks and numbers into a plain English sentence."
-        },
-        {
-          name: "Verify with Next Runs",
-          text: "Check the 'Next Scheduled Runs' panel to see exactly when the job will trigger in real-world time based on your local timezone.",
-          description: "Check the 'Next Scheduled Runs' panel to see exactly when the job will trigger in real-world time based on your local timezone."
-        }
-      ]}
-    />
-    <TechnicalExplainer 
-      title="The 5 Fields of Cron"
-      sections={[
-        {
-          title: "Format: MIN HOUR DOM MON DOW",
-          content: "A standard cron expression consists of five fields separated by spaces: Minute (0-59), Hour (0-23), Day of Month (1-31), Month (1-12), and Day of Week (0-6, where 0 is Sunday)."
-        },
-        {
-          title: "Special Characters",
-          content: "<ul><li><code>*</code> (Asterisk) means 'every'.</li><li><code>,</code> (Comma) separates items in a list (e.g., <code>1,3,5</code>).</li><li><code>-</code> (Hyphen) defines a range (e.g., <code>1-5</code>).</li><li><code>/</code> (Slash) defines a step value (e.g., <code>*/5</code> means every 5).</li></ul>"
-        },
-        {
-          title: "Execution Environment",
-          content: "Remember that this tool displays the 'Next Scheduled Runs' using your browser's local timezone. When you deploy a cron job to a Linux server, the execution time will depend on the server's timezone (which is usually UTC)."
-        }
-      ]}
-    />
-    <FaqSection 
-      faqs={[
-        {
-          question: "Can I use 6 fields for seconds?",
-          text: "Standard Linux cron daemon only supports 5 fields (down to the minute). While some specific schedulers (like AWS EventBridge or Spring Boot) support a 6th field for seconds, this tool currently focuses on the universal 5-field standard.",
-          answer: "Standard Linux cron daemon only supports 5 fields (down to the minute). While some specific schedulers (like AWS EventBridge or Spring Boot) support a 6th field for seconds, this tool currently focuses on the universal 5-field standard."
-        },
-        {
-          question: "Does it support text aliases like 'MON' or 'JAN'?",
-          text: "Yes! You can use three-letter abbreviations for months (JAN, FEB, etc.) and days of the week (SUN, MON, etc.) instead of numbers.",
-          answer: "Yes! You can use three-letter abbreviations for months (JAN, FEB, etc.) and days of the week (SUN, MON, etc.) instead of numbers."
-        },
-        {
-          question: "Why is the next run blank?",
-          text: "If you enter a mathematically impossible date (like February 30th), the scheduler will never trigger, and the next runs list will remain empty.",
-          answer: "If you enter a mathematically impossible date (like February 30th), the scheduler will never trigger, and the next runs list will remain empty."
-        }
-      ]}
-    />
-  </Fragment>
+
 
   <script>
     import { explainCron } from '../../tools/cron-explainer';

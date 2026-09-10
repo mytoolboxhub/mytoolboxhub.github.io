@@ -1,8 +1,5 @@
 ---
 import ToolLayout from '../../layouts/ToolLayout.astro';
-import HowToSection from '../../components/seo/HowToSection.astro';
-import FaqSection from '../../components/seo/FaqSection.astro';
-import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
 import { tools } from '../../lib/tool-registry';
 
 const tool = tools.find(t => t.id === 'word-counter')!;
@@ -89,69 +86,7 @@ const tool = tools.find(t => t.id === 'word-counter')!;
     </div>
   </div>
 
-  <Fragment slot="content">
-    <HowToSection 
-      title="How to Use the Word Counter"
-      steps={[
-        {
-          name: "Type or Paste Text",
-          text: "Simply type or paste your text into the large text area. The tool will automatically calculate metrics as you type.",
-          description: "Simply type or paste your text into the large text area. The tool will automatically calculate metrics as you type."
-        },
-        {
-          name: "View Basic Metrics",
-          text: "Look at the top row to instantly see the total word count, character count, sentences, and paragraphs.",
-          description: "Look at the top row to instantly see the total <strong>word count</strong>, <strong>character count</strong>, sentences, and paragraphs."
-        },
-        {
-          name: "Analyze Reading Time",
-          text: "Check the right sidebar to see the estimated reading time, calculated based on an average reading speed of 200 words per minute.",
-          description: "Check the right sidebar to see the estimated reading time, calculated based on an average reading speed of 200 words per minute."
-        },
-        {
-          name: "Review Keyword Density",
-          text: "The bottom right panel shows your top 10 most used keywords (excluding common stop words like 'the' or 'and'). This is highly useful for SEO optimization.",
-          description: "The bottom right panel shows your top 10 most used keywords (excluding common stop words like 'the' or 'and'). This is highly useful for SEO optimization."
-        }
-      ]}
-    />
-    <TechnicalExplainer 
-      title="How Text Metrics Are Calculated"
-      sections={[
-        {
-          title: "Word Counting Logic",
-          content: "Words are calculated by splitting the text by any whitespace character (spaces, tabs, newlines). This means hyphenated words (e.g., 'state-of-the-art') are counted as a single word, which aligns with standard typographical rules."
-        },
-        {
-          title: "Sentences and Paragraphs",
-          content: "Sentences are identified by looking for terminal punctuation marks: periods, exclamation points, and question marks (<code>.!?</code>). Paragraphs are simply counted by looking for line breaks (<code>\\n</code>) in the text."
-        },
-        {
-          title: "Keyword Density and Stop Words",
-          content: "To provide meaningful keyword density analysis, this tool automatically filters out common English 'stop words' (e.g., <em>the, is, at, which, on</em>). The remaining words are converted to lowercase and stripped of punctuation before being tallied, ensuring 'Apple' and 'apple,' count as the same word."
-        }
-      ]}
-    />
-    <FaqSection 
-      faqs={[
-        {
-          question: "Is my text saved or sent to a server?",
-          text: "No. The word counter is completely strictly client-side. Your text is never sent over the internet or saved anywhere.",
-          answer: "No. The word counter is completely strictly client-side. Your text is never sent over the internet or saved anywhere."
-        },
-        {
-          question: "What is the difference between characters with and without spaces?",
-          text: "The standard 'Characters' count includes every space, tab, and line break. If you need a count strictly of letters, numbers, and symbols, this is often required for specific ad platforms or strict social media limits.",
-          answer: "The standard 'Characters' count includes every space, tab, and line break. If you need a count strictly of letters, numbers, and symbols, this is often required for specific ad platforms or strict social media limits."
-        },
-        {
-          question: "How accurate is the reading time estimation?",
-          text: "The reading time is an estimate based on the widely accepted average adult reading speed of 200 to 250 words per minute. Technical or complex texts may take longer to read.",
-          answer: "The reading time is an estimate based on the widely accepted average adult reading speed of 200 to 250 words per minute. Technical or complex texts may take longer to read."
-        }
-      ]}
-    />
-  </Fragment>
+
 
   <script>
     import { copyToClipboard } from '../../lib/clipboard';

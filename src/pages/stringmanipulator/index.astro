@@ -1,8 +1,5 @@
 ---
 import ToolLayout from '../../layouts/ToolLayout.astro';
-import HowToSection from '../../components/seo/HowToSection.astro';
-import FaqSection from '../../components/seo/FaqSection.astro';
-import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
 import { tools } from '../../lib/tool-registry';
 
 const tool = tools.find(t => t.id === 'string-manipulator')!;
@@ -89,81 +86,14 @@ const tool = tools.find(t => t.id === 'string-manipulator')!;
   </div>
 
   <!-- ── SEO Content ──────────────────────────────────────────────────────── -->
-  <Fragment slot="content">
-    <HowToSection
-      title="How to Use the String Manipulator"
-      steps={[
-        {
-          name: "Paste Your Text",
-          text: "Type or paste any block of text into the left Input panel. It can be a column of values, a list of items, or any multi-line string.",
-          description: "Type or paste any block of text into the left Input panel. It can be a column of values, a list of items, or any multi-line string."
-        },
-        {
-          name: "Enable Operations",
-          text: "In the center Operations panel, toggle one or more transformations. Each operation has its own parameter controls that appear when enabled.",
-          description: "In the center Operations panel, toggle one or more transformations. Each operation has its own parameter controls that appear when enabled."
-        },
-        {
-          name: "Chain Transformations (Pipeline)",
-          text: "Operations are applied in order from top to bottom, forming a pipeline. For example: enable 'Trim Lines' first, then 'Remove Empty Lines', then 'Join Lines' with a comma separator.",
-          description: "Operations are applied in order from top to bottom, forming a pipeline. For example: enable 'Trim Lines' first, then 'Remove Empty Lines', then 'Join Lines' with a comma separator."
-        },
-        {
-          name: "Copy or Download the Result",
-          text: "The output updates live. Click Copy to grab the result to your clipboard, or Download to save it as a .txt file.",
-          description: "The output updates live. Click Copy to grab the result to your clipboard, or Download to save it as a .txt file."
-        }
-      ]}
-    />
-    <TechnicalExplainer
-      title="What Each Operation Does"
-      sections={[
-        {
-          title: "Join Lines",
-          content: "Collapses all lines into a single line, joined by a separator you choose. Ideal for converting a spreadsheet column into a comma-separated list for use in SQL <code>IN (...)</code> clauses or similar."
-        },
-        {
-          title: "Prefix / Suffix",
-          content: "Adds arbitrary text before and/or after every line. A common use case: wrap each line in double quotes and add a trailing comma to create a JSON-ready string array."
-        },
-        {
-          title: "Find & Replace",
-          content: "Performs a global search-and-replace across all lines. Supports both plain text and full JavaScript regular expressions with flags, making it more powerful than a simple text editor's find & replace."
-        },
-        {
-          title: "Wrap Each Line",
-          content: "A specialized version of prefix/suffix that lets you choose from quick presets (single quotes, double quotes, brackets, parentheses, etc.) for wrapping each line."
-        },
-        {
-          title: "Filter Lines",
-          content: "Keeps only lines that match (or don't match) a keyword or regex pattern. The invert toggle turns it into an exclusion filter, equivalent to <code>grep -v</code> in Unix."
-        }
-      ]}
-    />
-    <FaqSection
-      faqs={[
-        {
-          question: "Are operations applied in order?",
-          text: "Yes. Operations run as a pipeline from top to bottom. The output of one operation feeds directly into the next. Enable them in the order that makes sense for your task.",
-          answer: "Yes. Operations run as a pipeline from top to bottom. The output of one operation feeds directly into the next. Enable them in the order that makes sense for your task."
-        },
-        {
-          question: "Can I use regex in Find & Replace and Filter Lines?",
-          text: "Yes. Toggle 'Use regex' on each of those operations to enable full JavaScript regular expression support, including named groups, lookaheads, and flags.",
-          answer: "Yes. Toggle 'Use regex' on each of those operations to enable full JavaScript regular expression support, including named groups, lookaheads, and flags."
-        },
-        {
-          question: "Does any data leave my browser?",
-          text: "No. All processing happens entirely in your browser using JavaScript. No text is ever sent to a server.",
-          answer: "No. All processing happens entirely in your browser using JavaScript. No text is ever sent to a server."
-        }
-      ]}
-    />
-  </Fragment>
+
 
   <script>
-    import { allOps, applyPipeline } from '../../tools/string-manipulator';
-    import { copyToClipboard } from '../../lib/clipboard';
+    import { allOps } from '../../tools/string-manipulator';
+    import { createTaskRunner } from '../../lib/worker-task';
+    const runTask = createTaskRunner();
+    let requestId = 0;
+
     import { downloadFile } from '../../lib/download';
 
     // ── State ──────────────────────────────────────────────────────────────
@@ -366,7 +296,8 @@ const tool = tools.find(t => t.id === 'string-manipulator')!;
     }
 
     // ── Run pipeline ───────────────────────────────────────────────────────
-    function run() {
+    async function run() {
+      const id = ++requestId;
       const text = inputArea.value;
       const lines = text.split('\n');
 
@@ -377,7 +308,12 @@ const tool = tools.find(t => t.id === 'string-manipulator')!;
         .filter(op => state.get(op.id)!.enabled)
         .map(op => ({ opId: op.id, params: { ...state.get(op.id)!.params } }));
 
-      const result = applyPipeline(text, steps);
+      const status = document.getElementById('toolStatus')!;
+      let result: string;
+      try { result = await runTask('pipeline', [text, steps]); }
+      catch (e) { if (id === requestId) { outputArea.value = ''; status.textContent = String(e); } return; }
+      if (id !== requestId) return;
+      status.textContent = '';
       outputArea.value = result;
 
       const outLines = result ? result.split('\n').length : 0;
@@ -397,6 +333,7 @@ const tool = tools.find(t => t.id === 'string-manipulator')!;
     inputArea.addEventListener('input', run);
 
     clearBtn.addEventListener('click', () => {
+      ++requestId;
       inputArea.value = '';
       outputArea.value = '';
       statInputLines.textContent = '0';

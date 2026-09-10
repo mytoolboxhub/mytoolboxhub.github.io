@@ -1,8 +1,5 @@
 ---
 import ToolLayout from '../../layouts/ToolLayout.astro';
-import HowToSection from '../../components/seo/HowToSection.astro';
-import FaqSection from '../../components/seo/FaqSection.astro';
-import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
 import { tools } from '../../lib/tool-registry';
 
 const tool = tools.find(t => t.id === 'html-to-markdown')!;
@@ -52,64 +49,7 @@ const tool = tools.find(t => t.id === 'html-to-markdown')!;
     </div>
   </div>
 
-  <Fragment slot="content">
-    <HowToSection 
-      title="How to Convert HTML to Markdown"
-      steps={[
-        {
-          name: "Paste Your HTML",
-          text: "Copy raw HTML from your editor or the source code of a webpage, and paste it into the left panel.",
-          description: "Copy raw HTML from your editor or the source code of a webpage, and paste it into the left panel."
-        },
-        {
-          name: "Live Conversion",
-          text: "The tool uses your browser's internal parser to instantly convert the HTML tags into their Markdown equivalents.",
-          description: "The tool uses your browser's internal parser to instantly convert the HTML tags into their Markdown equivalents."
-        },
-        {
-          name: "Copy or Download",
-          text: "Use the Copy button to copy the resulting Markdown, or download it directly as a .md file.",
-          description: "Use the Copy button to copy the resulting Markdown, or download it directly as a <code>.md</code> file."
-        }
-      ]}
-    />
-    <TechnicalExplainer 
-      title="Why Convert HTML to Markdown?"
-      sections={[
-        {
-          title: "Simplicity and Readability",
-          content: "Markdown was created by John Gruber in 2004 to be a plain-text formatting syntax that is easy to read and write. Unlike HTML, which is cluttered with opening and closing tags, Markdown uses minimal punctuation characters (like <code>#</code> for headers and <code>*</code> for emphasis) to format text."
-        },
-        {
-          title: "Platform Compatibility",
-          content: "Markdown has become the standard for developer documentation. It is the default format for GitHub READMEs, Notion pages, Discord messages, and Static Site Generators (like Astro, Hugo, or Next.js)."
-        },
-        {
-          title: "How the Parser Works",
-          content: "This tool leverages the <code>DOMParser</code> API built directly into your web browser. Instead of using complex regular expressions (which often fail on malformed HTML), it builds an actual Document Object Model tree, traverses it recursively, and maps supported HTML elements (h1-h6, p, ul, ol, a, img, etc.) to standard Markdown syntax."
-        }
-      ]}
-    />
-    <FaqSection 
-      faqs={[
-        {
-          question: "Are inline styles and classes preserved?",
-          text: "No. Markdown is strictly a structural format. It does not support custom CSS classes or inline styles. Elements like <span style='color: red'> will be converted to plain text.",
-          answer: "No. Markdown is strictly a structural format. It does not support custom CSS classes or inline styles. Elements like <code>&lt;span style='color: red'&gt;</code> will be converted to plain text."
-        },
-        {
-          question: "What happens to complex layouts like tables or grids?",
-          text: "Standard Markdown has very limited support for complex layouts. While basic tables are supported by GitHub Flavored Markdown (GFM), nested grids or complex divs will generally be stripped of their structure and output as block text.",
-          answer: "Standard Markdown has very limited support for complex layouts. While basic tables are supported by GitHub Flavored Markdown (GFM), nested grids or complex divs will generally be stripped of their structure and output as block text."
-        },
-        {
-          question: "Does it support script and style tags?",
-          text: "No. The converter automatically ignores all <script>, <style>, and <noscript> tags so their raw code doesn't pollute your markdown document.",
-          answer: "No. The converter automatically ignores all <code>&lt;script&gt;</code>, <code>&lt;style&gt;</code>, and <code>&lt;noscript&gt;</code> tags so their raw code doesn't pollute your markdown document."
-        }
-      ]}
-    />
-  </Fragment>
+
 
   <script>
     import { copyToClipboard } from '../../lib/clipboard';

@@ -104,7 +104,7 @@ export function parseColor(input: string): ColorResult {
     }
   }
 
-  if (!isValid) {
+  if (!isValid || ![r, g, b, a].every(Number.isFinite)) {
     return { hex: '', rgb: '', hsl: '', argb: '', rgba: '', isValid: false, r: 0, g: 0, b: 0, a: 1 };
   }
 

@@ -1,8 +1,5 @@
 ---
 import ToolLayout from '../../layouts/ToolLayout.astro';
-import HowToSection from '../../components/seo/HowToSection.astro';
-import FaqSection from '../../components/seo/FaqSection.astro';
-import TechnicalExplainer from '../../components/seo/TechnicalExplainer.astro';
 import { tools } from '../../lib/tool-registry';
 
 const tool = tools.find(t => t.id === 'code-minifier')!;
@@ -116,69 +113,7 @@ const tool = tools.find(t => t.id === 'code-minifier')!;
     </div>
   </div>
 
-  <Fragment slot="content">
-    <HowToSection 
-      title="How to Minify Your Code"
-      steps={[
-        {
-          name: "Select the Language",
-          text: "Ensure the correct language (CSS, JavaScript, or JSON) is selected in the dropdown menu so the minifier applies the right rules.",
-          description: "Ensure the correct language (CSS, JavaScript, or JSON) is selected in the dropdown menu so the minifier applies the right rules."
-        },
-        {
-          name: "Upload or Paste",
-          text: "Click 'Upload File' to load a file directly from your computer, or paste your raw source code into the left editor.",
-          description: "Click 'Upload File' to load a file directly from your computer, or paste your raw source code into the left editor."
-        },
-        {
-          name: "Review Options",
-          text: "For CSS, you can opt to shorten hex colors (like converting #ffffff to #fff). Generally, it is safe to leave all default checkboxes checked.",
-          description: "For CSS, you can opt to shorten hex colors (like converting <code>#ffffff</code> to <code>#fff</code>). Generally, it is safe to leave all default checkboxes checked."
-        },
-        {
-          name: "Minify and Download",
-          text: "Click 'Minify Code'. Review the stats bar to see how much file size you saved, then click Download to save the new .min version of your file.",
-          description: "Click 'Minify Code'. Review the stats bar to see how much file size you saved, then click Download to save the new <code>.min</code> version of your file."
-        }
-      ]}
-    />
-    <TechnicalExplainer 
-      title="How Minification Works"
-      sections={[
-        {
-          title: "Stripping Whitespace",
-          content: "The majority of code size comes from spaces, tabs, and newlines inserted solely for human readability. Compilers and browsers ignore this whitespace. Minification strips it out, putting your entire script onto a single line."
-        },
-        {
-          title: "Comment Removal",
-          content: "Comments (<code>/* ... */</code> or <code>// ...</code>) are essential for developers but useless for the browser rendering the page. Removing them can reduce file size by up to 20% in heavily documented codebases."
-        },
-        {
-          title: "CSS-Specific Optimizations",
-          content: "This tool applies CSS-specific tricks to save bytes: it removes units from zero values (<code>margin: 0px</code> becomes <code>margin: 0</code>), strips leading zeros from decimals (<code>0.5</code> becomes <code>.5</code>), and removes trailing semicolons from the last rule in a block."
-        }
-      ]}
-    />
-    <FaqSection 
-      faqs={[
-        {
-          question: "Is this minifier safe for production JavaScript?",
-          text: "This is a lightweight, regex-based minifier. While perfect for small scripts, JSON data, and CSS files, for massive production-scale JavaScript applications (like React bundles), we recommend using a dedicated build tool like Terser or ESBuild which perform AST-level mangling.",
-          answer: "This is a lightweight, regex-based minifier. While perfect for small scripts, JSON data, and CSS files, for massive production-scale JavaScript applications (like React bundles), we recommend using a dedicated build tool like <em>Terser</em> or <em>ESBuild</em> which perform AST-level mangling."
-        },
-        {
-          question: "Does it rename my variables?",
-          text: "No. This tool only performs whitespace, comment, and structural compression. It does not perform 'mangling' (renaming long variable names like 'userAccountList' to 'a'), ensuring your code behaves exactly as originally written.",
-          answer: "No. This tool only performs whitespace, comment, and structural compression. It does not perform 'mangling' (renaming long variable names like <code>userAccountList</code> to <code>a</code>), ensuring your code behaves exactly as originally written."
-        },
-        {
-          question: "Can it un-minify (beautify) code?",
-          text: "No. Minification is generally a one-way process. Because comments and semantic whitespace are deleted, they cannot be perfectly reconstructed. To format code, use a dedicated code formatter.",
-          answer: "No. Minification is generally a one-way process. Because comments and semantic whitespace are deleted, they cannot be perfectly reconstructed. To format code, use a dedicated code formatter."
-        }
-      ]}
-    />
-  </Fragment>
+
 
   <script>
     import { copyToClipboard } from '../../lib/clipboard';
@@ -223,6 +158,8 @@ const tool = tools.find(t => t.id === 'code-minifier')!;
     });
 
     function runProcess() {
+      const status = document.getElementById('toolStatus')!;
+      status.textContent = '';
       const val = inputArea.value;
       if (!val) {
         outputArea.value = '';
@@ -239,7 +176,9 @@ const tool = tools.find(t => t.id === 'code-minifier')!;
       const res = minifyCode(val, options);
 
       if (res.error) {
-        alert(res.error);
+        outputArea.value = '';
+        statsBar.classList.add('hidden');
+        status.textContent = res.error;
         return;
       }
 
